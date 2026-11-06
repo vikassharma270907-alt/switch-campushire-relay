@@ -1,0 +1,13 @@
+laya-repo/
+.agents/
+.git/
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+graphify-out/
+scripts/ralph/archive/
+campushire-relay/.git_origin/
+campushire-relay/.venv/
