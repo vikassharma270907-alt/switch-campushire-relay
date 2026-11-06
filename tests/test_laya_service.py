@@ -43,8 +43,9 @@ class TestLayaDecisionEngine(unittest.TestCase):
         """Verify double-checked locking under concurrent multi-threaded access."""
         mock_router_instance = MagicMock()
         mock_router_cls = MagicMock(return_value=mock_router_instance)
+        mock_torch = MagicMock()
 
-        with patch("laya.Router", mock_router_cls):
+        with patch.dict("sys.modules", {"torch": mock_torch}), patch("laya.Router", mock_router_cls):
             engine = LayaDecisionEngine()
 
             def worker():
@@ -180,7 +181,7 @@ class TestLayaDecisionEngine(unittest.TestCase):
 
     def test_init_router_failure_raises_runtime_error(self):
         """Verify that failure in Router instantiation raises RuntimeError."""
-        with patch("laya.Router", side_effect=Exception("Out of Memory")):
+        with patch.dict("sys.modules", {"torch": MagicMock()}), patch("laya.Router", side_effect=Exception("Out of Memory")):
             engine = LayaDecisionEngine()
             with self.assertRaises(RuntimeError) as ctx:
                 engine._init_router()

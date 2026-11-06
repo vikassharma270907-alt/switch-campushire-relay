@@ -1,12 +1,16 @@
 """Main test runner for switch wemakedev hackathon project."""
 
-import os
 import sys
 import unittest
 
 if __name__ == "__main__":
-    loader = unittest.TestLoader()
-    suite = loader.discover(start_dir="tests", pattern="test_*.py")
-    runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(suite)
-    sys.exit(0 if result.wasSuccessful() else 1)
+    try:
+        import pytest
+        code = pytest.main(["tests/", "-v", "--tb=short"])
+        sys.exit(code)
+    except ImportError:
+        loader = unittest.TestLoader()
+        suite = loader.discover(start_dir="tests", pattern="test_*.py")
+        runner = unittest.TextTestRunner(verbosity=2)
+        result = runner.run(suite)
+        sys.exit(0 if result.wasSuccessful() else 1)
