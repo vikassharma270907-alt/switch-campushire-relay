@@ -1,6 +1,7 @@
 # Sub-repositories
 laya-repo/
 strix/
+external_500_ai_projects/
 .agents/
 **/.git_origin/
 

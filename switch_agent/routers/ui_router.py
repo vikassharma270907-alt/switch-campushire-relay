@@ -218,21 +218,34 @@ async def search_brand_logo(query: str = Query(..., min_length=1, description="B
     }
 
 
+@router.get("/search")
 @router.post("/search")
-async def search_ui_components(req: ComponentSearchRequest) -> Dict[str, Any]:
-    """Searches 21st.dev catalog for components matching the given query."""
-    q = req.query.strip().lower()
-    
+async def search_ui_components(
+    req: Optional[ComponentSearchRequest] = None,
+    q: Optional[str] = Query(None, description="Query string for GET requests")
+) -> Dict[str, Any]:
+    """Searches 21st.dev catalog for components matching the given query (supports GET and POST)."""
+    search_query = ""
+    item_type = "component"
+    limit = 10
+
+    if req:
+        search_query = req.query.strip().lower()
+        item_type = req.item_type or "component"
+        limit = req.limit or 10
+    elif q:
+        search_query = q.strip().lower()
+
     # Filter curated catalog first
-    matched = [c for c in CURATED_CATALOG if q in c["name"].lower() or q in c["category"] or q in c["description"].lower()]
+    matched = [c for c in CURATED_CATALOG if search_query in c["name"].lower() or search_query in c["category"] or search_query in c["description"].lower()]
     
     # If empty, return all matching or fallback suggestions
-    results = matched if matched else CURATED_CATALOG[:req.limit]
+    results = matched if matched else CURATED_CATALOG[:limit]
 
     return {
         "status": "success",
-        "query": req.query,
-        "type": req.item_type,
+        "query": search_query or "all",
+        "type": item_type,
         "count": len(results),
         "components": results
     }
