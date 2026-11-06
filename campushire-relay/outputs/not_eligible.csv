@@ -1,0 +1,5 @@
+student_id,branch,cgpa,active_backlogs,graduation_year,status,reason
+STU003,ME,8.2,0,2027,NOT_ELIGIBLE,Branch not eligible (ME not in CSE/IT)
+STU004,CSE,6.8,0,2027,NOT_ELIGIBLE,CGPA below minimum (6.80 < 7.00)
+STU005,ECE,7.9,1,2027,NOT_ELIGIBLE,Branch not eligible (ECE not in CSE/IT)
+STU007,IT,8.4,0,2026,NOT_ELIGIBLE,Graduation year mismatch (2026 != 2027)

@@ -1,0 +1,9 @@
+{
+  "students_csv_sha256": "5508f7aa6fb03130a2c1fbc69e6aeaaad7cf2eb138d772961a9d2b131d7e68c5",
+  "criteria_json_sha256": "82647df707ab784312e7b6844219477b7007baeb47e57cf974bb81a153a10f7d",
+  "results_csv_sha256": "4a9debe425ba232e9291ccc09be05f80fef3d40ee9a9690fad8465bdb5600d82",
+  "total_records": 7,
+  "eligible_count": 2,
+  "not_eligible_count": 4,
+  "needs_review_count": 1
+}

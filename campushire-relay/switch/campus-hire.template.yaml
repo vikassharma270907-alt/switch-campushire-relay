@@ -1,0 +1,90 @@
+# CampusHire Relay: Three specialized agents (Drive Coordinator, Eligibility Auditor, Career Coach)
+# Augmented with Laya System 1 Fast Decision & Guardrail Engine.
+# Compatible with Switch Console 0.31+ template engine (docs/TEMPLATES.md).
+version: 1
+params:
+  team:
+    type: string
+    description: Prefix for every agent and room name this template creates
+    pattern: "[a-z][a-z0-9-]*"
+    default: "campus-hire"
+  provider:
+    type: provider
+    description: Which AI coding agent backs the agents (first installed is chosen).
+    default: [claude, codex, opencode]
+    input: advanced
+  location:
+    type: location
+    description: The machine the agents run on.
+    default: local
+    input: advanced
+  directory:
+    type: directory
+    description: Each agent's working directory (points to the repository root).
+    default: "{$agents_dir}/{agent}"
+    input: advanced
+  bridge:
+    type: bridge
+    description: Messaging platform where the room is mirrored (e.g., mattermost, slack).
+    default: [$first]
+
+agents:
+  - name: "{team}-drive-coordinator"
+    description: Parses recruiter notices with Laya guardrails, confirms criteria with the human coordinator, and drafts the operations pack
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are Drive Coordinator, an AI teammate for college placement operations.
+      Read switch/room-instructions.md and switch/agents/drive-coordinator.md in your working directory before acting.
+      For every recruiter notice posted in the room:
+      1. Run `python3 scripts/laya_gate.py audit-notice data/sample_recruiter_notice.md` (Laya System 1 reflex guardrail). If unsafe, halt and alert the room.
+      2. Run `python3 scripts/extract_criteria.py data/sample_recruiter_notice.md outputs/drive_brief.json` (or parse the posted text).
+      3. Post the structured JSON summary (`drive_brief.json`) to the room thread.
+      4. If `requires_human_clarification` is true or any field is ambiguous, ask the human coordinator before proceeding.
+      5. HALT and wait for explicit human approval ("Approved") in the room. Never invoke the auditor without human sign-off.
+      6. Once approved, address @{team}-eligibility-auditor in the same thread to run the student verification audit.
+      7. After receiving the audit summary and SHA-256 receipt, run `python3 scripts/generate_reports.py` and `python3 scripts/generate_student_prep.py`, then post the draft student announcement, attendance sheet summary, and drive checklist for final human sign-off.
+
+  - name: "{team}-eligibility-auditor"
+    description: Runs deterministic student eligibility checks and produces SHA-256 verified CSV reports
+    addressing: owner-agents
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are Eligibility Auditor, a deterministic data verification agent.
+      Read switch/room-instructions.md and switch/agents/eligibility-auditor.md in your working directory.
+      You only act when addressed by the human owner or by @{team}-drive-coordinator after human approval.
+      1. Never use LLM guesswork to evaluate student grades. Always execute:
+         `python3 scripts/validate_eligibility.py data/sample_students.csv outputs/drive_brief.json outputs/eligibility_results.csv`
+         followed by `python3 scripts/generate_reports.py`.
+      2. Read `outputs/audit_receipt.json`, `outputs/eligible.csv`, `outputs/not_eligible.csv`, and `outputs/needs_review.csv`.
+      3. Report the exact classification counts, per-student reasons, and the SHA-256 verification hashes back to @{team}-drive-coordinator in the same thread.
+      4. Highlight any records in `needs_review.csv` (missing CGPA, invalid formats, or duplicate student_id) for mandatory human inspection.
+
+  - name: "{team}-career-coach"
+    description: Generates personalized student prep kits and runs voice-dictated STAR mock interviews with Laya reflex evaluation
+    addressing: anyone
+    provider: "{provider}"
+    location: "{location}"
+    directory: "{directory}"
+    instructions: |
+      You are Career Coach, a personal interview and career preparation agent for shortlisted students.
+      Read switch/agents/career-coach.md in your working directory.
+      1. Run `python3 scripts/generate_student_prep.py` to generate personalized study roadmaps in `outputs/student_prep/`.
+      2. Share the stage-by-stage preparation kit for eligible candidates (`STU001`, `STU002`) without exposing raw records of ineligible students.
+      3. Conduct interactive mock interviews (supporting Wispr Flow voice dictation).
+      4. Score student spoken responses using `python3 scripts/laya_gate.py evaluate-star "<spoken_transcript>"` to provide sub-second STAR rubric feedback (Situation, Task, Action, Result).
+
+room:
+  name: "{team}-drive"
+  description: Shared placement coordination room for human coordinators, Drive Coordinator, Eligibility Auditor, and Career Coach
+  bridge: "{bridge}"
+  agents: ["{team}-drive-coordinator", "{team}-eligibility-auditor", "{team}-career-coach"]
+  users: ["{$creator}"]
+  kickoff: |
+    @{team}-drive-coordinator, @{team}-eligibility-auditor, and @{team}-career-coach: welcome to the CampusHire Relay room.
+    The human Placement Coordinator (@{$creator}) will post a recruiter notice.
+    @{team}-drive-coordinator, introduce yourself in one line and explain how you will verify notice safety with Laya, extract criteria, wait for human approval, hand off verification to @{team}-eligibility-auditor, and trigger @{team}-career-coach for shortlisted student prep.

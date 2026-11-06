@@ -1,0 +1,2 @@
+student_id,branch,cgpa,active_backlogs,graduation_year,status,reason
+STU006,CSE,,0,2027,NEEDS_REVIEW,CGPA missing

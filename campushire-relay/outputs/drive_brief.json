@@ -1,0 +1,20 @@
+{
+  "company": "Northstar Technologies",
+  "role": "Graduate Engineer Trainee",
+  "graduation_year": 2027,
+  "eligible_branches": [
+    "CSE",
+    "IT"
+  ],
+  "minimum_cgpa": 7.0,
+  "active_backlogs_allowed": 0,
+  "selection_stages": [
+    "Online Test",
+    "Technical Interview",
+    "HR Interview"
+  ],
+  "application_deadline": "December 1, 2026",
+  "portal_registration_deadline": "Nov 28, 2026",
+  "missing_or_ambiguous_fields": [],
+  "requires_human_clarification": false
+}

@@ -1,0 +1,3 @@
+student_id,branch,cgpa,active_backlogs,graduation_year,status,reason
+STU001,CSE,8.1,0,2027,ELIGIBLE,Meets all criteria
+STU002,IT,7.5,0,2027,ELIGIBLE,Meets all criteria

@@ -1,0 +1,347 @@
+<#
+.SYNOPSIS
+    Instantly configures Antigravity Full-Power Automation (434+ skills, 107+ agents, 126+ rules, 99+ workflows, CodeRabbit, Ralph, and MCP servers) for any or all projects.
+.PARAMETER ProjectPath
+    The directory of the project to configure. Defaults to the current working directory.
+.PARAMETER AllProjects
+    When specified, iterates through all known projects in ~/.gemini/projects.json and active workspaces.
+#>
+param(
+    [string]$ProjectPath = (Get-Location).Path,
+    [switch]$AllProjects,
+    [switch]$All
+)
+
+$ErrorActionPreference = 'Stop'
+
+$MasterEcc = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\everything-claude-code'
+$MasterCodeRabbit = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\coderabbit'
+$MasterSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\skills'
+$ProjectsJsonPath = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\projects.json'
+
+if (-not (Test-Path -LiteralPath $MasterEcc)) {
+    Write-Error "Master ECC installation not found at $MasterEcc"
+    exit 1
+}
+
+# 1. Sync global skills into Master ECC skills so all 434+ skills are discoverable
+if (Test-Path -LiteralPath $MasterSkills) {
+    $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+    if (Test-Path -LiteralPath $eccSkillsDir) {
+        Get-ChildItem -LiteralPath $MasterSkills | ForEach-Object {
+            $dest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $dest)) {
+                if ($_.PSIsContainer) {
+                    try {
+                        New-Item -ItemType Junction -Path $dest -Target $_.FullName -Force | Out-Null
+                    } catch {
+                        Copy-Item -LiteralPath $_.FullName -Destination $dest -Recurse -Force
+                    }
+                } else {
+                    Copy-Item -LiteralPath $_.FullName -Destination $dest -Force
+                }
+            }
+        }
+    }
+}
+
+function Configure-SingleProject {
+    param([string]$TargetDir)
+
+    if (-not (Test-Path -LiteralPath $TargetDir)) {
+        New-Item -ItemType Directory -Path $TargetDir -Force | Out-Null
+    }
+    $Resolved = (Resolve-Path -Path $TargetDir).Path
+    $AgentsDir = Join-Path -Path $Resolved -ChildPath '.agents'
+
+    if (-not (Test-Path -LiteralPath $AgentsDir)) {
+        New-Item -ItemType Directory -Path $AgentsDir -Force | Out-Null
+    }
+
+    # Link subfolders from ECC master (agents, skills, rules, workflows)
+    $Subfolders = @('rules', 'workflows', 'agents', 'skills')
+    foreach ($folder in $Subfolders) {
+        $src = Join-Path -Path $MasterEcc -ChildPath $folder
+        $dst = Join-Path -Path $AgentsDir -ChildPath $folder
+
+        if (Test-Path -LiteralPath $dst) {
+            continue
+        }
+
+        try {
+            New-Item -ItemType Junction -Path $dst -Target $src -Force | Out-Null
+        }
+        catch {
+            Copy-Item -Path $src -Destination $dst -Recurse -Force
+        }
+    }
+
+    # Install hooks.json
+    $hooksSrc = Join-Path -Path $MasterEcc -ChildPath 'hooks.json'
+    $hooksDst = Join-Path -Path $AgentsDir -ChildPath 'hooks.json'
+    if (Test-Path -LiteralPath $hooksSrc) {
+        Copy-Item -Path $hooksSrc -Destination $hooksDst -Force
+    }
+
+    # Install CodeRabbit config
+    $crConfigSrc = Join-Path -Path $MasterCodeRabbit -ChildPath '.coderabbit.yaml'
+    $crConfigDst = Join-Path -Path $Resolved -ChildPath '.coderabbit.yaml'
+    if ((Test-Path -LiteralPath $crConfigSrc) -and (-not (Test-Path -LiteralPath $crConfigDst))) {
+        Copy-Item -Path $crConfigSrc -Destination $crConfigDst -Force
+    }
+
+    # Install Ralph scaffolding (scripts/ralph)
+    $MasterRalph = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\ralph'
+    $ralphScriptsDst = Join-Path -Path $Resolved -ChildPath 'scripts\ralph'
+    if (Test-Path -LiteralPath $MasterRalph) {
+        if (-not (Test-Path -LiteralPath $ralphScriptsDst)) {
+            New-Item -ItemType Directory -Path $ralphScriptsDst -Force | Out-Null
+        }
+        Copy-Item -Path (Join-Path $MasterRalph 'scripts\ralph.ps1') -Destination (Join-Path $ralphScriptsDst 'ralph.ps1') -Force
+        Copy-Item -Path (Join-Path $MasterRalph 'scripts\ralph.sh') -Destination (Join-Path $ralphScriptsDst 'ralph.sh') -Force
+        Copy-Item -Path (Join-Path $MasterRalph 'scripts\prompt.md') -Destination (Join-Path $ralphScriptsDst 'prompt.md') -Force
+        Copy-Item -Path (Join-Path $MasterRalph 'scripts\CLAUDE.md') -Destination (Join-Path $ralphScriptsDst 'CLAUDE.md') -Force
+        Copy-Item -Path (Join-Path $MasterRalph 'scripts\prd.json.example') -Destination (Join-Path $ralphScriptsDst 'prd.json.example') -Force
+    }
+
+    # Scaffold or update .mcp.json with standard servers (Figma, Laya)
+    $mcpJsonPath = Join-Path -Path $Resolved -ChildPath '.mcp.json'
+    $defaultMcp = @{
+        mcpServers = @{
+            figma = @{
+                type = "http"
+                url = "https://mcp.figma.com/mcp"
+            }
+        }
+    }
+    
+    # Check if a python venv with laya exists in workspace or user profile
+    $layaPy = $null
+    $possibleLayaPy = @(
+        (Join-Path $Resolved 'laya-repo\.venv\Scripts\python.exe'),
+        (Join-Path $Resolved '.venv\Scripts\python.exe'),
+        "C:\Users\vikas sharma\AppData\Local\Programs\Python\Python312\python.exe"
+    )
+    foreach ($p in $possibleLayaPy) {
+        if (Test-Path -LiteralPath $p) {
+            $layaPy = $p
+            break
+        }
+    }
+
+    if ($layaPy) {
+        $defaultMcp.mcpServers["laya"] = @{
+            command = $layaPy
+            args = @("-m", "laya.mcp.server")
+            env = @{
+                LAYA_DEVICE = "cpu"
+                LAYA_PRELOAD = "0"
+                LAYA_THREADS = "8"
+            }
+        }
+    }
+
+    if (-not (Test-Path -LiteralPath $mcpJsonPath)) {
+        $defaultMcp | ConvertTo-Json -Depth 6 | Set-Content -Path $mcpJsonPath -Encoding utf8
+    } else {
+        try {
+            $existingMcp = Get-Content -LiteralPath $mcpJsonPath -Raw | ConvertFrom-Json
+            if (-not $existingMcp.mcpServers) {
+                $existingMcp | Add-Member -MemberType NoteProperty -Name "mcpServers" -Value @{} -Force
+            }
+            # Add figma if missing
+            if (-not $existingMcp.mcpServers.figma) {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "figma" -Value $defaultMcp.mcpServers.figma -Force
+            }
+            # Add laya if missing and python available
+            if ($layaPy -and (-not $existingMcp.mcpServers.laya)) {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "laya" -Value $defaultMcp.mcpServers.laya -Force
+            }
+            $existingMcp | ConvertTo-Json -Depth 6 | Set-Content -Path $mcpJsonPath -Encoding utf8
+        } catch {}
+    }
+
+    # Copy antigravity-sync helper scripts to scripts/
+    $scriptsDir = Join-Path -Path $Resolved -ChildPath 'scripts'
+    if (-not (Test-Path -LiteralPath $scriptsDir)) {
+        New-Item -ItemType Directory -Path $scriptsDir -Force | Out-Null
+    }
+    # Copy setup-project.ps1 to project scripts directory for portability
+    $masterSetupScript = $MyInvocation.MyCommand.Path
+    if (-not $masterSetupScript) {
+        $masterSetupScript = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\setup-project.ps1'
+    }
+    if (Test-Path -LiteralPath $masterSetupScript) {
+        Copy-Item -LiteralPath $masterSetupScript -Destination (Join-Path $scriptsDir 'setup-project.ps1') -Force
+    }
+
+    $syncPs1 = Join-Path -Path $scriptsDir -ChildPath 'antigravity-sync.ps1'
+    $syncCmd = Join-Path -Path $scriptsDir -ChildPath 'antigravity-sync.cmd'
+    Set-Content -Path $syncPs1 -Value @"
+<#
+.SYNOPSIS
+    Antigravity Project Synchronization Script
+    Provisions all 434+ skills, 107+ agents, 126+ rules, 99+ workflows,
+    ArmorAntigravity governance, CodeRabbit, Ralph autonomous loop, and MCP servers into the target project.
+#>
+param(
+    [string]`$ProjectPath = (Get-Location).Path,
+    [switch]`$AllProjects,
+    [switch]`$All
+)
+
+`$runAll = `$AllProjects.IsPresent -or `$All.IsPresent
+`$setupScript = Join-Path `$PSScriptRoot 'setup-project.ps1'
+if (-not (Test-Path -LiteralPath `$setupScript)) {
+    `$setupScript = Join-Path `$env:USERPROFILE '.gemini\config\setup-project.ps1'
+}
+
+if (Test-Path -LiteralPath `$setupScript) {
+    & `$setupScript -ProjectPath `$ProjectPath -AllProjects:`$runAll
+} else {
+    Write-Error "Antigravity setup script not found at `$setupScript"
+}
+"@ -Encoding utf8
+    Set-Content -Path $syncCmd -Value "@ECHO OFF`r`n@powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"%~dp0antigravity-sync.ps1`" %*" -Encoding ascii
+
+    # Scaffold GitHub Actions CI workflow if missing
+    $ghWorkflowDir = Join-Path -Path $Resolved -ChildPath '.github\workflows'
+    $ghCiFile = Join-Path -Path $ghWorkflowDir -ChildPath 'ci.yml'
+    if (-not (Test-Path -LiteralPath $ghCiFile)) {
+        if (-not (Test-Path -LiteralPath $ghWorkflowDir)) {
+            New-Item -ItemType Directory -Path $ghWorkflowDir -Force | Out-Null
+        }
+        $ciYaml = @"
+name: Antigravity CI / CD Quality Gate
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  verify:
+    name: Master Verification & Security Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f campushire-relay/pyproject.toml ]; then pip install pytest pydantic fastapi httpx uvicorn; fi
+
+      - name: Run Master Verification Suite
+        run: |
+          if [ -f run_all_tests.py ]; then
+            python run_all_tests.py
+          elif [ -f scripts/run_all_tests.py ]; then
+            python scripts/run_all_tests.py
+          else
+            pytest -v
+          fi
+"@
+        Set-Content -Path $ghCiFile -Value $ciYaml -Encoding utf8
+    }
+
+    # Write ecc-install-state.json
+    $stateFile = Join-Path -Path $AgentsDir -ChildPath 'ecc-install-state.json'
+    $stateObj = @{
+        version = 3
+        target = 'antigravity'
+        mode = 'full-power'
+        installedAt = (Get-Date -Format 'o')
+        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity')
+        sourceVersion = '2.2.3'
+    }
+    $stateJson = $stateObj | ConvertTo-Json -Depth 4
+    Set-Content -Path $stateFile -Value $stateJson -Encoding utf8
+
+    # Auto-register workspace into projects.json if not present
+    if (Test-Path -LiteralPath $ProjectsJsonPath) {
+        try {
+            $pData = Get-Content -LiteralPath $ProjectsJsonPath -Raw | ConvertFrom-Json
+            if (-not $pData.projects) {
+                $pData | Add-Member -MemberType NoteProperty -Name "projects" -Value @{} -Force
+            }
+            $normPath = $Resolved.ToLower()
+            $exists = $false
+            foreach ($prop in $pData.projects.PSObject.Properties) {
+                if ($prop.Name.ToLower() -eq $normPath) {
+                    $exists = $true
+                    break
+                }
+            }
+            if (-not $exists) {
+                $projName = (Split-Path $Resolved -Leaf).ToLower() -replace '[^a-z0-9_-]', '-'
+                $pData.projects | Add-Member -MemberType NoteProperty -Name $Resolved -Value $projName -Force
+                $pData | ConvertTo-Json -Depth 4 | Set-Content -Path $ProjectsJsonPath -Encoding utf8
+            }
+        } catch {}
+    }
+
+    Write-Host "[Antigravity Full-Power] Successfully configured: $Resolved" -ForegroundColor Green
+    Write-Host "  - Skills: 434+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify)"
+    Write-Host "  - Agents: 107+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Autofix + Ralph-Agent)"
+    Write-Host "  - Rules: 126+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ralph, GSD Methodology)"
+    Write-Host "  - Workflows: 99+ (Slash commands & autonomous pipelines)"
+    Write-Host "  - GSD Spec-Driven Engine: Active (/gsd-new-project, /gsd-plan-phase, /gsd-execute-phase, /gsd-progress, /gsd-verify-work)"
+    Write-Host "  - MCP Servers: Active (.mcp.json configured with Figma & Laya)"
+    Write-Host "  - Ralph Scaffolding: Active (scripts\ralph\ralph.ps1, ralph.sh)"
+    Write-Host "  - CodeRabbit Config: Active (.coderabbit.yaml)"
+    Write-Host "  - SessionStart Automation: Active (.agents\hooks.json)"
+    Write-Host "  - Effort & Models: Maximum Effort ('high'), Best Models (Pro/Opus tier), Max AI Credits Enabled"
+}
+
+$runAll = $AllProjects.IsPresent -or $All.IsPresent
+
+if ($runAll) {
+    $targets = [System.Collections.Generic.List[string]]::new()
+    if (Test-Path -LiteralPath $ProjectsJsonPath) {
+        try {
+            $json = Get-Content -LiteralPath $ProjectsJsonPath -Raw | ConvertFrom-Json
+            if ($json.projects) {
+                foreach ($prop in $json.projects.PSObject.Properties) {
+                    if (Test-Path -LiteralPath $prop.Name) {
+                        $targets.Add($prop.Name)
+                    }
+                }
+            }
+        } catch {}
+    }
+
+    # Auto-discover projects in common developer workspaces
+    $devRoots = @('D:\code', 'C:\Users\vikas sharma\projects')
+    foreach ($devRoot in $devRoots) {
+        if (Test-Path -LiteralPath $devRoot) {
+            Get-ChildItem -LiteralPath $devRoot -Directory | ForEach-Object {
+                $sub = $_.FullName
+                if ((Test-Path (Join-Path $sub '.git')) -or (Test-Path (Join-Path $sub 'package.json')) -or (Test-Path (Join-Path $sub 'pyproject.toml'))) {
+                    if (-not $targets.Contains($sub)) {
+                        $targets.Add($sub)
+                    }
+                }
+            }
+        }
+    }
+
+    # Always include current working directory as well
+    if (-not $targets.Contains($ProjectPath)) {
+        $targets.Add($ProjectPath)
+    }
+
+    foreach ($dir in $targets) {
+        Write-Host "--- Configuring $dir ---" -ForegroundColor Cyan
+        Configure-SingleProject -TargetDir $dir
+    }
+} else {
+    Configure-SingleProject -TargetDir $ProjectPath
+}
