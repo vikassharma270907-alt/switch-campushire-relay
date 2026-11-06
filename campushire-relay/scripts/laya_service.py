@@ -111,8 +111,30 @@ class LayaDecisionEngine:
     ) -> Dict[str, Any]:
         """Audit input text for prompt injections, system overrides, or jailbreaks."""
         t0 = time.perf_counter()
-        router = self._init_router()
 
+        # 1. Zero-latency heuristic reflex defense for known adversarial patterns
+        lower_text = text.lower()
+        adversarial_patterns = [
+            r"ignore\s+(all\s+)?(previous\s+)?instructions",
+            r"disregard\s+(all\s+)?rules",
+            r"bypass\s+approval",
+            r"set\s+cgpa\s+(cutoff\s+)?to\s+0",
+            r"system\s*:\s*you\s+are",
+            r"give\s+all\s+students\s+10",
+        ]
+        for pat in adversarial_patterns:
+            if re.search(pat, lower_text):
+                latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+                return {
+                    "safe": False,
+                    "risk_score": 0.95,
+                    "flags": ["prompt_injection"],
+                    "engine": "laya-rule-reflex",
+                    "latency_ms": latency_ms,
+                }
+
+        # 2. Neural Laya classification for advanced semantic probing
+        router = self._init_router()
         if router is not None and self._laya_module is not None:
             try:
                 questions = self._laya_module.guard_questions()
@@ -128,10 +150,10 @@ class LayaDecisionEngine:
                     ans_type = ans.get("type")
                     if ans_type == "noul":
                         prob = float(ans.get("noul", 0.0))
-                        if prob >= risk_threshold:
-                            triggered_flags.append(key)
                         if key in ("jailbreak", "prompt_injection"):
                             max_risk = max(max_risk, prob)
+                            if prob >= risk_threshold:
+                                triggered_flags.append(key)
                     elif ans_type == "choice":
                         if ans.get("choice") in ("unsafe", "violation", "attack"):
                             triggered_flags.append(key)
@@ -148,30 +170,11 @@ class LayaDecisionEngine:
             except Exception:
                 pass  # Fall through to fallback engine
 
-        # High-precision heuristic fallback when running in lightweight environments
         latency_ms = round((time.perf_counter() - t0) * 1000, 2)
-        lower_text = text.lower()
-        adversarial_patterns = [
-            r"ignore\s+(all\s+)?(previous\s+)?instructions",
-            r"disregard\s+(all\s+)?rules",
-            r"bypass\s+approval",
-            r"set\s+cgpa\s+(cutoff\s+)?to\s+0",
-            r"system\s*:\s*you\s+are",
-            r"give\s+all\s+students\s+10",
-        ]
-
-        flags = []
-        for pat in adversarial_patterns:
-            if re.search(pat, lower_text):
-                flags.append("prompt_injection")
-                break
-
-        is_safe = len(flags) == 0
-        risk_score = 0.95 if not is_safe else 0.02
         return {
-            "safe": is_safe,
-            "risk_score": risk_score,
-            "flags": flags,
+            "safe": True,
+            "risk_score": 0.02,
+            "flags": [],
             "engine": "laya-rule-reflex",
             "latency_ms": latency_ms,
         }

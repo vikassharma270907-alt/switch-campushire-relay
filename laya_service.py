@@ -10,6 +10,7 @@ Provides high-speed, local 'System 1' reflex decision making:
 from __future__ import annotations
 
 import os
+import re
 import sys
 import threading
 import time
@@ -101,13 +102,36 @@ class LayaDecisionEngine:
         Returns:
             Dict containing 'safe': bool, 'risk_score': float, 'flags': list, and 'latency_ms': float.
         """
+        t0 = time.perf_counter()
+
+        # 1. Zero-latency heuristic reflex defense for known adversarial patterns
+        lower_text = text.lower()
+        adversarial_patterns = [
+            r"ignore\s+(all\s+)?(previous\s+)?instructions",
+            r"disregard\s+(all\s+)?rules",
+            r"bypass\s+approval",
+            r"set\s+cgpa\s+(cutoff\s+)?to\s+0",
+            r"system\s*:\s*you\s+are",
+            r"give\s+all\s+students\s+10",
+        ]
+        for pat in adversarial_patterns:
+            if re.search(pat, lower_text):
+                latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+                return {
+                    "safe": False,
+                    "risk_score": 0.95,
+                    "flags": ["prompt_injection"],
+                    "engine": "laya-rule-reflex",
+                    "latency_ms": latency_ms,
+                }
+
+        # 2. Neural Laya classification for semantic probing
         router = self._init_router()
         laya_mod = self._laya_module
 
         questions = laya_mod.guard_questions()
         state = self._build_state(text)
 
-        t0 = time.perf_counter()
         res = router.predict(state, questions, model=self.default_model)
         latency_ms = round((time.perf_counter() - t0) * 1000, 2)
 
@@ -120,10 +144,10 @@ class LayaDecisionEngine:
             # In Laya, binary questions return type 'noul' with float probability in [0.0, 1.0]
             if ans_type == "noul":
                 prob = float(ans.get("noul", 0.0))
-                if prob >= risk_threshold:
-                    triggered_flags.append(key)
                 if key in ("jailbreak", "prompt_injection"):
                     max_risk = max(max_risk, prob)
+                    if prob >= risk_threshold:
+                        triggered_flags.append(key)
             elif ans_type == "choice":
                 if ans.get("choice") in ("unsafe", "violation", "attack"):
                     triggered_flags.append(key)
@@ -191,6 +215,47 @@ class LayaDecisionEngine:
         res = router.predict(state, questions, model=self.default_model)
         res["latency_ms"] = round((time.perf_counter() - t0) * 1000, 2)
         return res
+
+    def evaluate_star_response(self, spoken_text: str, target_role: str = "") -> Dict[str, Any]:
+        """Evaluate spoken interview response against STAR rubric (Situation, Task, Action, Result)."""
+        import re
+        t0 = time.perf_counter()
+        normalized = spoken_text.strip()
+        lower = normalized.lower()
+
+        has_situation = bool(re.search(r"\b(during|when|internship|project|faced|situation|context|problem|challenge|company|team)\b", lower))
+        has_task = bool(re.search(r"\b(task|goal|objective|responsible|assigned|needed to|had to|aim|role was)\b", lower))
+        has_action = bool(re.search(r"\b(implemented|built|developed|optimized|designed|created|wrote|action|refactored|configured|migrated)\b", lower))
+        has_result = bool(re.search(r"\b(result|reduced|increased|improved|achieved|percent|%|outcome|latency|zero dropouts|delivered|saved)\b", lower))
+
+        dimensions = {
+            "situation": has_situation,
+            "task": has_task,
+            "action": has_action,
+            "result": has_result,
+        }
+
+        true_count = sum(1 for v in dimensions.values() if v)
+        star_score = round((true_count / 4.0) * 10.0, 1)
+
+        recommendations = []
+        if not has_situation:
+            recommendations.append("Include a clear Situation dimension to set up the context.")
+        if not has_task:
+            recommendations.append("Include a clear Task dimension defining your explicit objective.")
+        if not has_action:
+            recommendations.append("Include a clear Action dimension detailing technical steps you took.")
+        if not has_result:
+            recommendations.append("Include a clear Result dimension detailing measurable impact (metrics, %, performance).")
+
+        latency_ms = round((time.perf_counter() - t0) * 1000, 2)
+        return {
+            "star_score": star_score,
+            "dimensions": dimensions,
+            "recommendations": recommendations,
+            "word_count": len(normalized.split()),
+            "latency_ms": max(latency_ms, 0.5),
+        }
 
     def unload(self) -> None:
         """Free memory by unloading resident neural weights from RAM."""

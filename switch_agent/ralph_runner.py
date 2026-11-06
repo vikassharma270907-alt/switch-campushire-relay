@@ -11,7 +11,7 @@ import sys
 import subprocess
 import tempfile
 import time
-from typing import Dict, Any, List, Generator
+from typing import Dict, Any, List, Generator, Union
 from dataclasses import dataclass
 
 @dataclass
@@ -91,6 +91,11 @@ class RalphCollaborativeRunner:
             pass
 
         return prd
+
+    def execute_iteration(self, story: Union[str, Dict[str, Any]]) -> Generator[RalphIterationEvent, None, bool]:
+        """Runs an iteration for a story specified as either an ID string or story dict."""
+        story_id = story.get("id", "US-001") if isinstance(story, dict) else str(story)
+        return self.execute_story_iteration(story_id)
 
     def execute_story_iteration(self, story_id: str) -> Generator[RalphIterationEvent, None, bool]:
         """Runs or simulates an atomic Ralph story iteration and streams events."""

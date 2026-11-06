@@ -38,8 +38,8 @@ class LayaDecisionGate:
     ]
 
     INJECTION_PATTERNS = [
-        re.compile(r"(ignore\s+(previous|all)\s+instructions|system\s+prompt|reveal\s+secret)", re.IGNORECASE),
-        re.compile(r"(you\s+are\s+now\s+dan|developer\s+mode\s+enabled|jailbreak)", re.IGNORECASE),
+        re.compile(r"(ignore\s+(?:all\s+|any\s+)?(?:previous\s+)?instructions|system\s+prompt|reveal\s+secret)", re.IGNORECASE),
+        re.compile(r"(you\s+are\s+now\s+dan|developer\s+mode\s+enabled|jailbreak|disregard\s+(?:all\s+|previous\s+)?instructions)", re.IGNORECASE),
     ]
 
     def __init__(self, confidence_threshold: float = 0.75):
