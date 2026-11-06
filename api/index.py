@@ -13,6 +13,10 @@ CAMPUSHIRE_ROOT = os.path.join(PROJECT_ROOT, "campushire-relay")
 if os.path.exists(CAMPUSHIRE_ROOT) and CAMPUSHIRE_ROOT not in sys.path:
     sys.path.insert(0, CAMPUSHIRE_ROOT)
 
+SCRIPTS_ROOT = os.path.join(CAMPUSHIRE_ROOT, "scripts")
+if os.path.exists(SCRIPTS_ROOT) and SCRIPTS_ROOT not in sys.path:
+    sys.path.insert(0, SCRIPTS_ROOT)
+
 from switch_agent.server import app
 
 # Mount the CampusHire Relay application under /campushire
