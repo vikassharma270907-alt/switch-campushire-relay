@@ -1,0 +1,20 @@
+{
+  "project": "SwitchHackathon",
+  "branchName": "ralph/fix-the-concurrent-writer-star",
+  "description": "High-confidence bug_fix identified; routing to Ralph autonomous agent loop.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Initial implementation: fix the concurrent writer starvation in laya/agent.py",
+      "description": "As a developer, I want fix the concurrent writer starvation in laya/agent.py so that High-confidence bug_fix identified; routing to Ralph autonomous agent loop.",
+      "acceptanceCriteria": [
+        "Implementation completed according to specification",
+        "Typecheck passes",
+        "Tests pass"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

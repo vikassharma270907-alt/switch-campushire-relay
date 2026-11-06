@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Antigravity Project Synchronization Script
     Provisions all 434+ skills, 107+ agents, 126+ rules, 99+ workflows,
@@ -6,7 +6,9 @@
 #>
 param(
     [string]$ProjectPath = (Get-Location).Path,
-    [switch]$AllProjects
+    [switch]$AllProjects,
+    [switch]$All
 )
 
-& "C:\Users\vikas sharma\.gemini\config\setup-project.ps1" -ProjectPath $ProjectPath -AllProjects:$AllProjects
+$runAll = $AllProjects.IsPresent -or $All.IsPresent
+& "C:\Users\vikas sharma\.gemini\config\setup-project.ps1" -ProjectPath $ProjectPath -AllProjects:$runAll

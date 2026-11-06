@@ -25,3 +25,6 @@ htmlcov/
 # Ralph archive
 scripts/ralph/archive/
 scripts/ralph/.last-branch
+
+# Graphify
+graphify-out/

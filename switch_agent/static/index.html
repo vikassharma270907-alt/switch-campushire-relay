@@ -348,6 +348,12 @@
             auditLogs.scrollTop = auditLogs.scrollHeight;
         }
 
+        function escapeHtml(str) {
+            const p = document.createElement("p");
+            p.textContent = str;
+            return p.innerHTML;
+        }
+
         function appendMessage(sender, text, isBot = false, triage = null, isBlocked = false) {
             const msg = document.createElement("div");
             msg.className = `message ${isBot ? 'bot' : 'user'}`;
@@ -363,15 +369,17 @@
                 `;
             }
 
+            const renderedText = isBot ? text : escapeHtml(text);
+
             msg.innerHTML = `
                 <div class="avatar ${isBot ? 'bot-avatar' : ''}">${isBot ? 'SG' : 'YOU'}</div>
                 <div class="msg-body">
                     <div class="msg-header">
-                        <span class="msg-sender">${sender}</span>
+                        <span class="msg-sender">${escapeHtml(sender)}</span>
                         <span class="msg-time">${new Date().toLocaleTimeString()}</span>
                     </div>
                     <div class="msg-content ${isBlocked ? 'blocked' : ''}">
-                        ${text}
+                        ${renderedText}
                         ${triageHtml}
                     </div>
                 </div>

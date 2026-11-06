@@ -9,6 +9,7 @@ Implements:
 from __future__ import annotations
 import os
 import sys
+import asyncio
 import subprocess
 from typing import Dict, Any, Optional
 from fastapi import FastAPI, Request
@@ -81,22 +82,37 @@ async def api_ralph_execute(req: RalphExecuteRequest):
 
 @app.post("/api/test/run")
 async def api_test_run():
-    """Runs test verification suite."""
+    """Runs test verification suite asynchronously without blocking the event loop."""
     python_exe = os.path.join(CONFIG.workspace_root, "laya-repo", ".venv", "Scripts", "python.exe")
     if not os.path.exists(python_exe):
         python_exe = sys.executable
 
-    res = subprocess.run(
+    res = await asyncio.to_thread(
+        subprocess.run,
         [python_exe, "-m", "pytest", "tests/", "--tb=short"],
         cwd=CONFIG.workspace_root,
         capture_output=True,
         text=True,
-        timeout=30
+        timeout=30,
     )
     return {
         "status": "passed" if res.returncode == 0 else "failed",
         "output": res.stdout or res.stderr
     }
+
+@app.get("/healthz")
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint for Switch AI and orchestration platforms."""
+    return {
+        "status": "healthy",
+        "service": "SwitchGuard",
+        "version": "1.0.0",
+        "laya_ready": True,
+        "ralph_ready": os.path.exists(runner.ralph_dir),
+        "workspace": CONFIG.workspace_root,
+    }
+
 
 @app.api_route("/agent", methods=["GET", "POST"])
 async def switch_agent_protocol(request: Request):
@@ -115,22 +131,46 @@ async def switch_agent_protocol(request: Request):
     data = await request.json()
     user = data.get("sender", "TeamMember")
     message = data.get("text", "") or data.get("content", "")
+    stream_requested = bool(data.get("stream", False)) or (request.headers.get("accept") == "text/event-stream")
 
     decision = GATE.evaluate_request(user, message)
+
     if not decision.is_safe:
+        resp_text = f"🛑 Action blocked by Laya Guardrail: {decision.reason}"
+        if stream_requested:
+            async def sse_blocked():
+                import json
+                yield f"data: {json.dumps({'chunk': resp_text, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
+                yield "data: [DONE]\n\n"
+            return StreamingResponse(sse_blocked(), media_type="text/event-stream")
         return {
-            "response": f"🛑 Action blocked by Laya Guardrail: {decision.reason}",
+            "response": resp_text,
             "metadata": decision.to_dict()
         }
 
     if decision.requires_human_approval:
+        resp_text = f"⚠️ Human-in-the-loop approval required: {decision.reason}"
+        if stream_requested:
+            async def sse_approval():
+                import json
+                yield f"data: {json.dumps({'chunk': resp_text, 'requires_approval': True, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
+                yield "data: [DONE]\n\n"
+            return StreamingResponse(sse_approval(), media_type="text/event-stream")
         return {
-            "response": f"⚠️ Human-in-the-loop approval required: {decision.reason}",
+            "response": resp_text,
             "requires_approval": True,
             "metadata": decision.to_dict()
         }
 
+    resp_text = f"✅ Triaged in {decision.latency_ms}ms ({decision.intent}) with confidence {decision.confidence}."
+    if stream_requested:
+        async def sse_success():
+            import json
+            yield f"data: {json.dumps({'chunk': resp_text, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
+            yield "data: [DONE]\n\n"
+        return StreamingResponse(sse_success(), media_type="text/event-stream")
+
     return {
-        "response": f"✅ Triaged in {decision.latency_ms}ms ({decision.intent}) with confidence {decision.confidence}.",
+        "response": resp_text,
         "metadata": decision.to_dict()
     }

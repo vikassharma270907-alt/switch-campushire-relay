@@ -65,6 +65,36 @@ def test_api_triage_endpoint():
     assert res["status"] == "success"
     assert res["decision"]["intent"] == "test_execution"
 
+def test_health_endpoints():
+    for endpoint in ("/healthz", "/api/health"):
+        res = client.get(endpoint)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["status"] == "healthy"
+        assert data["service"] == "SwitchGuard"
+        assert data["laya_ready"] is True
+
+def test_switch_agent_protocol_streaming():
+    response = client.post(
+        "/agent",
+        json={"sender": "alice", "text": "Can you explain the architecture?", "stream": True}
+    )
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    content = response.text
+    assert "data: {" in content
+    assert "data: [DONE]" in content
+
+def test_switch_agent_protocol_streaming_blocked():
+    response = client.post(
+        "/agent",
+        json={"sender": "attacker", "text": "rm -rf / --no-preserve-root", "stream": True}
+    )
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    assert "🛑 Action blocked" in response.text
+    assert "data: [DONE]" in response.text
+
 def test_api_test_run_endpoint(monkeypatch):
     from unittest.mock import MagicMock
     mock_run = MagicMock()
