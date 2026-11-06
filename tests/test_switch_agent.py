@@ -50,6 +50,21 @@ def test_laya_gate_human_approval_trigger():
     decision = gate.evaluate_request("user", "deploy to production with api_key secret")
     assert decision.requires_human_approval is True
 
+def test_laya_gate_system_time_query():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "date today")
+    assert decision.is_safe is True
+    assert decision.requires_human_approval is False
+    assert decision.intent == "system_time"
+    assert decision.recommended_action == "DIRECT_ANSWER"
+
+def test_laya_gate_system_status_query():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "what is your status and health?")
+    assert decision.is_safe is True
+    assert decision.intent == "system_status"
+    assert decision.recommended_action == "DIRECT_ANSWER"
+
 def test_switch_agent_protocol_handshake():
     response = client.get("/agent")
     assert response.status_code == 200

@@ -445,8 +445,12 @@
                     const testRes = await fetch("/api/test/run", { method: "POST" });
                     const tData = await testRes.json();
                     appendMessage("SwitchGuard", `🧪 <strong>Pytest Verification Result:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px;">${tData.output}</pre>`, true, d);
+                } else if (d.intent === "system_time") {
+                    appendMessage("SwitchGuard", `📅 <strong>System Date & Time:</strong> ${d.reason}`, true, d);
+                } else if (d.intent === "system_status") {
+                    appendMessage("SwitchGuard", `⚡ <strong>System Status:</strong> ${d.reason}`, true, d);
                 } else {
-                    appendMessage("SwitchGuard", `🤖 <strong>Direct Response:</strong> Processed query in ${d.latency_ms}ms with calibrated confidence ${d.confidence}.`, true, d);
+                    appendMessage("SwitchGuard", `🤖 <strong>Direct Response:</strong> ${d.reason || `Processed query in ${d.latency_ms}ms with calibrated confidence ${d.confidence}.`}`, true, d);
                 }
             } catch (err) {
                 log(`Error: ${err.message}`, "red");

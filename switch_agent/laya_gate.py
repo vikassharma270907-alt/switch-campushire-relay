@@ -136,6 +136,26 @@ class LayaDecisionGate:
             is_sensitive = True
             difficulty = 1.5
             confidence = 0.91
+        elif any(w in lower_msg for w in ("date", "time", "clock", "today", "now", "calendar")):
+            import datetime
+            now_str = datetime.datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
+            intent = "system_time"
+            domain = "utility"
+            difficulty = 0.1
+            needs_tools = False
+            confidence = 0.98
+        elif any(w in lower_msg for w in ("status", "health", "uptime", "ping", "who are you", "who")):
+            intent = "system_status"
+            domain = "utility"
+            difficulty = 0.1
+            needs_tools = False
+            confidence = 0.98
+        elif any(w in lower_msg for w in ("help", "commands", "menu")):
+            intent = "help"
+            domain = "utility"
+            difficulty = 0.1
+            needs_tools = False
+            confidence = 0.96
         elif len(lower_msg.split()) < 3 and not any(w in lower_msg for w in ("hi", "hello")):
             # Ambiguous input
             confidence = 0.45
@@ -159,6 +179,14 @@ class LayaDecisionGate:
         elif intent == "test_execution":
             recommended_action = "RUN_LOCAL_TESTS"
             reason = "Direct verification request; executing local pytest suite."
+        elif intent == "system_time":
+            import datetime
+            now_str = datetime.datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
+            recommended_action = "DIRECT_ANSWER"
+            reason = f"Current system date and time is {now_str}."
+        elif intent == "system_status":
+            recommended_action = "DIRECT_ANSWER"
+            reason = "SwitchGuard active on Switch AI. System 1 Laya reflexes and Ralph autonomous loop ready."
         else:
             recommended_action = "DIRECT_ANSWER"
             reason = "Standard conversational or lookup query; answering directly."

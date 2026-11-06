@@ -24,3 +24,4 @@ except Exception as e:
 
 # Expose app for Vercel (@vercel/python looks for 'app')
 handler = app
+
