@@ -76,6 +76,38 @@ repo = StudentRepository()
 repo.load_synthetic_dataset()
 room = SwitchRoom(student_repo=repo, room_name="#placement-drive-2027")
 
+# Default baseline placement criteria for cold-start serverless environments
+DEFAULT_CRITERIA = PlacementCriteria(
+    company_name="Stripe Technologies",
+    role_title="Backend Platform Engineer",
+    package_ctc="28 LPA",
+    min_cgpa=8.0,
+    max_active_backlogs=0,
+    eligible_branches=["CSE", "IT", "ECE"],
+    batch_year=2027,
+    deadline="Nov 15, 2026, 6:00 PM",
+    drive_date="Nov 18, 2026",
+)
+
+
+def _ensure_active_audit(target_room: SwitchRoom) -> AuditReport:
+    """Ensure room has a verified active audit report, auto-running baseline audit if needed."""
+    if target_room.active_report is None:
+        if target_room.active_criteria is None:
+            target_room.active_criteria = DEFAULT_CRITERIA
+        candidates = target_room.repo.get_all_candidates()
+        if not candidates:
+            target_room.repo.load_synthetic_dataset()
+            candidates = target_room.repo.get_all_candidates()
+        target_room.active_report = target_room.eligibility_auditor.audit_candidates(
+            candidates, target_room.active_criteria
+        )
+    return target_room.active_report
+
+
+# Ensure initial baseline report is ready immediately on serverless start
+_ensure_active_audit(room)
+
 
 # ---------------------------------------------------------------------------
 # 1. Candidate Database & Webhook Endpoints
@@ -114,22 +146,17 @@ def handle_switch_event(event: CampusHireEventRequest) -> Dict[str, Any]:
 @router.get("/api/audit/report")
 def get_audit_report() -> Dict[str, Any]:
     """Return the active eligibility audit report with SHA-256 cryptographic hashes."""
-    if not room.active_report:
-        return {
-            "status": "no_active_audit",
-            "message": "No active audit report available. Submit a notice to @DriveCoordinator first.",
-        }
-    return room.active_report.model_dump()
+    report = _ensure_active_audit(room)
+    return report.model_dump()
 
 
 @router.get("/api/campushire/audit/export-csv")
 @router.get("/api/audit/export-csv")
 def export_csv() -> Response:
     """Download verified candidate shortlist as a CSV file."""
-    if not room.active_report:
-        raise HTTPException(status_code=400, detail="No active audit report available to export.")
-    csv_data = room.eligibility_auditor.export_shortlist_csv(room.active_report)
-    company = room.active_report.criteria.company_name.lower().replace(" ", "_")
+    report = _ensure_active_audit(room)
+    csv_data = room.eligibility_auditor.export_shortlist_csv(report)
+    company = report.criteria.company_name.lower().replace(" ", "_")
     filename = f"shortlist_{company}.csv"
     return Response(
         content=csv_data,

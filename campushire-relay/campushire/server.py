@@ -2,8 +2,8 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse, Response
-from typing import List, Dict, Any
-from campushire.models import SwitchMessage
+from typing import List, Dict, Any, Optional
+from campushire.models import SwitchMessage, PlacementCriteria, AuditReport
 from campushire.switch_room import SwitchRoom
 from campushire.storage.student_db import StudentRepository
 from campushire.config import settings
@@ -18,6 +18,37 @@ app = FastAPI(
 repo = StudentRepository()
 repo.load_synthetic_dataset()
 room = SwitchRoom(student_repo=repo, room_name=settings.room_name, borderline_delta=settings.borderline_cgpa_delta)
+
+DEFAULT_CRITERIA = PlacementCriteria(
+    company_name="Stripe Technologies",
+    role_title="Backend Platform Engineer",
+    package_ctc="28 LPA",
+    min_cgpa=8.0,
+    max_active_backlogs=0,
+    eligible_branches=["CSE", "IT", "ECE"],
+    batch_year=2027,
+    deadline="Nov 15, 2026, 6:00 PM",
+    drive_date="Nov 18, 2026",
+)
+
+
+def _ensure_active_audit(target_room: SwitchRoom) -> AuditReport:
+    """Ensure room has a verified active audit report, auto-running baseline audit if needed."""
+    if target_room.active_report is None:
+        if target_room.active_criteria is None:
+            target_room.active_criteria = DEFAULT_CRITERIA
+        candidates = target_room.repo.get_all_candidates()
+        if not candidates:
+            target_room.repo.load_synthetic_dataset()
+            candidates = target_room.repo.get_all_candidates()
+        target_room.active_report = target_room.eligibility_auditor.audit_candidates(
+            candidates, target_room.active_criteria
+        )
+    return target_room.active_report
+
+
+# Ensure initial baseline report is ready immediately on serverless start
+_ensure_active_audit(room)
 
 
 @app.get("/health")
@@ -56,18 +87,16 @@ def handle_switch_event(event: Dict[str, Any]) -> Dict[str, Any]:
 @app.get("/api/audit/report")
 def get_audit_report() -> Dict[str, Any]:
     """Return the active eligibility audit report in JSON format."""
-    if not room.active_report:
-        return {"status": "no_active_audit", "message": "No audit has been performed yet."}
-    return room.active_report.model_dump()
+    report = _ensure_active_audit(room)
+    return report.model_dump()
 
 
 @app.get("/api/audit/export-csv")
 def export_csv() -> Response:
     """Download verified candidate shortlist as a CSV file."""
-    if not room.active_report:
-        raise HTTPException(status_code=400, detail="No active audit report available to export.")
-    csv_data = room.eligibility_auditor.export_shortlist_csv(room.active_report)
-    filename = f"shortlist_{room.active_report.criteria.company_name.lower().replace(' ', '_')}.csv"
+    report = _ensure_active_audit(room)
+    csv_data = room.eligibility_auditor.export_shortlist_csv(report)
+    filename = f"shortlist_{report.criteria.company_name.lower().replace(' ', '_')}.csv"
     return Response(
         content=csv_data,
         media_type="text/csv",
