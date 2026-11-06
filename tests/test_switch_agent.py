@@ -81,6 +81,7 @@ def test_switch_agent_protocol_streaming():
     )
     assert response.status_code == 200
     assert "text/event-stream" in response.headers["content-type"]
+    assert response.headers.get("cache-control") == "no-cache"
     content = response.text
     assert "data: {" in content
     assert "data: [DONE]" in content
@@ -94,6 +95,45 @@ def test_switch_agent_protocol_streaming_blocked():
     assert "text/event-stream" in response.headers["content-type"]
     assert "🛑 Action blocked" in response.text
     assert "data: [DONE]" in response.text
+
+def test_switch_agent_protocol_non_streaming():
+    response = client.post(
+        "/agent",
+        json={"sender": "alice", "text": "What is the project architecture?"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "response" in data
+    assert "metadata" in data
+    assert data["metadata"]["is_safe"] is True
+
+def test_switch_agent_protocol_approval_streaming():
+    response = client.post(
+        "/agent",
+        json={"sender": "alice", "text": "Please provide the api_key for the database service", "stream": True}
+    )
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    assert "requires_approval" in response.text
+
+def test_switch_agent_protocol_accept_header_streaming():
+    response = client.post(
+        "/agent",
+        json={"sender": "alice", "text": "Can you triage this task?"},
+        headers={"Accept": "text/event-stream"}
+    )
+    assert response.status_code == 200
+    assert "text/event-stream" in response.headers["content-type"]
+    assert "data: [DONE]" in response.text
+
+def test_switch_agent_protocol_invalid_json():
+    response = client.post(
+        "/agent",
+        content="not-json-content",
+        headers={"Content-Type": "application/json"}
+    )
+    assert response.status_code in (400, 422)
+    assert "detail" in response.json()
 
 def test_api_test_run_endpoint(monkeypatch):
     from unittest.mock import MagicMock

@@ -9,10 +9,11 @@ Implements:
 from __future__ import annotations
 import os
 import sys
+import json
 import asyncio
 import subprocess
 from typing import Dict, Any, Optional
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -20,6 +21,23 @@ from pydantic import BaseModel
 from .config import CONFIG
 from .laya_gate import GATE
 from .ralph_runner import RalphCollaborativeRunner
+
+SSE_HEADERS = {
+    "Cache-Control": "no-cache",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no",
+}
+
+def get_python_exe(workspace_root: str) -> str:
+    """Finds cross-platform Python executable inside .venv or falls back to sys.executable."""
+    candidates = [
+        os.path.join(workspace_root, "laya-repo", ".venv", "Scripts", "python.exe"),
+        os.path.join(workspace_root, "laya-repo", ".venv", "bin", "python"),
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            return p
+    return sys.executable
 
 app = FastAPI(
     title="SwitchGuard AI Agent",
@@ -33,6 +51,12 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 class TriageRequest(BaseModel):
     user: str = "User"
     message: str
+
+class AgentMessageRequest(BaseModel):
+    sender: str = "TeamMember"
+    text: Optional[str] = None
+    content: Optional[str] = None
+    stream: bool = False
 
 class RalphExecuteRequest(BaseModel):
     task_name: str
@@ -82,10 +106,8 @@ async def api_ralph_execute(req: RalphExecuteRequest):
 
 @app.post("/api/test/run")
 async def api_test_run():
-    """Runs test verification suite asynchronously without blocking the event loop."""
-    python_exe = os.path.join(CONFIG.workspace_root, "laya-repo", ".venv", "Scripts", "python.exe")
-    if not os.path.exists(python_exe):
-        python_exe = sys.executable
+    """Runs test verification suite asynchronously in worker thread without blocking event loop."""
+    python_exe = get_python_exe(CONFIG.workspace_root)
 
     res = await asyncio.to_thread(
         subprocess.run,
@@ -110,67 +132,79 @@ async def health_check():
         "version": "1.0.0",
         "laya_ready": True,
         "ralph_ready": os.path.exists(runner.ralph_dir),
-        "workspace": CONFIG.workspace_root,
+        "environment": "active",
+        "ready": True,
     }
 
 
-@app.api_route("/agent", methods=["GET", "POST"])
-async def switch_agent_protocol(request: Request):
-    """Switch AI Agent Protocol endpoint supporting SSE and Webhook messages."""
-    if request.method == "GET":
-        # Handshake / metadata for Switch AI registration
-        return {
-            "name": CONFIG.bot_name,
-            "avatar": CONFIG.bot_avatar,
-            "description": CONFIG.bot_description,
-            "protocol": "switch-v1",
-            "capabilities": ["triage", "guardrails", "autonomous-coding", "human-in-the-loop"]
-        }
+async def sse_event_stream(payload: dict):
+    """Unified generator helper for SSE event streaming."""
+    yield f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+    yield "data: [DONE]\n\n"
 
-    # Handle incoming Switch message
-    data = await request.json()
-    user = data.get("sender", "TeamMember")
-    message = data.get("text", "") or data.get("content", "")
-    stream_requested = bool(data.get("stream", False)) or (request.headers.get("accept") == "text/event-stream")
+
+@app.get("/agent")
+async def switch_agent_discovery():
+    """Switch AI Agent Protocol handshake and metadata discovery."""
+    return {
+        "name": CONFIG.bot_name,
+        "avatar": CONFIG.bot_avatar,
+        "description": CONFIG.bot_description,
+        "protocol": "switch-v1",
+        "capabilities": ["triage", "guardrails", "autonomous-coding", "human-in-the-loop"]
+    }
+
+
+@app.post("/agent")
+async def switch_agent_protocol(request: Request, payload: Optional[AgentMessageRequest] = None):
+    """Switch AI Agent Protocol message handler supporting SSE streaming and JSON webhooks."""
+    if payload is None:
+        try:
+            body = await request.json()
+            if not isinstance(body, dict):
+                raise HTTPException(status_code=400, detail="Invalid JSON payload: expected a dictionary")
+            payload = AgentMessageRequest(**body)
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid or malformed JSON in request body")
+
+    user = payload.sender or "TeamMember"
+    message = payload.text or payload.content or ""
+    stream_requested = bool(payload.stream) or (request.headers.get("accept") == "text/event-stream")
 
     decision = GATE.evaluate_request(user, message)
 
     if not decision.is_safe:
         resp_text = f"🛑 Action blocked by Laya Guardrail: {decision.reason}"
-        if stream_requested:
-            async def sse_blocked():
-                import json
-                yield f"data: {json.dumps({'chunk': resp_text, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
-                yield "data: [DONE]\n\n"
-            return StreamingResponse(sse_blocked(), media_type="text/event-stream")
-        return {
+        out = {
             "response": resp_text,
+            "chunk": resp_text,
             "metadata": decision.to_dict()
         }
+        if stream_requested:
+            return StreamingResponse(sse_event_stream(out), media_type="text/event-stream", headers=SSE_HEADERS)
+        return out
 
     if decision.requires_human_approval:
         resp_text = f"⚠️ Human-in-the-loop approval required: {decision.reason}"
-        if stream_requested:
-            async def sse_approval():
-                import json
-                yield f"data: {json.dumps({'chunk': resp_text, 'requires_approval': True, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
-                yield "data: [DONE]\n\n"
-            return StreamingResponse(sse_approval(), media_type="text/event-stream")
-        return {
+        out = {
             "response": resp_text,
+            "chunk": resp_text,
             "requires_approval": True,
             "metadata": decision.to_dict()
         }
+        if stream_requested:
+            return StreamingResponse(sse_event_stream(out), media_type="text/event-stream", headers=SSE_HEADERS)
+        return out
 
     resp_text = f"✅ Triaged in {decision.latency_ms}ms ({decision.intent}) with confidence {decision.confidence}."
-    if stream_requested:
-        async def sse_success():
-            import json
-            yield f"data: {json.dumps({'chunk': resp_text, 'metadata': decision.to_dict()}, ensure_ascii=False)}\n\n"
-            yield "data: [DONE]\n\n"
-        return StreamingResponse(sse_success(), media_type="text/event-stream")
-
-    return {
+    out = {
         "response": resp_text,
+        "chunk": resp_text,
         "metadata": decision.to_dict()
     }
+    if stream_requested:
+        return StreamingResponse(sse_event_stream(out), media_type="text/event-stream", headers=SSE_HEADERS)
+
+    return out

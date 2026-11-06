@@ -4,7 +4,7 @@
 Runs all test suites across the repository:
 1. SwitchGuard Agent & Laya Decision Service tests (tests/)
 2. CampusHire Relay multi-agent & governance tests (campushire-relay/tests/)
-3. End-to-end deterministic pipeline execution check
+3. Laya Agent Gate tests (laya-repo/tests/test_agent_gate.py)
 """
 
 from __future__ import annotations
@@ -19,10 +19,12 @@ if os.path.basename(current_dir) == "scripts":
 else:
     WORKSPACE = current_dir
 
-# Prefer venv python if available, else sys.executable
-PYTHON_EXE = os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe")
-if not os.path.exists(PYTHON_EXE):
-    PYTHON_EXE = sys.executable
+# Cross-platform Python venv resolution
+candidate_bins = [
+    os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
+    os.path.join(WORKSPACE, "laya-repo", ".venv", "bin", "python"),
+]
+PYTHON_EXE = next((p for p in candidate_bins if os.path.exists(p)), sys.executable)
 
 
 def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
@@ -78,6 +80,11 @@ def main() -> int:
             "CampusHire Relay Multi-Agent & Governance Suite",
             ["tests/", "-v", "--tb=short"],
             os.path.join(WORKSPACE, "campushire-relay"),
+        ),
+        (
+            "Laya Agent Gate Test Suite",
+            ["laya-repo/tests/test_agent_gate.py", "-v", "--tb=short"],
+            WORKSPACE,
         ),
     ]
 
