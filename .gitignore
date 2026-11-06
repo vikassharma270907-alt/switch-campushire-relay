@@ -1,3 +1,8 @@
+# Sub-repositories
+laya-repo/
+campushire-relay/
+.agents/
+
 # Python
 __pycache__/
 *.py[cod]
