@@ -173,6 +173,7 @@ async def api_pipeline_run():
     """Runs the deterministic CampusHire eligibility audit and reporting pipeline on sample student data."""
     def _execute():
         try:
+            import tempfile
             campushire_root = os.path.join(CONFIG.workspace_root, "campushire-relay")
             scripts_dir = os.path.join(campushire_root, "scripts")
             if scripts_dir not in sys.path:
@@ -182,8 +183,21 @@ async def api_pipeline_run():
 
             students_csv = os.path.join(campushire_root, "data", "sample_students.csv")
             criteria_json = os.path.join(campushire_root, "data", "eligibility_rules.json")
-            output_csv = os.path.join(campushire_root, "outputs", "eligibility_results.csv")
-            output_dir = os.path.join(campushire_root, "outputs")
+
+            # In serverless edge environments (Vercel/AWS Lambda), /var/task is read-only.
+            # Use /tmp if local outputs directory is not writable.
+            try:
+                default_out = os.path.join(campushire_root, "outputs")
+                test_probe = os.path.join(default_out, ".probe")
+                with open(test_probe, "w") as f:
+                    f.write("probe")
+                os.remove(test_probe)
+                output_dir = default_out
+            except (OSError, PermissionError):
+                output_dir = os.path.join(tempfile.gettempdir(), "campushire_outputs")
+                os.makedirs(output_dir, exist_ok=True)
+
+            output_csv = os.path.join(output_dir, "eligibility_results.csv")
 
             receipt = run_validation(students_csv, criteria_json, output_csv)
             summary = generate_all_reports(output_csv, criteria_json, output_dir)
