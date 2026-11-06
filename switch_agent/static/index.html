@@ -388,6 +388,7 @@
                 <button class="quick-btn" onclick="sendSample('run data pipeline')">📊 Audit Placement Data &
                     Receipts</button>
                 <button class="quick-btn" onclick="sendSample('list all placement candidates')">👥 Placement Candidates</button>
+                <button class="quick-btn" onclick="sendSample('docs for React hooks useActionState')">📖 Context7 Live Docs</button>
                 <button class="quick-btn" onclick="sendSample('evaluate mock interview answer using star rubric')">🎙️ Wispr STAR Evaluation</button>
                 <button class="quick-btn" onclick="sendSample('@DriveCoordinator Stripe Software Engineer 28 LPA, min CGPA 8.0, 0 backlogs, Batch 2027, branches CSE,IT')">🏛️ CampusHire Multi-Agent Drive</button>
                 <button class="quick-btn" onclick="sendSample('what academic research grounds this architecture?')">📚
@@ -619,6 +620,17 @@
                         roomHtml += `<div style="margin-top:6px; padding:6px 10px; background:#0d1117; border-left:3px solid var(--accent); border-radius:4px;"><strong>@${escapeHtml(r.sender)}:</strong> ${escapeHtml(r.content)}</div>`;
                     });
                     appendMessage("SwitchGuard", roomHtml, true, d);
+                } else if (d.intent === "docs_lookup" || text.toLowerCase().includes("docs for")) {
+                    log("Querying Context7 live documentation engine...", "cyan");
+                    const dRes = await fetch("/api/docs/lookup", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ library: "React", query: text })
+                    });
+                    const docData = await dRes.json();
+                    let docHtml = `📖 <strong>Context7 Grounded Documentation (${escapeHtml(docData.library_id)}):</strong><br>`;
+                    docHtml += `<pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; background:#0d1117; padding:8px; border-radius:4px; max-height:220px; overflow-y:auto; white-space:pre-wrap;">${escapeHtml(docData.snippets)}</pre>`;
+                    appendMessage("SwitchGuard", docHtml, true, d);
                 } else if (d.intent === "system_location") {
                     appendMessage("SwitchGuard", `📍 <strong>System Location & Topology:</strong><br>${escapeHtml(d.reason)}`, true, d);
                 } else if (d.intent === "research_grounding") {
