@@ -18,6 +18,8 @@ $MasterEcc = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins
 $MasterCodeRabbit = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\coderabbit'
 $MasterPonytail = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\ponytail'
 $MasterLemo = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\lemo-opuscar'
+$MasterSkillspector = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\skillspector'
+$MasterContext7 = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\context7'
 $MasterAgentSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\agent-skills'
 $MasterSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\skills'
 $ProjectsJsonPath = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\projects.json'
@@ -61,7 +63,67 @@ if (Test-Path -LiteralPath $MasterAgentSkills) {
     }
 }
 
-# 2. Sync global skills into Master ECC skills so all 468+ skills are discoverable
+# 1b. Sync Context7 into Master ECC & Global Skills & Rules & Agents
+if (Test-Path -LiteralPath $MasterContext7) {
+    $c7SkillsDir = Join-Path -Path $MasterContext7 -ChildPath 'skills'
+    if (Test-Path -LiteralPath $c7SkillsDir) {
+        $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+        Get-ChildItem -LiteralPath $c7SkillsDir -Directory | ForEach-Object {
+            $gDest = Join-Path -Path $MasterSkills -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $gDest)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $gDest -Recurse -Force
+            }
+            if (Test-Path -LiteralPath $eccSkillsDir) {
+                $eDest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+                if (-not (Test-Path -LiteralPath $eDest)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination $eDest -Recurse -Force
+                }
+            }
+        }
+    }
+    # Sync rules
+    $c7RulesDir = Join-Path -Path $MasterContext7 -ChildPath 'rules'
+    $eccRulesDir = Join-Path -Path $MasterEcc -ChildPath 'rules'
+    if ((Test-Path -LiteralPath $c7RulesDir) -and (Test-Path -LiteralPath $eccRulesDir)) {
+        Get-ChildItem -LiteralPath $c7RulesDir -Filter "*.md" | ForEach-Object {
+            $dstFile = Join-Path -Path $eccRulesDir -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $dstFile)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $dstFile -Force
+            }
+        }
+    }
+    # Sync agents
+    $c7AgentFile = Join-Path -Path $MasterContext7 -ChildPath 'plugins\cursor\context7\agents\docs-researcher.md'
+    $eccAgentsDir = Join-Path -Path $MasterEcc -ChildPath 'agents'
+    if ((Test-Path -LiteralPath $c7AgentFile) -and (Test-Path -LiteralPath $eccAgentsDir)) {
+        $dstAgent = Join-Path -Path $eccAgentsDir -ChildPath 'docs-researcher.md'
+        if (-not (Test-Path -LiteralPath $dstAgent)) {
+            Copy-Item -LiteralPath $c7AgentFile -Destination $dstAgent -Force
+        }
+    }
+}
+
+# 2. Sync SkillSpector into Master ECC & Global Skills
+if (Test-Path -LiteralPath $MasterSkillspector) {
+    $ssSkillsDir = Join-Path -Path $MasterSkillspector -ChildPath 'skills'
+    if (Test-Path -LiteralPath $ssSkillsDir) {
+        $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+        Get-ChildItem -LiteralPath $ssSkillsDir -Directory | ForEach-Object {
+            $gDest = Join-Path -Path $MasterSkills -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $gDest)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $gDest -Recurse -Force
+            }
+            if (Test-Path -LiteralPath $eccSkillsDir) {
+                $eDest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+                if (-not (Test-Path -LiteralPath $eDest)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination $eDest -Recurse -Force
+                }
+            }
+        }
+    }
+}
+
+# 3. Sync global skills into Master ECC skills so all 470+ skills are discoverable
 if (Test-Path -LiteralPath $MasterSkills) {
     $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
     if (Test-Path -LiteralPath $eccSkillsDir) {
@@ -141,13 +203,18 @@ function Configure-SingleProject {
         Copy-Item -Path (Join-Path $MasterRalph 'scripts\prd.json.example') -Destination (Join-Path $ralphScriptsDst 'prd.json.example') -Force
     }
 
-    # Scaffold or update .mcp.json with standard servers (Figma, Laya)
+    # Scaffold or update .mcp.json with standard servers (Figma, Laya, Context7)
     $mcpJsonPath = Join-Path -Path $Resolved -ChildPath '.mcp.json'
     $defaultMcp = @{
         mcpServers = @{
             figma = @{
                 type = "http"
                 url = "https://mcp.figma.com/mcp"
+            }
+            context7 = @{
+                command = "npx"
+                args = @("-y", "@upstash/context7-mcp")
+                env = @{}
             }
         }
     }
@@ -178,6 +245,18 @@ function Configure-SingleProject {
         }
     }
 
+    $skillspectorPy = "C:\Users\vikas sharma\AppData\Roaming\uv\tools\skillspector\Scripts\python.exe"
+    if (Test-Path -LiteralPath $skillspectorPy) {
+        $defaultMcp.mcpServers["skillspector"] = @{
+            command = $skillspectorPy
+            args = @("-m", "skillspector.cli", "mcp")
+            env = @{
+                PYTHONIOENCODING = "utf-8"
+                PYTHONUNBUFFERED = "1"
+            }
+        }
+    }
+
     if (-not (Test-Path -LiteralPath $mcpJsonPath)) {
         $defaultMcp | ConvertTo-Json -Depth 6 | Set-Content -Path $mcpJsonPath -Encoding utf8
     } else {
@@ -190,9 +269,17 @@ function Configure-SingleProject {
             if (-not $existingMcp.mcpServers.figma) {
                 $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "figma" -Value $defaultMcp.mcpServers.figma -Force
             }
+            # Add context7 if missing
+            if (-not $existingMcp.mcpServers.context7) {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "context7" -Value $defaultMcp.mcpServers.context7 -Force
+            }
             # Add laya if missing and python available
             if ($layaPy -and (-not $existingMcp.mcpServers.laya)) {
                 $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "laya" -Value $defaultMcp.mcpServers.laya -Force
+            }
+            # Add skillspector if missing and python available
+            if ((Test-Path -LiteralPath $skillspectorPy) -and (-not $existingMcp.mcpServers.skillspector)) {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "skillspector" -Value $defaultMcp.mcpServers.skillspector -Force
             }
             $existingMcp | ConvertTo-Json -Depth 6 | Set-Content -Path $mcpJsonPath -Encoding utf8
         } catch {}
@@ -293,12 +380,12 @@ jobs:
     # Write ecc-install-state.json
     $stateFile = Join-Path -Path $AgentsDir -ChildPath 'ecc-install-state.json'
     $stateObj = @{
-        version = 3
+        version = 5
         target = 'antigravity'
         mode = 'full-power'
         installedAt = (Get-Date -Format 'o')
-        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar', 'agent-skills')
-        sourceVersion = '2.2.3'
+        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar', 'agent-skills', 'context7', 'skillspector')
+        sourceVersion = '2.12.0'
     }
     $stateJson = $stateObj | ConvertTo-Json -Depth 4
     Set-Content -Path $stateFile -Value $stateJson -Encoding utf8
@@ -327,20 +414,22 @@ jobs:
     }
 
     Write-Host "[Antigravity Full-Power] Successfully configured: $Resolved" -ForegroundColor Green
-    Write-Host "  - Skills: 468+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar + Agent-Skills)"
-    Write-Host "  - Agents: 112+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Security-Auditor + Test-Engineer + Web-Perf-Auditor + Film-Director)"
-    Write-Host "  - Rules: 130+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules, Agent-Skills)"
-    Write-Host "  - Workflows: 110+ (Slash commands, /spec, /ship, /webperf, /test, /review, /planning, /reach, autonomous pipelines)"
+    Write-Host "  - Skills: 472+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar + Agent-Skills + Context7 + SkillSpector)"
+    Write-Host "  - Agents: 114+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Security-Auditor + Skill-Inspector + Test-Engineer + Film-Director)"
+    Write-Host "  - Rules: 133+ (TDD, Security, Immutability, CodeRabbit Quality Gates, SkillSpector Safety, Context7 Docs, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules, Agent-Skills)"
+    Write-Host "  - Workflows: 112+ (/skillspector, /spec, /ship, /webperf, /test, /review, /planning, /reach, autonomous pipelines)"
+    Write-Host "  - NVIDIA SkillSpector: Active (71 vulnerability patterns, pre-install static vetting, semantic source review, skillspector MCP server)"
+    Write-Host "  - Context7 Live Docs: Active (resolve-library-id, query-docs, ctx7 CLI, docs-researcher agent, auto-grounding for all libraries)"
     Write-Host "  - Addy Osmani Agent-Skills: Active (25 engineering skills, 4 agents, /spec, /ship, /webperf, /test, /review, /planning)"
     Write-Host "  - Lemo-Opuscar Studio: Active (66+ film styles, HTML5 Canvas/WebGL code animation, Kokoro/Edge TTS, FFmpeg muxing, film-director agent)"
     Write-Host "  - Agent-Reach Live Internet Layer: Active (YouTube transcripts, GitHub, Reddit, Twitter/X, V2EX, Web search)"
     Write-Host "  - Ponytail Engine: Active (YAGNI, stdlib first, /ponytail, /ponytail-review, /ponytail-audit, /ponytail-debt, /ponytail-gain, /ponytail-help)"
     Write-Host "  - GSD Spec-Driven Engine: Active (/gsd-new-project, /gsd-plan-phase, /gsd-execute-phase, /gsd-progress, /gsd-verify-work)"
-    Write-Host "  - MCP Servers: Active (.mcp.json configured with Figma & Laya)"
+    Write-Host "  - MCP Servers: Active (.mcp.json configured with Figma, Laya, Context7 & SkillSpector)"
     Write-Host "  - Ralph Scaffolding: Active (scripts\ralph\ralph.ps1, ralph.sh)"
     Write-Host "  - CodeRabbit Config: Active (.coderabbit.yaml)"
     Write-Host "  - SessionStart Automation: Active (.agents\hooks.json)"
-    Write-Host "  - Effort & Models: Maximum Effort ('high'), Best Models (Pro/Opus tier), Max AI Credits Enabled"
+    Write-Host "  - Effort & Models: MAXIMUM EFFORT ('high' / 'max', 64k thinking tokens), Best Models (Pro/Opus tier, Gemini 3.8 Flash (High)), Max AI Credits Enabled (useAiCredits: true)"
 }
 
 $runAll = $AllProjects.IsPresent -or $All.IsPresent
