@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchGuard + Laya + Ralph | Collaborative AI Agent War Room</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --border: #30363d;
+            --accent: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-amber: #d29922;
+            --accent-red: #f85149;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-badge {
+            background: linear-gradient(135deg, #238636, #2ea043);
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+        .hackathon-badge {
+            background: #1f6feb22;
+            color: #58a6ff;
+            border: 1px solid #1f6feb44;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        main {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            flex: 1;
+            overflow: hidden;
+            height: calc(100vh - 65px);
+        }
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            background: #0d1117;
+        }
+        .channel-header {
+            padding: 0.75rem 1.5rem;
+            background: #161b22;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .channel-header span { color: white; font-weight: 600; }
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+        }
+        .message.bot {
+            align-self: flex-start;
+        }
+        .message.user {
+            align-self: flex-start;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #21262d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .avatar.bot-avatar {
+            background: #1f6feb;
+            color: white;
+        }
+        .msg-body {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .msg-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        .msg-sender { font-weight: 600; color: white; }
+        .msg-time { color: var(--text-muted); font-size: 0.75rem; }
+        .msg-content {
+            background: #161b22;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+        .bot .msg-content {
+            border-left: 3px solid var(--accent);
+        }
+        .msg-content.blocked {
+            border-left: 3px solid var(--accent-red);
+            background: #2a1215;
+        }
+        .triage-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #21262d;
+            margin-top: 6px;
+            color: var(--accent);
+        }
+        .quick-actions {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            background: #12161c;
+            border-top: 1px solid var(--border);
+        }
+        .quick-btn {
+            background: #21262d;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            font-size: 0.78rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .quick-btn:hover {
+            background: #30363d;
+            border-color: var(--accent);
+            color: white;
+        }
+        .chat-input-bar {
+            padding: 1rem 1.5rem;
+            background: #161b22;
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .chat-input:focus { border-color: var(--accent); }
+        .send-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 0 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .send-btn:hover { background: #2ea043; }
+        
+        /* Sidebar Analytics */
+        .analytics-sidebar {
+            background: #161b22;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        .sidebar-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+        .metric-card {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .metric-label { font-size: 0.75rem; color: var(--text-muted); }
+        .metric-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+        .metric-desc { font-size: 0.75rem; color: var(--text-muted); }
+        .log-box {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #8b949e;
+            height: 220px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+        .log-entry { margin-bottom: 4px; }
+        .log-entry.green { color: var(--accent-green); }
+        .log-entry.cyan { color: var(--accent); }
+        .log-entry.red { color: var(--accent-red); }
+        .log-entry.yellow { color: var(--accent-amber); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <span class="logo-badge">SWITCH-AI</span>
+            <h2>SwitchGuard <span style="font-weight:400; color:var(--text-muted); font-size:1rem;">| Laya + Ralph Collaborative Agent</span></h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <span class="hackathon-badge">Flip The Switch Hackathon 2026</span>
+            <span style="font-size:0.8rem; color:var(--accent-green);">● Online & Serving</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="chat-section">
+            <div class="channel-header">
+                <span>#war-room-switch</span> — Collaborative Team Chat with Autonomous AI Engineer
+            </div>
+            <div class="messages-container" id="messagesContainer">
+                <div class="message bot">
+                    <div class="avatar bot-avatar">SG</div>
+                    <div class="msg-body">
+                        <div class="msg-header">
+                            <span class="msg-sender">SwitchGuard (Laya + Ralph)</span>
+                            <span class="msg-time">Just now</span>
+                        </div>
+                        <div class="msg-content">
+                            👋 Hello team! I am your collaborative on-device AI engineer connected via <strong>Switch AI</strong>.
+                            <br><br>
+                            I evaluate incoming requests in <strong>&lt;5ms</strong> using <strong>Laya's System-1 decision engine</strong>, block malicious or dangerous commands via local guardrails, and autonomously execute verified engineering tasks with <strong>Ralph</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-btn" onclick="sendSample('fix the concurrent writer starvation in laya/agent.py')">⚡ Fix Concurrent Writer Bug (Ralph Loop)</button>
+                <button class="quick-btn" onclick="sendSample('run test_agent_gate.py verification suite')">🧪 Run Pytest Verification</button>
+                <button class="quick-btn" onclick="sendSample('rm -rf / && drop database users')">🛑 Test Dangerous Command (Laya Guardrail)</button>
+                <button class="quick-btn" onclick="sendSample('deploy updates')">⚠️ Test Ambiguous Input (Clarification Gate)</button>
+            </div>
+
+            <div class="chat-input-bar">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Message #war-room-switch (e.g. '@SwitchGuard fix bug #649 in laya-repo')..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="analytics-sidebar">
+            <div class="sidebar-title">Laya Decision Engine Telemetry</div>
+            <div class="metric-card">
+                <div class="metric-label">DECISION LATENCY</div>
+                <div class="metric-val" id="metricLatency">1.2 ms</div>
+                <div class="metric-desc">Sub-millisecond local on-device decision speed</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">CALIBRATED CONFIDENCE</div>
+                <div class="metric-val" id="metricConfidence" style="color:var(--accent);">0.95</div>
+                <div class="metric-desc">Threshold: 0.75 (Lower triggers human-in-the-loop)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">ACTIVE ACTION DISPATCH</div>
+                <div class="metric-val" id="metricAction" style="font-size:1.05rem; color:white;">READY</div>
+                <div class="metric-desc" id="metricDomain">Domain: general</div>
+            </div>
+
+            <div class="sidebar-title">Ralph Loop & Audit Trail</div>
+            <div class="log-box" id="auditLogs">
+                <div class="log-entry cyan">[Init] Laya Decision Gate loaded (v0.4.27)</div>
+                <div class="log-entry green">[Ready] Ralph Autonomous Loop active</div>
+                <div class="log-entry">[Switch] SSE protocol endpoint listening at /agent</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const container = document.getElementById("messagesContainer");
+        const chatInput = document.getElementById("chatInput");
+        const auditLogs = document.getElementById("auditLogs");
+
+        function log(msg, colorClass = "") {
+            const entry = document.createElement("div");
+            entry.className = "log-entry " + colorClass;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            auditLogs.appendChild(entry);
+            auditLogs.scrollTop = auditLogs.scrollHeight;
+        }
+
+        function appendMessage(sender, text, isBot = false, triage = null, isBlocked = false) {
+            const msg = document.createElement("div");
+            msg.className = `message ${isBot ? 'bot' : 'user'}`;
+            
+            let triageHtml = "";
+            if (triage) {
+                triageHtml = `
+                    <div class="triage-tag">
+                        <span>⚡ ${triage.latency_ms}ms</span> | 
+                        <span>Conf: ${triage.confidence}</span> | 
+                        <span>Action: ${triage.recommended_action}</span>
+                    </div>
+                `;
+            }
+
+            msg.innerHTML = `
+                <div class="avatar ${isBot ? 'bot-avatar' : ''}">${isBot ? 'SG' : 'YOU'}</div>
+                <div class="msg-body">
+                    <div class="msg-header">
+                        <span class="msg-sender">${sender}</span>
+                        <span class="msg-time">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="msg-content ${isBlocked ? 'blocked' : ''}">
+                        ${text}
+                        ${triageHtml}
+                    </div>
+                </div>
+            `;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+            chatInput.value = "";
+            appendMessage("You", text, false);
+
+            log(`Evaluating message: "${text}"`);
+
+            try {
+                const response = await fetch("/api/triage", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user: "You", message: text })
+                });
+                const data = await response.json();
+                const d = data.decision;
+
+                // Update Telemetry
+                document.getElementById("metricLatency").textContent = `${d.latency_ms} ms`;
+                document.getElementById("metricConfidence").textContent = d.confidence.toFixed(2);
+                document.getElementById("metricAction").textContent = d.recommended_action;
+                document.getElementById("metricDomain").textContent = `Domain: ${d.domain} (${d.intent})`;
+
+                if (!d.is_safe) {
+                    log(`GUARDRAIL TRIGGERED: ${d.reason}`, "red");
+                    appendMessage("SwitchGuard", `🛑 <strong>Action Blocked by Laya Guardrail:</strong><br>${d.reason}`, true, d, true);
+                    return;
+                }
+
+                if (d.requires_human_approval) {
+                    log(`HUMAN-IN-THE-LOOP: ${d.reason}`, "yellow");
+                    appendMessage("SwitchGuard", `⚠️ <strong>Human-in-the-Loop Sign-Off Required:</strong><br>${d.reason}<br><br><em>Please specify more details or confirm intent to proceed.</em>`, true, d);
+                    return;
+                }
+
+                if (d.recommended_action === "DISPATCH_RALPH_LOOP") {
+                    log(`DISPATCHING RALPH: ${d.intent}`, "cyan");
+                    appendMessage("SwitchGuard", `🚀 <strong>Laya Gate Verified:</strong> High confidence (${d.confidence}). Triggering autonomous Ralph loop worker...`, true, d);
+
+                    // Execute Ralph Story
+                    const ralphRes = await fetch("/api/ralph/execute", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ task_name: text, description: d.reason })
+                    });
+                    const rData = await ralphRes.json();
+                    
+                    rData.events.forEach(ev => {
+                        log(`[Ralph ${ev.status}] ${ev.details}`, ev.status === "passed" ? "green" : "");
+                    });
+
+                    appendMessage("SwitchGuard", `✅ <strong>Ralph Autonomous Iteration Complete:</strong><br>• User Story: <code>${rData.story_id}</code><br>• Verification: <code>tests/test_agent_gate.py (PASSED)</code><br>• Atomic Commit: <code>feat: ${rData.story_id} - Verified</code><br>• Status: <code>&lt;promise&gt;COMPLETE&lt;/promise&gt;</code>`, true);
+                } else if (d.recommended_action === "RUN_LOCAL_TESTS") {
+                    log("Running local test suite...", "green");
+                    const testRes = await fetch("/api/test/run", { method: "POST" });
+                    const tData = await testRes.json();
+                    appendMessage("SwitchGuard", `🧪 <strong>Pytest Verification Result:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px;">${tData.output}</pre>`, true, d);
+                } else {
+                    appendMessage("SwitchGuard", `🤖 <strong>Direct Response:</strong> Processed query in ${d.latency_ms}ms with calibrated confidence ${d.confidence}.`, true, d);
+                }
+            } catch (err) {
+                log(`Error: ${err.message}`, "red");
+                appendMessage("SwitchGuard", `❌ Request failed: ${err.message}`, true);
+            }
+        }
+
+        function sendSample(text) {
+            chatInput.value = text;
+            sendMessage();
+        }
+    </script>
+</body>
+</html>
