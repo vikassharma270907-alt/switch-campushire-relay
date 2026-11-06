@@ -272,3 +272,4 @@ async def get_ui_component_details(req: ComponentDetailRequest) -> Dict[str, Any
             "target_path": "components/ui/"
         }
     }
+

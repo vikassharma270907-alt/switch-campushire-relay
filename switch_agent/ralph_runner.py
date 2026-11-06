@@ -127,9 +127,11 @@ class RalphCollaborativeRunner:
         if os.path.exists(test_file):
             # Check for available python binary
             candidates = [
+                os.path.join(laya_repo, ".venv312", "Scripts", "python.exe"),
+                os.path.join(self.workspace_root, ".venv312", "Scripts", "python.exe"),
+                sys.executable,
                 os.path.join(laya_repo, ".venv", "Scripts", "python.exe"),
                 os.path.join(laya_repo, ".venv", "bin", "python"),
-                sys.executable,
             ]
             py_bin = next((c for c in candidates if os.path.exists(c)), sys.executable)
             try:
