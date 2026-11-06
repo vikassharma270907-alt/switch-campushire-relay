@@ -178,6 +178,52 @@ class TestLayaDecisionEngine(unittest.TestCase):
         mock_router.unload.assert_called_once()
         self.assertIsNone(self.engine._router)
 
+    def test_init_router_failure_raises_runtime_error(self):
+        """Verify that failure in Router instantiation raises RuntimeError."""
+        with patch("laya.Router", side_effect=Exception("Out of Memory")):
+            engine = LayaDecisionEngine()
+            with self.assertRaises(RuntimeError) as ctx:
+                engine._init_router()
+            self.assertIn("Failed to initialize Laya decision engine", str(ctx.exception))
+
+    def test_check_guardrails_handles_choice_violations(self):
+        """Verify that choice-type guardrail violations trigger unsafe flag."""
+        mock_router = MagicMock()
+        mock_router.predict.return_value = {
+            "answers": {
+                "jailbreak": {"type": "noul", "noul": 0.05},
+                "policy_check": {"type": "choice", "choice": "unsafe", "confidence": 0.96},
+            }
+        }
+
+        self.engine._router = mock_router
+        self.engine._laya_module = MagicMock()
+        self.engine._laya_module.guard_questions.return_value = {}
+
+        res = self.engine.check_guardrails("Malicious request triggering policy choice")
+
+        self.assertFalse(res["safe"])
+        self.assertEqual(res["risk_score"], 0.96)
+        self.assertIn("policy_check", res["flags"])
+
+    def test_module_main_entrypoint(self):
+        """Verify that running laya_service as main executes without error."""
+        import runpy
+        # Running the module executes the __main__ block
+        res = runpy.run_module("laya_service", run_name="__main__")
+        self.assertIn("LayaDecisionEngine", res)
+
+    def test_init_router_cached_inside_lock(self):
+        """Verify that if router is populated while waiting for lock, it returns cached."""
+        engine = LayaDecisionEngine()
+        mock_router = MagicMock()
+        # Acquire lock and set _router
+        with engine._lock:
+            engine._router = mock_router
+            # Calling _init_router when _router is set returns it directly
+            res = engine._init_router()
+            self.assertEqual(res, mock_router)
+
 
 if __name__ == "__main__":
     unittest.main()

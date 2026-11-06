@@ -1,28 +1,12 @@
-"""Unit tests for LayaDecisionEngine interface and state formatting."""
+"""Main test runner for switch wemakedev hackathon project."""
 
+import os
+import sys
 import unittest
-from laya_service import LayaDecisionEngine
-
-
-class TestLayaDecisionEngine(unittest.TestCase):
-    def setUp(self):
-        self.engine = LayaDecisionEngine()
-
-    def test_build_state(self):
-        text = "Hello world"
-        state = self.engine._build_state(text)
-        self.assertEqual(state["text"], text)
-        self.assertEqual(state["prompt"], text)
-        self.assertEqual(state["message"], text)
-        self.assertEqual(state["body"], text)
-        self.assertEqual(state["ticket"], text)
-
-    def test_lazy_initialization(self):
-        self.assertIsNone(self.engine._router)
-        # Verify unload when not loaded doesn't crash
-        self.engine.unload()
-        self.assertIsNone(self.engine._router)
-
 
 if __name__ == "__main__":
-    unittest.main()
+    loader = unittest.TestLoader()
+    suite = loader.discover(start_dir="tests", pattern="test_*.py")
+    runner = unittest.TextTestRunner(verbosity=2)
+    result = runner.run(suite)
+    sys.exit(0 if result.wasSuccessful() else 1)
