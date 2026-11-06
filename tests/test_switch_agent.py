@@ -65,6 +65,20 @@ def test_api_triage_endpoint():
     assert res["status"] == "success"
     assert res["decision"]["intent"] == "test_execution"
 
+def test_api_test_run_endpoint(monkeypatch):
+    from unittest.mock import MagicMock
+    mock_run = MagicMock()
+    mock_run.return_value.returncode = 0
+    mock_run.return_value.stdout = "20 passed in 1.5s"
+    mock_run.return_value.stderr = ""
+    monkeypatch.setattr("switch_agent.server.subprocess.run", mock_run)
+
+    response = client.post("/api/test/run")
+    assert response.status_code == 200
+    res = response.json()
+    assert res["status"] == "passed"
+    assert "20 passed" in res["output"]
+
 def test_ralph_runner_prd_lifecycle(tmp_path):
     runner = RalphCollaborativeRunner(workspace_root=str(tmp_path))
     prd = runner.get_or_create_prd("Test Feature", "Feature description")

@@ -5,7 +5,7 @@
       "url": "https://mcp.figma.com/mcp"
     },
     "laya": {
-      "command": "d:\\switch wemakedev hackathon\\laya-repo\\.venv\\Scripts\\python.exe",
+      "command": "D:\\switch wemakedev hackathon\\laya-repo\\.venv\\Scripts\\python.exe",
       "args": [
         "-m",
         "laya.mcp.server"

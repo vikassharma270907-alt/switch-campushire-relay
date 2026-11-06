@@ -80,22 +80,22 @@ async def api_ralph_execute(req: RalphExecuteRequest):
 
 @app.post("/api/test/run")
 async def api_test_run():
-    """Runs test_agent_gate.py verification suite."""
-    laya_repo = os.path.join(CONFIG.workspace_root, "laya-repo")
-    python_exe = os.path.join(laya_repo, ".venv", "Scripts", "python.exe")
-    if os.path.exists(python_exe):
-        res = subprocess.run(
-            [python_exe, "tests/test_agent_gate.py"],
-            cwd=laya_repo,
-            capture_output=True,
-            text=True,
-            timeout=15
-        )
-        return {
-            "status": "passed" if res.returncode == 0 else "failed",
-            "output": res.stdout or res.stderr
-        }
-    return {"status": "error", "output": "Python environment not found."}
+    """Runs test verification suite."""
+    python_exe = os.path.join(CONFIG.workspace_root, "laya-repo", ".venv", "Scripts", "python.exe")
+    if not os.path.exists(python_exe):
+        python_exe = sys.executable
+
+    res = subprocess.run(
+        [python_exe, "-m", "pytest", "tests/", "--tb=short"],
+        cwd=CONFIG.workspace_root,
+        capture_output=True,
+        text=True,
+        timeout=30
+    )
+    return {
+        "status": "passed" if res.returncode == 0 else "failed",
+        "output": res.stdout or res.stderr
+    }
 
 @app.api_route("/agent", methods=["GET", "POST"])
 async def switch_agent_protocol(request: Request):
