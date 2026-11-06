@@ -298,8 +298,11 @@
             <div class="quick-actions">
                 <button class="quick-btn" onclick="sendSample('fix the concurrent writer starvation in laya/agent.py')">⚡ Fix Concurrent Writer Bug (Ralph Loop)</button>
                 <button class="quick-btn" onclick="sendSample('run test_agent_gate.py verification suite')">🧪 Run Pytest Verification</button>
+                <button class="quick-btn" onclick="sendSample('run data pipeline')">📊 Audit Placement Data & Receipts</button>
+                <button class="quick-btn" onclick="sendSample('what academic research grounds this architecture?')">📚 Research Grounding</button>
+                <button class="quick-btn" onclick="sendSample('location')">📍 System Location</button>
                 <button class="quick-btn" onclick="sendSample('rm -rf / && drop database users')">🛑 Test Dangerous Command (Laya Guardrail)</button>
-                <button class="quick-btn" onclick="sendSample('deploy updates')">⚠️ Test Ambiguous Input (Clarification Gate)</button>
+                <button class="quick-btn" onclick="sendSample('deploy updates')">⚠️ Clarification Gate</button>
             </div>
 
             <div class="chat-input-bar">
@@ -419,7 +422,13 @@
 
                 if (d.requires_human_approval) {
                     log(`HUMAN-IN-THE-LOOP: ${d.reason}`, "yellow");
-                    appendMessage("SwitchGuard", `⚠️ <strong>Human-in-the-Loop Sign-Off Required:</strong><br>${d.reason}<br><br><em>Please specify more details or confirm intent to proceed.</em>`, true, d);
+                    appendMessage("SwitchGuard", `⚠️ <strong>Human-in-the-Loop Sign-Off Required:</strong><br>${escapeHtml(d.reason)}<br><br><em>Please specify more details or confirm intent to proceed.</em>`, true, d);
+                    return;
+                }
+
+                if (d.recommended_action === "REQUEST_CLARIFICATION") {
+                    log(`CLARIFICATION: ${d.reason}`, "yellow");
+                    appendMessage("SwitchGuard", `💡 <strong>Clarification Suggested:</strong><br>${escapeHtml(d.reason)}`, true, d);
                     return;
                 }
 
@@ -444,13 +453,23 @@
                     log("Running local test suite...", "green");
                     const testRes = await fetch("/api/test/run", { method: "POST" });
                     const tData = await testRes.json();
-                    appendMessage("SwitchGuard", `🧪 <strong>Pytest Verification Result:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px;">${tData.output}</pre>`, true, d);
+                    appendMessage("SwitchGuard", `🧪 <strong>Pytest Verification Result:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px;">${escapeHtml(tData.output)}</pre>`, true, d);
+                } else if (d.recommended_action === "RUN_DATA_PIPELINE" || d.intent === "data_pipeline") {
+                    log("Executing deterministic student eligibility pipeline...", "cyan");
+                    appendMessage("SwitchGuard", `📊 <strong>Audit Pipeline Initiated:</strong> Ingesting <code>data/sample_students.csv</code> against <code>data/eligibility_rules.json</code>...`, true, d);
+                    const pipeRes = await fetch("/api/pipeline/run", { method: "POST" });
+                    const pData = await pipeRes.json();
+                    appendMessage("SwitchGuard", `🧾 <strong>Audit Results & Cryptographic Receipt:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(pData.output)}</pre>`, true, d);
+                } else if (d.intent === "system_location") {
+                    appendMessage("SwitchGuard", `📍 <strong>System Location & Topology:</strong><br>${escapeHtml(d.reason)}`, true, d);
+                } else if (d.intent === "research_grounding") {
+                    appendMessage("SwitchGuard", `📚 <strong>Academic Research Grounding:</strong><br>${escapeHtml(d.reason)}<br><br><em>Features: Kahneman Dual-Process Cognition, MAST Organizational Verification, and ArmorAntigravity cryptographic Merkle ledgers.</em>`, true, d);
                 } else if (d.intent === "system_time") {
-                    appendMessage("SwitchGuard", `📅 <strong>System Date & Time:</strong> ${d.reason}`, true, d);
+                    appendMessage("SwitchGuard", `📅 <strong>System Date & Time:</strong> ${escapeHtml(d.reason)}`, true, d);
                 } else if (d.intent === "system_status") {
-                    appendMessage("SwitchGuard", `⚡ <strong>System Status:</strong> ${d.reason}`, true, d);
+                    appendMessage("SwitchGuard", `⚡ <strong>System Status:</strong> ${escapeHtml(d.reason)}`, true, d);
                 } else {
-                    appendMessage("SwitchGuard", `🤖 <strong>Direct Response:</strong> ${d.reason || `Processed query in ${d.latency_ms}ms with calibrated confidence ${d.confidence}.`}`, true, d);
+                    appendMessage("SwitchGuard", `🤖 <strong>Direct Response:</strong> ${escapeHtml(d.reason || `Processed query in ${d.latency_ms}ms with calibrated confidence ${d.confidence}.`)}`, true, d);
                 }
             } catch (err) {
                 log(`Error: ${err.message}`, "red");

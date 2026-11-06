@@ -65,6 +65,40 @@ def test_laya_gate_system_status_query():
     assert decision.intent == "system_status"
     assert decision.recommended_action == "DIRECT_ANSWER"
 
+def test_laya_gate_system_location_query():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "location")
+    assert decision.is_safe is True
+    assert decision.requires_human_approval is False
+    assert decision.intent == "system_location"
+    assert decision.recommended_action == "DIRECT_ANSWER"
+    assert "Vercel" in decision.reason
+
+def test_laya_gate_research_grounding_query():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "what research papers ground this architecture?")
+    assert decision.is_safe is True
+    assert decision.requires_human_approval is False
+    assert decision.intent == "research_grounding"
+    assert "MAST" in decision.reason
+
+def test_laya_gate_data_pipeline_query():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "run data pipeline")
+    assert decision.is_safe is True
+    assert decision.intent == "data_pipeline"
+    assert decision.recommended_action == "RUN_DATA_PIPELINE"
+
+def test_api_pipeline_run_endpoint():
+    response = client.post("/api/pipeline/run")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "passed"
+    assert "receipt" in data
+    assert data["receipt"]["total_records"] == 7
+    assert data["receipt"]["eligible_count"] == 2
+    assert "SHA-256" in data["output"]
+
 def test_switch_agent_protocol_handshake():
     response = client.get("/agent")
     assert response.status_code == 200

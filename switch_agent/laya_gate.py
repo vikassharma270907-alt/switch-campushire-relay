@@ -150,6 +150,24 @@ class LayaDecisionGate:
             difficulty = 0.1
             needs_tools = False
             confidence = 0.98
+        elif any(w in lower_msg for w in ("location", "where", "host", "environment", "region", "server")):
+            intent = "system_location"
+            domain = "utility"
+            difficulty = 0.1
+            needs_tools = False
+            confidence = 0.98
+        elif any(w in lower_msg for w in ("research", "paper", "papers", "academic", "theory", "literature", "mast", "chatdev", "kahneman", "architecture")):
+            intent = "research_grounding"
+            domain = "knowledge"
+            difficulty = 0.2
+            needs_tools = False
+            confidence = 0.98
+        elif any(w in lower_msg for w in ("data", "students", "pipeline", "shortlist", "audit data")):
+            intent = "data_pipeline"
+            domain = "data_ops"
+            difficulty = 1.0
+            needs_tools = True
+            confidence = 0.96
         elif any(w in lower_msg for w in ("help", "commands", "menu")):
             intent = "help"
             domain = "utility"
@@ -171,8 +189,8 @@ class LayaDecisionGate:
             reason = "Sensitive credentials or secrets referenced in query."
         elif confidence < self.confidence_threshold:
             recommended_action = "REQUEST_CLARIFICATION"
-            requires_approval = True
-            reason = f"Confidence score ({confidence:.2f}) below calibrated threshold ({self.confidence_threshold:.2f})."
+            requires_approval = False
+            reason = f"I noticed a brief query ('{normalized}'). Did you mean to check 'location', inspect 'research', 'run tests', or 'audit data'?"
         elif intent in ("bug_fix", "feature_request"):
             recommended_action = "DISPATCH_RALPH_LOOP"
             reason = f"High-confidence {intent} identified; routing to Ralph autonomous agent loop."
@@ -187,6 +205,18 @@ class LayaDecisionGate:
         elif intent == "system_status":
             recommended_action = "DIRECT_ANSWER"
             reason = "SwitchGuard active on Switch AI. System 1 Laya reflexes and Ralph autonomous loop ready."
+        elif intent == "system_location":
+            recommended_action = "DIRECT_ANSWER"
+            reason = "📍 Runtime Environment: Vercel Edge Serverless & Local Workspace. Linked to Switch AI channels #war-room-switch and #placement-drive-2027."
+        elif intent == "research_grounding":
+            recommended_action = "DIRECT_ANSWER"
+            reason = "📚 Academic Foundation: Grounded in MAST Taxonomy (UC Berkeley 2025; arXiv:2503.13657), ProgRouter Dual-Process Cognitive Routing (ACL 2026), MetaGPT SOPs (ICLR 2024 Oral), and ChatDev Communicative Dehallucination (ACL 2024)."
+        elif intent == "data_pipeline":
+            recommended_action = "RUN_DATA_PIPELINE"
+            reason = "Placement drive dataset execution requested; running deterministic eligibility audit on synthetic candidate pool."
+        elif intent == "help":
+            recommended_action = "DIRECT_ANSWER"
+            reason = "🤖 SwitchGuard Quick Commands: Type 'location' for runtime details, 'date today' for clock, 'research' for literature grounding, or click the buttons below to run Pytest or audit candidate data."
         else:
             recommended_action = "DIRECT_ANSWER"
             reason = "Standard conversational or lookup query; answering directly."
