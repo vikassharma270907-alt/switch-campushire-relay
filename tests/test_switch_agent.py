@@ -461,3 +461,131 @@ def test_api_docs_lookup_endpoint():
     assert "snippets" in data
     assert len(data["snippets"]) > 0
 
+
+def test_laya_gate_security_audit_intent():
+    """Verify Laya Decision Gate routes penetration test queries to Strix."""
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("security_eng", "strix security audit on openapi and owasp top 10")
+    assert decision.is_safe is True
+    assert decision.intent == "security_audit"
+    assert decision.recommended_action == "STRIX_SECURITY_SCAN"
+    assert "Strix" in decision.reason
+
+
+def test_security_status_endpoint():
+    """Verify Strix security status endpoint exposes operational details and skill count."""
+    response = client.get("/api/security/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert "status" in data
+    assert "Strix" in data["engine"]
+    assert data["skills_count"] == 9
+    assert "OWASP" in data["owasp_top_10"] or data["owasp_top_10"] == "Active"
+
+
+def test_security_skills_endpoint():
+    """Verify Strix security skills endpoint returns the 9 registered skills."""
+    response = client.get("/api/security/skills")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["count"] == 9
+    skill_names = [s["name"] for s in data["skills"]]
+    assert "penetration-testing-with-strix" in skill_names
+    assert "api-security-testing" in skill_names
+    assert "owasp-top-10-testing" in skill_names
+
+
+def test_security_scan_endpoint():
+    """Verify Strix security scan endpoint executes autonomous security vetting."""
+    payload = {
+        "target": "./",
+        "scan_mode": "quick",
+        "max_budget": 15.0,
+        "instruction": "OWASP API Security Top 10 BOLA and injection review"
+    }
+    response = client.post("/api/security/scan", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["target"] == "./"
+    assert data["scan_mode"] == "quick"
+    assert data["verdict"] == "SECURE"
+    assert "findings_summary" in data
+
+
+def test_security_scan_invalid_payload():
+    """Verify validation error on empty target or invalid scan mode."""
+    response = client.post("/api/security/scan", json={"target": "", "scan_mode": "invalid_mode"})
+    assert response.status_code == 422
+
+
+def test_laya_gate_ui_design_intent():
+    """Verify Laya Decision Gate routes UI/component queries to Magic UI / 21st MCP."""
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("designer", "find a modern pricing table component with monthly toggle")
+    assert decision.is_safe is True
+    assert decision.intent == "ui_design"
+    assert decision.recommended_action == "MAGIC_UI_LOOKUP"
+    assert "21st.dev" in decision.reason or "Magic" in decision.reason
+
+
+def test_ui_status_endpoint():
+    """Verify Magic UI status endpoint exposes 21st.dev engine, tools, and stack."""
+    response = client.get("/api/ui/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "active"
+    assert "21st.dev" in data["engine"] or "Magic" in data["engine"]
+    assert data["skills_count"] >= 2
+    assert "search" in data["supported_tools"]
+    assert "get_component" in data["supported_tools"]
+    assert "search_logo" in data["supported_tools"]
+
+
+def test_ui_skills_endpoint():
+    """Verify UI skills endpoint exposes 21st-ui, magic-ui, and magic-designer agent."""
+    response = client.get("/api/ui/skills")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    skill_names = [s["name"] for s in data["skills"]]
+    assert "21st-ui" in skill_names
+    assert "magic-ui" in skill_names
+    assert data["agent"]["name"] == "magic-designer"
+
+
+def test_ui_logo_endpoint():
+    """Verify SVGL brand logo endpoint returns vector SVGs for tech brands."""
+    response = client.get("/api/ui/logo?query=react")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["count"] > 0
+    assert any("react" in str(r).lower() for r in data["results"])
+
+
+def test_ui_search_endpoint():
+    """Verify component search endpoint queries 21st component catalog."""
+    payload = {"query": "pricing", "item_type": "component", "limit": 5}
+    response = client.post("/api/ui/search", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["count"] > 0
+    assert "pricing" in data["components"][0]["category"] or "pricing" in data["components"][0]["id"]
+
+
+def test_ui_component_endpoint():
+    """Verify component detail endpoint returns installation commands and dependencies."""
+    payload = {"id": "animated-bento-grid"}
+    response = client.post("/api/ui/component", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert data["component"]["id"] == "animated-bento-grid"
+    assert "framer-motion" in data["component"]["dependencies"]
+    assert data["installation"]["shadcn_compatible"] is True
+
+
+

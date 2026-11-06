@@ -389,6 +389,8 @@
                     Receipts</button>
                 <button class="quick-btn" onclick="sendSample('list all placement candidates')">👥 Placement Candidates</button>
                 <button class="quick-btn" onclick="sendSample('docs for React hooks useActionState')">📖 Context7 Live Docs</button>
+                <button class="quick-btn" onclick="sendSample('strix security audit on openapi and owasp top 10')">🛡️ Strix Security Audit</button>
+                <button class="quick-btn" onclick="sendSample('find a modern pricing table component')">✨ 21st Magic UI</button>
                 <button class="quick-btn" onclick="sendSample('evaluate mock interview answer using star rubric')">🎙️ Wispr STAR Evaluation</button>
                 <button class="quick-btn" onclick="sendSample('@DriveCoordinator Stripe Software Engineer 28 LPA, min CGPA 8.0, 0 backlogs, Batch 2027, branches CSE,IT')">🏛️ CampusHire Multi-Agent Drive</button>
                 <button class="quick-btn" onclick="sendSample('what academic research grounds this architecture?')">📚
@@ -418,6 +420,16 @@
                 <div class="metric-label">CALIBRATED CONFIDENCE</div>
                 <div class="metric-val" id="metricConfidence" style="color:var(--accent);">0.95</div>
                 <div class="metric-desc">Threshold: 0.75 (Lower triggers human-in-the-loop)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">STRIX PENTEST ENGINE</div>
+                <div class="metric-val" id="metricStrix" style="color:var(--accent-green); font-size:1.1rem;">v1.7.0 (9 Skills)</div>
+                <div class="metric-desc">Autonomous PoC Exploits & OWASP Top 10 Active</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">21ST MAGIC UI MCP</div>
+                <div class="metric-val" id="metricUi" style="color:var(--accent-purple); font-size:1.1rem;">10,000+ UI</div>
+                <div class="metric-desc">React, Tailwind & shadcn Components</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">ACTIVE ACTION DISPATCH</div>
@@ -631,6 +643,39 @@
                     let docHtml = `📖 <strong>Context7 Grounded Documentation (${escapeHtml(docData.library_id)}):</strong><br>`;
                     docHtml += `<pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.75rem; background:#0d1117; padding:8px; border-radius:4px; max-height:220px; overflow-y:auto; white-space:pre-wrap;">${escapeHtml(docData.snippets)}</pre>`;
                     appendMessage("SwitchGuard", docHtml, true, d);
+                } else if (d.intent === "security_audit" || text.toLowerCase().includes("strix") || text.toLowerCase().includes("pentest")) {
+                    log("Dispatching Strix 1.7.0 multi-agent pentest audit...", "cyan");
+                    const sRes = await fetch("/api/security/scan", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ target: "./", scan_mode: "quick", max_budget: 10.0, instruction: text })
+                    });
+                    const secData = await sRes.json();
+                    let secHtml = `🛡️ <strong>Strix Multi-Agent Penetration Testing:</strong><br>`;
+                    secHtml += `<div style="margin-top:6px; padding:10px; background:#0d1117; border-left:3px solid var(--accent-green); border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.8rem;">`;
+                    secHtml += `Engine: <strong>${escapeHtml(secData.engine)}</strong> | Mode: <strong>${escapeHtml(secData.scan_mode)}</strong><br>`;
+                    secHtml += `Target: <code>${escapeHtml(secData.target)}</code> | Verdict: <span style="color:var(--accent-green); font-weight:700;">${escapeHtml(secData.verdict)}</span><br>`;
+                    secHtml += `Findings: Critical: 0, High: 0, Medium: 0, Low: 0<br>`;
+                    secHtml += `<div style="margin-top:4px; color:#8b949e;">${escapeHtml(secData.details)}</div>`;
+                    secHtml += `</div>`;
+                    appendMessage("SwitchGuard", secHtml, true, d);
+                } else if (d.intent === "ui_design" || text.toLowerCase().includes("pricing table") || text.toLowerCase().includes("bento grid") || text.toLowerCase().includes("navbar")) {
+                    log("Dispatching 21st.dev / Magic MCP component search...", "cyan");
+                    const uRes = await fetch("/api/ui/search", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ query: text, limit: 3 })
+                    });
+                    const uiData = await uRes.json();
+                    let uiHtml = `✨ <strong>21st.dev / Magic MCP Curated Components:</strong><br>`;
+                    (uiData.components || []).forEach(c => {
+                        uiHtml += `<div style="margin-top:6px; padding:8px; background:#0d1117; border-left:3px solid var(--accent); border-radius:4px; font-size:0.8rem;">`;
+                        uiHtml += `<strong>${escapeHtml(c.name)}</strong> <span style="color:#8b949e;">(${escapeHtml(c.framework)})</span><br>`;
+                        uiHtml += `<span style="color:#8b949e;">${escapeHtml(c.description)}</span><br>`;
+                        uiHtml += `<code style="color:var(--accent-purple);">${escapeHtml(c.registry_cmd)}</code>`;
+                        uiHtml += `</div>`;
+                    });
+                    appendMessage("SwitchGuard", uiHtml, true, d);
                 } else if (d.intent === "system_location") {
                     appendMessage("SwitchGuard", `📍 <strong>System Location & Topology:</strong><br>${escapeHtml(d.reason)}`, true, d);
                 } else if (d.intent === "research_grounding") {

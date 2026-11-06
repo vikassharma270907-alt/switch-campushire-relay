@@ -30,11 +30,13 @@ from .routers.wispr_router import router as wispr_router
 from .routers.ralph_router import router as ralph_router, runner
 from .routers.telemetry_router import router as telemetry_router
 from .routers.docs_router import router as docs_router
+from .routers.security_router import router as security_router
+from .routers.ui_router import router as ui_router
 
 app = FastAPI(
     title="SwitchGuard & CampusHire Unified AI Platform",
-    description="Unified collaborative AI platform connecting Switch AI protocol, Laya System-1 reflexes, CampusHire multi-agent placement room, Wispr Flow voice scoring, and Ralph autonomous loops.",
-    version="2.0.0"
+    description="Unified collaborative AI platform connecting Switch AI protocol, Laya System-1 reflexes, CampusHire multi-agent placement room, Wispr Flow voice scoring, Context7 live docs, Strix autonomous pentesting, 21st.dev Magic UI, and Ralph autonomous loops.",
+    version="2.2.0"
 )
 
 # Enable CORS for Switch frontend clients & webhooks
@@ -54,7 +56,8 @@ app.include_router(wispr_router)
 app.include_router(ralph_router)
 app.include_router(telemetry_router)
 app.include_router(docs_router)
-app.include_router(docs_router)
+app.include_router(security_router)
+app.include_router(ui_router)
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 

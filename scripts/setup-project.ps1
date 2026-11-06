@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Instantly configures Antigravity Full-Power Automation (434+ skills, 107+ agents, 126+ rules, 99+ workflows, CodeRabbit, Ralph, and MCP servers) for any or all projects.
+    Instantly configures Antigravity Full-Power Automation (468+ skills, 112+ agents, 130+ rules, 110+ workflows, Addy Osmani Agent-Skills, CodeRabbit, Ralph, and MCP servers) for any or all projects.
 .PARAMETER ProjectPath
     The directory of the project to configure. Defaults to the current working directory.
 .PARAMETER AllProjects
@@ -20,6 +20,8 @@ $MasterPonytail = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\pl
 $MasterLemo = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\lemo-opuscar'
 $MasterSkillspector = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\skillspector'
 $MasterContext7 = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\context7'
+$MasterMagic = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\magic'
+$MasterStrix = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\strix'
 $MasterAgentSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\agent-skills'
 $MasterSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\skills'
 $ProjectsJsonPath = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\projects.json'
@@ -123,6 +125,64 @@ if (Test-Path -LiteralPath $MasterSkillspector) {
     }
 }
 
+# 2b. Sync Strix Autonomous Pentesting Skills & Rules into Master ECC & Global Skills
+if (Test-Path -LiteralPath $MasterStrix) {
+    $strixSkillsDir = Join-Path -Path $MasterStrix -ChildPath 'skills'
+    if (Test-Path -LiteralPath $strixSkillsDir) {
+        $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+        Get-ChildItem -LiteralPath $strixSkillsDir -Directory | ForEach-Object {
+            $gDest = Join-Path -Path $MasterSkills -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $gDest)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $gDest -Recurse -Force
+            }
+            if (Test-Path -LiteralPath $eccSkillsDir) {
+                $eDest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+                if (-not (Test-Path -LiteralPath $eDest)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination $eDest -Recurse -Force
+                }
+            }
+        }
+    }
+}
+
+# 2c. Sync Magic UI & 21st MCP Skills, Agent, and Rules into Master ECC & Global Skills
+if (Test-Path -LiteralPath $MasterMagic) {
+    $magicSkillsDir = Join-Path -Path $MasterMagic -ChildPath 'skills'
+    if (Test-Path -LiteralPath $magicSkillsDir) {
+        $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+        Get-ChildItem -LiteralPath $magicSkillsDir -Directory | ForEach-Object {
+            $gDest = Join-Path -Path $MasterSkills -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $gDest)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $gDest -Recurse -Force
+            }
+            if (Test-Path -LiteralPath $eccSkillsDir) {
+                $eDest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+                if (-not (Test-Path -LiteralPath $eDest)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination $eDest -Recurse -Force
+                }
+            }
+        }
+    }
+    # Sync rule
+    $magicRuleSrc = Join-Path -Path $MasterMagic -ChildPath 'rules\AGENTS.md'
+    $eccRulesDir = Join-Path -Path $MasterEcc -ChildPath 'rules'
+    if ((Test-Path -LiteralPath $magicRuleSrc) -and (Test-Path -LiteralPath $eccRulesDir)) {
+        $dstRule = Join-Path -Path $eccRulesDir -ChildPath 'magic-ui.md'
+        if (-not (Test-Path -LiteralPath $dstRule)) {
+            Copy-Item -LiteralPath $magicRuleSrc -Destination $dstRule -Force
+        }
+    }
+    # Sync agent
+    $magicAgentSrc = Join-Path -Path $MasterMagic -ChildPath 'agents\magic-designer.md'
+    $eccAgentsDir = Join-Path -Path $MasterEcc -ChildPath 'agents'
+    if ((Test-Path -LiteralPath $magicAgentSrc) -and (Test-Path -LiteralPath $eccAgentsDir)) {
+        $dstAgent = Join-Path -Path $eccAgentsDir -ChildPath 'magic-designer.md'
+        if (-not (Test-Path -LiteralPath $dstAgent)) {
+            Copy-Item -LiteralPath $magicAgentSrc -Destination $dstAgent -Force
+        }
+    }
+}
+
 # 3. Sync global skills into Master ECC skills so all 470+ skills are discoverable
 if (Test-Path -LiteralPath $MasterSkills) {
     $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
@@ -216,6 +276,18 @@ function Configure-SingleProject {
                 args = @("-y", "@upstash/context7-mcp")
                 env = @{}
             }
+            magic = @{
+                command = "node"
+                args = @("C:\Users\vikas sharma\.gemini\config\plugins\magic\dist\index.js")
+                env = @{}
+            }
+            "21st" = @{
+                type = "http"
+                url = "https://21st.dev/api/mcp"
+                headers = @{
+                    "x-api-key" = "`${API_KEY_21ST}"
+                }
+            }
         }
     }
     
@@ -281,6 +353,14 @@ function Configure-SingleProject {
             if ((Test-Path -LiteralPath $skillspectorPy) -and (-not $existingMcp.mcpServers.skillspector)) {
                 $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "skillspector" -Value $defaultMcp.mcpServers.skillspector -Force
             }
+            # Add magic if missing
+            if (-not $existingMcp.mcpServers.magic) {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "magic" -Value $defaultMcp.mcpServers.magic -Force
+            }
+            # Add 21st if missing
+            if (-not $existingMcp.mcpServers.'21st') {
+                $existingMcp.mcpServers | Add-Member -MemberType NoteProperty -Name "21st" -Value $defaultMcp.mcpServers.'21st' -Force
+            }
             $existingMcp | ConvertTo-Json -Depth 6 | Set-Content -Path $mcpJsonPath -Encoding utf8
         } catch {}
     }
@@ -295,6 +375,36 @@ function Configure-SingleProject {
                 Copy-Item -LiteralPath $_.FullName -Destination $hookDst -Force
             }
         }
+    }
+
+    # Scaffold project-level .vscode/settings.json for maximum effort, best models, and max credits
+    $vscodeDir = Join-Path -Path $Resolved -ChildPath '.vscode'
+    if (-not (Test-Path -LiteralPath $vscodeDir)) {
+        New-Item -ItemType Directory -Path $vscodeDir -Force | Out-Null
+    }
+    $vscodeSettingsPath = Join-Path -Path $vscodeDir -ChildPath 'settings.json'
+    $maxEffortSettings = @{
+        "antigravity.alwaysThinkingEnabled" = $true
+        "antigravity.effortLevel" = "high"
+        "antigravity.reasoningEffort" = "high"
+        "antigravity.useAiCredits" = $true
+        "antigravity.maxThinkingTokens" = 65536
+        "claudeCode.alwaysThinkingEnabled" = $true
+        "claudeCode.effortLevel" = "max"
+        "claudeCode.maxEffortLevel" = "max"
+    }
+    if (-not (Test-Path -LiteralPath $vscodeSettingsPath)) {
+        $maxEffortSettings | ConvertTo-Json -Depth 4 | Set-Content -Path $vscodeSettingsPath -Encoding utf8
+    } else {
+        try {
+            $existingVs = Get-Content -LiteralPath $vscodeSettingsPath -Raw | ConvertFrom-Json
+            foreach ($k in $maxEffortSettings.Keys) {
+                if (-not $existingVs.$k) {
+                    $existingVs | Add-Member -MemberType NoteProperty -Name $k -Value $maxEffortSettings[$k] -Force
+                }
+            }
+            $existingVs | ConvertTo-Json -Depth 4 | Set-Content -Path $vscodeSettingsPath -Encoding utf8
+        } catch {}
     }
 
     # Copy antigravity-sync helper scripts to scripts/
@@ -317,8 +427,8 @@ function Configure-SingleProject {
 <#
 .SYNOPSIS
     Antigravity Project Synchronization Script
-    Provisions all 434+ skills, 107+ agents, 126+ rules, 99+ workflows,
-    ArmorAntigravity governance, CodeRabbit, Ralph autonomous loop, and MCP servers into the target project.
+    Provisions all 468+ skills, 112+ agents, 130+ rules, 110+ workflows,
+    Addy Osmani Agent-Skills, ArmorAntigravity governance, CodeRabbit, Ralph autonomous loop, and MCP servers into the target project.
 #>
 param(
     [string]`$ProjectPath = (Get-Location).Path,
@@ -396,8 +506,8 @@ jobs:
         target = 'antigravity'
         mode = 'full-power'
         installedAt = (Get-Date -Format 'o')
-        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar', 'agent-skills', 'context7', 'skillspector')
-        sourceVersion = '2.12.0'
+        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar', 'agent-skills', 'context7', 'skillspector', 'strix')
+        sourceVersion = '2.13.0'
     }
     $stateJson = $stateObj | ConvertTo-Json -Depth 4
     Set-Content -Path $stateFile -Value $stateJson -Encoding utf8
@@ -426,10 +536,11 @@ jobs:
     }
 
     Write-Host "[Antigravity Full-Power] Successfully configured: $Resolved" -ForegroundColor Green
-    Write-Host "  - Skills: 472+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar + Agent-Skills + Context7 + SkillSpector)"
+    Write-Host "  - Skills: 481+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar + Agent-Skills + Context7 + SkillSpector + Strix)"
     Write-Host "  - Agents: 114+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Security-Auditor + Skill-Inspector + Test-Engineer + Film-Director)"
-    Write-Host "  - Rules: 133+ (TDD, Security, Immutability, CodeRabbit Quality Gates, SkillSpector Safety, Context7 Docs, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules, Agent-Skills)"
+    Write-Host "  - Rules: 134+ (TDD, Security, Immutability, CodeRabbit Quality Gates, SkillSpector Safety, Context7 Docs, Strix Pentesting, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules, Agent-Skills)"
     Write-Host "  - Workflows: 112+ (/skillspector, /spec, /ship, /webperf, /test, /review, /planning, /reach, autonomous pipelines)"
+    Write-Host "  - Strix Autonomous Pentesting: Active (9 security skills, OWASP Top 10, API testing, PoC exploit validation, strix 1.7.0 CLI)"
     Write-Host "  - NVIDIA SkillSpector: Active (71 vulnerability patterns, pre-install static vetting, semantic source review, skillspector MCP server)"
     Write-Host "  - Context7 Live Docs: Active (resolve-library-id, query-docs, ctx7 CLI, docs-researcher agent, auto-grounding for all libraries)"
     Write-Host "  - Addy Osmani Agent-Skills: Active (25 engineering skills, 4 agents, /spec, /ship, /webperf, /test, /review, /planning)"

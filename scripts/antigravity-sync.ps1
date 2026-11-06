@@ -1,8 +1,8 @@
 ﻿<#
 .SYNOPSIS
     Antigravity Project Synchronization Script
-    Provisions all 434+ skills, 107+ agents, 126+ rules, 99+ workflows,
-    ArmorAntigravity governance, CodeRabbit, Ralph autonomous loop, and MCP servers into the target project.
+    Provisions all 468+ skills, 112+ agents, 130+ rules, 110+ workflows,
+    Addy Osmani Agent-Skills, ArmorAntigravity governance, CodeRabbit, Ralph autonomous loop, and MCP servers into the target project.
 #>
 param(
     [string]$ProjectPath = (Get-Location).Path,

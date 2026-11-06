@@ -159,6 +159,18 @@ class LayaDecisionGate:
             difficulty = 0.5
             needs_tools = True
             confidence = 0.96
+        elif any(w in lower_msg for w in ("strix", "pentest", "penetration test", "security audit", "owasp", "vulnerability scan", "security test", "find vulnerabilities")):
+            intent = "security_audit"
+            domain = "security"
+            difficulty = 2.0
+            needs_tools = True
+            confidence = 0.97
+        elif any(w in lower_msg for w in ("ui", "component", "pricing table", "navbar", "hero section", "bento grid", "logo svg", "brand logo", "21st", "magic ui")):
+            intent = "ui_design"
+            domain = "frontend"
+            difficulty = 1.2
+            needs_tools = True
+            confidence = 0.96
         elif any(w in lower_msg for w in ("date", "time", "clock", "today", "now", "calendar")):
             import datetime
             now_str = datetime.datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
@@ -244,6 +256,12 @@ class LayaDecisionGate:
         elif intent == "docs_lookup":
             recommended_action = "CONTEXT7_DOCS_LOOKUP"
             reason = "Live documentation inquiry; resolving library and fetching verified syntax via Context7."
+        elif intent == "security_audit":
+            recommended_action = "STRIX_SECURITY_SCAN"
+            reason = "Autonomous penetration testing & vulnerability assessment dispatched via Strix 1.7.0 multi-agent engine."
+        elif intent == "ui_design":
+            recommended_action = "MAGIC_UI_LOOKUP"
+            reason = "Frontend UI component / brand logo request; querying 21st.dev / Magic MCP catalog for production React + Tailwind code."
         elif intent == "help":
             recommended_action = "DIRECT_ANSWER"
             reason = "🤖 SwitchGuard Quick Commands: Type 'location' for runtime details, 'date today' for clock, 'research' for literature grounding, or click the buttons below to run Pytest or audit candidate data."
