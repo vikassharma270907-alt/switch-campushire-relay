@@ -1,0 +1,118 @@
+{
+  "audit_fairness_summary": {
+    "total_audited": 7,
+    "eligible_total": 2,
+    "not_eligible_total": 4,
+    "needs_review_total": 1,
+    "branch_distribution": {
+      "CSE": {
+        "total_candidates": 3,
+        "eligible_count": 1,
+        "pass_rate_pct": 33.3
+      },
+      "ECE": {
+        "total_candidates": 1,
+        "eligible_count": 0,
+        "pass_rate_pct": 0.0
+      },
+      "IT": {
+        "total_candidates": 2,
+        "eligible_count": 1,
+        "pass_rate_pct": 50.0
+      },
+      "ME": {
+        "total_candidates": 1,
+        "eligible_count": 0,
+        "pass_rate_pct": 0.0
+      }
+    },
+    "sensitivity_analysis": {
+      "relaxed_cgpa_threshold": 6.5,
+      "potential_newly_eligible_count": 1,
+      "near_miss_candidates": [
+        {
+          "student_id": "STU004",
+          "cgpa": 6.8,
+          "required": 7.0,
+          "delta": 0.2
+        }
+      ]
+    }
+  },
+  "counterfactual_explanations": [
+    {
+      "student_id": "STU003",
+      "primary_reasons": [
+        "Branch 'ME' not in allowed list: CSE, IT"
+      ],
+      "counterfactual_actions": {
+        "branch": {
+          "current": "ME",
+          "target": [
+            "CSE",
+            "IT"
+          ],
+          "eligible": false
+        }
+      },
+      "is_near_boundary": false
+    },
+    {
+      "student_id": "STU004",
+      "primary_reasons": [
+        "CGPA deficit: 6.80 < 7.00 (gap: +0.20)"
+      ],
+      "counterfactual_actions": {
+        "cgpa": {
+          "current": 6.8,
+          "target": 7.0,
+          "delta_required": "+0.20"
+        }
+      },
+      "is_near_boundary": true
+    },
+    {
+      "student_id": "STU005",
+      "primary_reasons": [
+        "Branch 'ECE' not in allowed list: CSE, IT",
+        "Excess backlogs: 1 > 0 (must clear 1)"
+      ],
+      "counterfactual_actions": {
+        "branch": {
+          "current": "ECE",
+          "target": [
+            "CSE",
+            "IT"
+          ],
+          "eligible": false
+        },
+        "active_backlogs": {
+          "current": 1,
+          "target": 0,
+          "clear_required": 1
+        }
+      },
+      "is_near_boundary": false
+    },
+    {
+      "student_id": "STU006",
+      "primary_reasons": [],
+      "counterfactual_actions": {},
+      "is_near_boundary": false
+    },
+    {
+      "student_id": "STU007",
+      "primary_reasons": [
+        "Graduation year mismatch (2026 vs 2027)"
+      ],
+      "counterfactual_actions": {
+        "graduation_year": {
+          "current": 2026,
+          "target": 2027,
+          "delta_years": 1
+        }
+      },
+      "is_near_boundary": false
+    }
+  ]
+}

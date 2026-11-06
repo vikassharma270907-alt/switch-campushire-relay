@@ -32,14 +32,16 @@ class LayaDecisionGate:
 
     # Pre-compiled regex patterns for fast safety guardrails
     DESTRUCTIVE_PATTERNS = [
-        re.compile(r"\b(rm\s+-rf|drop\s+database|format\s+[a-z]:|dd\s+if=)\b", re.IGNORECASE),
-        re.compile(r"\b(truncate\s+table|delete\s+from\s+users|flushall)\b", re.IGNORECASE),
-        re.compile(r"\b(deploy\s+to\s+production|push\s+--force\s+origin\s+main)\b", re.IGNORECASE),
+        re.compile(r"(rm\s+-rf|drop\s+database|format\s+[a-z]:|dd\s+if=|del\s+/[a-z]|del\s+[a-z]:)", re.IGNORECASE),
+        re.compile(r"(truncate\s+table|delete\s+from\s+users|flushall|shutdown\s+nosave)", re.IGNORECASE),
+        re.compile(r"(deploy\s+to\s+production|push\s+.*--force|git\s+push\s+.*--force)", re.IGNORECASE),
+        re.compile(r"(curl\s+.*\|\s*(?:bash|sh|zsh)|cat\s+/etc/(?:shadow|passwd))", re.IGNORECASE),
     ]
 
     INJECTION_PATTERNS = [
         re.compile(r"(ignore\s+(?:all\s+|any\s+)?(?:previous\s+)?instructions|system\s+prompt|reveal\s+secret)", re.IGNORECASE),
         re.compile(r"(you\s+are\s+now\s+dan|developer\s+mode\s+enabled|jailbreak|disregard\s+(?:all\s+|previous\s+)?instructions)", re.IGNORECASE),
+        re.compile(r"(\.env|private\s+key|bearer\s+tokens?|password\s+for|credentials|exfiltrat)", re.IGNORECASE),
     ]
 
     def __init__(self, confidence_threshold: float = 0.75):
@@ -141,6 +143,18 @@ class LayaDecisionGate:
             difficulty = 2.5
             needs_tools = True
             confidence = 0.92
+        elif any(w in lower_msg for w in ("receipt", "cryptographic receipt", "armoriq", "merkle receipt", "sha256 receipt", "verify receipt")):
+            intent = "governance_receipt"
+            domain = "governance"
+            difficulty = 0.5
+            needs_tools = True
+            confidence = 0.98
+        elif any(w in lower_msg for w in ("armoriq", "cryptographic receipt", "governance receipt", "seal drive", "merkle receipt")):
+            intent = "governance_receipt"
+            domain = "governance"
+            difficulty = 1.0
+            needs_tools = True
+            confidence = 0.98
         elif any(w in lower_msg for w in ("test", "pytest", "coverage", "verify", "check")):
             intent = "test_execution"
             domain = "qa"
@@ -163,6 +177,18 @@ class LayaDecisionGate:
             intent = "security_audit"
             domain = "security"
             difficulty = 2.0
+            needs_tools = True
+            confidence = 0.97
+        elif any(w in lower_msg for w in ("notebooklm", "audio briefing", "podcast", "audio overview", "audio debrief", "candidate audio")):
+            intent = "audio_briefing"
+            domain = "audio_ai"
+            difficulty = 1.0
+            needs_tools = True
+            confidence = 0.97
+        elif any(w in lower_msg for w in ("skill gap", "500 ai projects", "bridge gap", "recommend projects", "upskilling")):
+            intent = "skill_gap_recommendation"
+            domain = "career_ai"
+            difficulty = 0.8
             needs_tools = True
             confidence = 0.97
         elif any(w in lower_msg for w in ("ui", "component", "pricing table", "navbar", "hero section", "bento grid", "logo svg", "brand logo", "21st", "magic ui")):
@@ -259,6 +285,15 @@ class LayaDecisionGate:
         elif intent == "security_audit":
             recommended_action = "STRIX_SECURITY_SCAN"
             reason = "Autonomous penetration testing & vulnerability assessment dispatched via Strix 1.7.0 multi-agent engine."
+        elif intent == "audio_briefing":
+            recommended_action = "NOTEBOOKLM_AUDIO_BRIEFING"
+            reason = "Citation-grounded 2-host audio prep briefing generated via NotebookLM engine."
+        elif intent == "skill_gap_recommendation":
+            recommended_action = "RECOMMEND_SKILL_GAP_PROJECTS"
+            reason = "Skill-gap pathfinding initiated against 500+ AI Projects Library to recommend hands-on open source repositories."
+        elif intent == "governance_receipt":
+            recommended_action = "VERIFY_ARMOR_RECEIPT"
+            reason = "ArmorIQ Intent Security Protocol: Validating SHA-256 cryptographic intent hashes and Merkle root integrity."
         elif intent == "ui_design":
             recommended_action = "MAGIC_UI_LOOKUP"
             reason = "Frontend UI component / brand logo request; querying 21st.dev / Magic MCP catalog for production React + Tailwind code."

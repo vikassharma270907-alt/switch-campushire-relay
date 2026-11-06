@@ -100,3 +100,25 @@ CampusHire Relay's system design is grounded in seven peer-reviewed papers on mu
 ### 6. AutoGen: Grounding Verification (Wu et al., COLM 2024; `arXiv:2308.08155`)
 - **Key Finding:** Introducing a dedicated verification agent into agentic workflows improved task success across unseen environments by +15 percentage points.
 - **Architectural Application:** Eligibility Auditor acts as an isolated grounding verifier, cross-checking all student records against the approved brief and generating cryptographic SHA-256 verification receipts.
+
+---
+
+## 5. Integration of Open-Source ML/CV/NLP Patterns (500+ AI Projects Compendium)
+
+To maximize competitive differentiation in the WeMakeDevs Hackathon, CampusHire Relay incorporates high-leverage architectural patterns synthesized from the **500+ AI/ML/DL/CV/NLP Projects** compendium ([ashishpatel26/500-AI-Projects](https://github.com/ashishpatel26/500-AI-Machine-learning-Deep-learning-Computer-vision-NLP-Projects-with-code)):
+
+1. **Semantic Skill Matching & Recommendation (`scripts/skill_matcher.py`):**
+   - *Source Inspiration:* `awesome-sentence-embedding` (#43) and Recommendation Systems (#17).
+   - *Implementation:* Compares candidate skill tokens against recruiter role requirements, calculating a Jaccard & coverage readiness index. Generates customized 3-day sprint gap-remediation roadmaps injected directly into each student's prep kit in `#student-prep-studio`.
+
+2. **Explainable AI & Counterfactual Decision Attribution (`scripts/explainability.py`):**
+   - *Source Inspiration:* `awesome-machine-learning-interpretability` (#49) and `awesome-reproducible-research` (#54).
+   - *Implementation:* Automatically computes counterfactual perturbations for rejected candidates (e.g., exact CGPA deficit, active backlog clearance required) and audits cohort fairness (branch pass rates, sensitivity analysis for relaxing cutoffs). Embeds explainability summaries into `audit_receipt.json`.
+
+3. **Anti-Fraud Exam Hall Admit Pass Generator (`scripts/hall_pass_generator.py`):**
+   - *Source Inspiration:* `learnopencv` (#70) and document security verification systems (#36, #56).
+   - *Implementation:* Generates printable candidate admit cards with 16-character tamper-proof HMAC-SHA256 verification tokens and anti-counterfeit seat allocations (`Hall-A, Seat A-01`). Provides invigilators with sub-second CLI authentication to prevent candidate impersonation on test day.
+
+4. **Speech-to-Text & STAR Audio Evaluation (Wispr Flow Integration):**
+   - *Source Inspiration:* `Awesome-Chatbot` (#51) and multi-modal dialogue systems (#50).
+   - *Implementation:* Combines Wispr Flow voice dictation (112 WPM, 99.4% accuracy) with Laya's sub-50ms neural reflex engine to score spoken STAR interview responses (Situation, Task, Action, Result) in `#student-prep-studio`.

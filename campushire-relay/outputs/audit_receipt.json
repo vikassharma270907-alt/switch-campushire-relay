@@ -5,5 +5,41 @@
   "total_records": 7,
   "eligible_count": 2,
   "not_eligible_count": 4,
-  "needs_review_count": 1
+  "needs_review_count": 1,
+  "explainability_summary": {
+    "branch_distribution": {
+      "CSE": {
+        "total_candidates": 3,
+        "eligible_count": 1,
+        "pass_rate_pct": 33.3
+      },
+      "ECE": {
+        "total_candidates": 1,
+        "eligible_count": 0,
+        "pass_rate_pct": 0.0
+      },
+      "IT": {
+        "total_candidates": 2,
+        "eligible_count": 1,
+        "pass_rate_pct": 50.0
+      },
+      "ME": {
+        "total_candidates": 1,
+        "eligible_count": 0,
+        "pass_rate_pct": 0.0
+      }
+    },
+    "sensitivity_analysis": {
+      "relaxed_cgpa_threshold": 6.5,
+      "potential_newly_eligible_count": 1,
+      "near_miss_candidates": [
+        {
+          "student_id": "STU004",
+          "cgpa": 6.8,
+          "required": 7.0,
+          "delta": 0.2
+        }
+      ]
+    }
+  }
 }

@@ -128,6 +128,30 @@ def run_validation(
         "not_eligible_count": int((res_df["status"] == "NOT_ELIGIBLE").sum()),
         "needs_review_count": int((res_df["status"] == "NEEDS_REVIEW").sum()),
     }
+
+    # Automatically generate explainability & fairness audit
+    try:
+        from scripts.explainability import generate_explainability_report
+    except ImportError:
+        try:
+            from explainability import generate_explainability_report
+        except ImportError:
+            generate_explainability_report = None
+
+    if generate_explainability_report is not None:
+        try:
+            exp_report = generate_explainability_report(
+                results_csv=str(out_path),
+                criteria_json=criteria_file,
+                out_file=str(out_path.parent / "explainability_report.json"),
+            )
+            receipt["explainability_summary"] = {
+                "branch_distribution": exp_report.get("audit_fairness_summary", {}).get("branch_distribution", {}),
+                "sensitivity_analysis": exp_report.get("audit_fairness_summary", {}).get("sensitivity_analysis", {}),
+            }
+        except Exception:
+            pass
+
     receipt_path = out_path.parent / "audit_receipt.json"
     receipt_path.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
     return receipt

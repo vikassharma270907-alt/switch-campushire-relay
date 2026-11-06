@@ -44,7 +44,28 @@ def generate_all_reports(
     attendance_df["seat_no"] = [f"A-{i+1:02d}" for i in range(len(attendance_df))]
     attendance_df["student_signature"] = ""
     attendance_df["invigilator_initials"] = ""
-    attendance_df.to_csv(out_path / "attendance_sheet.csv", index=False)
+    attendance_sheet_file = out_path / "attendance_sheet.csv"
+    attendance_df.to_csv(attendance_sheet_file, index=False)
+
+    # Automatically generate cryptographic admit passes for eligible students
+    try:
+        from scripts.hall_pass_generator import generate_hall_passes
+    except ImportError:
+        try:
+            from hall_pass_generator import generate_hall_passes
+        except ImportError:
+            generate_hall_passes = None
+
+    if generate_hall_passes is not None and len(eligible) > 0:
+        try:
+            crit_file = str(out_path / "drive_brief.json") if (out_path / "drive_brief.json").exists() else criteria_json
+            generate_hall_passes(
+                attendance_csv=str(attendance_sheet_file),
+                criteria_json=crit_file,
+                out_dir=str(out_path / "hall_passes"),
+            )
+        except Exception:
+            pass
 
     # Generate Draft Student Announcement
     company = criteria.get("company", "Northstar Technologies")

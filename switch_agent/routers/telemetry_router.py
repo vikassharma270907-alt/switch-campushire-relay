@@ -26,6 +26,7 @@ def get_python_exe(workspace_root: str) -> str:
     return sys.executable
 
 
+@router.get("/health")
 @router.get("/healthz")
 @router.get("/api/health")
 async def health_check():

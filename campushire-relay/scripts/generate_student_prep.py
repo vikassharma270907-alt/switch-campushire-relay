@@ -10,6 +10,14 @@ import sys
 from pathlib import Path
 import pandas as pd
 
+try:
+    from scripts.skill_matcher import evaluate_student_skills
+except ImportError:
+    try:
+        from skill_matcher import evaluate_student_skills
+    except ImportError:
+        evaluate_student_skills = None
+
 
 def generate_student_prep_pack(
     eligible_csv: str = "outputs/eligible.csv",
@@ -48,12 +56,22 @@ def generate_student_prep_pack(
         branch = row.get("branch", "Engineering")
         cgpa = row.get("cgpa", "N/A")
 
+        skill_section = ""
+        stage_num = 1
+        if evaluate_student_skills is not None:
+            try:
+                skill_res = evaluate_student_skills(safe_sid, branch, role)
+                skill_section = f"\n## 1. Semantic Skill Match & Gap Analysis\n{skill_res['roadmap_markdown']}\n"
+                stage_num = 2
+            except Exception:
+                pass
+
         prep_md = f"""# Personal Career & Creative Prep Kit: {safe_sid} — {company} ({role})
 
 **Student Profile:** ID `{safe_sid}` | Branch: `{branch}` | Verified CGPA: `{cgpa}`  
 **Portal Registration Deadline:** {portal_deadline}  
-
-## 1. Stage-by-Stage Preparation Roadmap
+{skill_section}
+## {stage_num}. Stage-by-Stage Preparation Roadmap
 """
         for idx, stage in enumerate(stages, 1):
             prep_md += (
@@ -62,7 +80,7 @@ def generate_student_prep_pack(
             )
 
         prep_md += f"""
-## 2. Voice Mock Interview Prompts (Practice with Wispr Flow in `#student-prep-studio`)
+## {stage_num + 1}. Voice Mock Interview Prompts (Practice with Wispr Flow in `#student-prep-studio`)
 1. *"Walk me through a {branch} project on your resume and explain a technical trade-off you made."*
 2. *"Why are you interested in the {role} position at {company}?"*
 3. *"Describe a time you debugged a failure under a tight deadline."*

@@ -17,6 +17,8 @@ You are **Eligibility Auditor**, a deterministic data verification agent operati
 4. **Post Evidence & Cryptographic Receipt:** Reply in the room thread addressing `@campus-hire-drive-coordinator` with:
    - A Markdown table showing each `student_id`, status, and exact reason.
    - Summary totals (Total, Eligible, Not Eligible, Needs Review).
+   - Counterfactual decision attribution (e.g., `STU004: +0.20 CGPA deficit`; `STU005: 1 active backlog excess`) from `outputs/explainability_report.json`.
+   - Cohort demographic pass rates across branches (`CSE`, `IT`, `ECE`, `ME`).
    - The SHA-256 checksums from `outputs/audit_receipt.json` (`students_csv_sha256`, `criteria_json_sha256`, `results_csv_sha256`).
 
 ## Strict Constraints

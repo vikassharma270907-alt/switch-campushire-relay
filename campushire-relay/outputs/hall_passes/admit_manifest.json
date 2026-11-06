@@ -1,0 +1,23 @@
+{
+  "company": "Northstar Technologies",
+  "role": "Graduate Engineer Trainee",
+  "total_admit_passes": 2,
+  "passes": [
+    {
+      "student_id": "STU001",
+      "room_no": "Hall-A",
+      "seat_no": "A-01",
+      "branch": "CSE",
+      "verification_token": "20ED-E77A-7CDB-86ED",
+      "pass_file": "D:\\switch wemakedev hackathon\\campushire-relay\\outputs\\hall_passes\\STU001_admit_pass.md"
+    },
+    {
+      "student_id": "STU002",
+      "room_no": "Hall-A",
+      "seat_no": "A-02",
+      "branch": "IT",
+      "verification_token": "CEBA-A8F3-12C2-2E5D",
+      "pass_file": "D:\\switch wemakedev hackathon\\campushire-relay\\outputs\\hall_passes\\STU002_admit_pass.md"
+    }
+  ]
+}

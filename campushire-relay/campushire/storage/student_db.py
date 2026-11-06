@@ -18,6 +18,9 @@ class StudentRepository:
         """Fetch candidate by roll number."""
         return self._students.get(roll_no)
 
+    # Alias for convenience
+    get_candidate_by_roll = get_candidate
+
     def get_all_candidates(self) -> List[Candidate]:
         """Return all candidates in repository."""
         return list(self._students.values())

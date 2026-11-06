@@ -29,6 +29,24 @@ UI_SKILLS = [
         "description": "Discover, install, and generate modern React, Tailwind, and shadcn/ui components, themes, and brand logos.",
         "category": "design-system",
         "tools": ["search", "get_component", "get_theme", "search_logo", "iterate_generation"]
+    },
+    {
+        "name": "motion-foundations",
+        "description": "Motion tokens, spring presets, performance rules, and SSR-safe physics animations using motion/react.",
+        "category": "animation",
+        "tools": ["get_tokens", "get_springs", "should_animate"]
+    },
+    {
+        "name": "motion-patterns",
+        "description": "Staggered lists, border beams, interactive particles, and celebration confetti cannons.",
+        "category": "animation",
+        "tools": ["border_beam", "particles_mesh", "confetti_cannon", "hyper_text"]
+    },
+    {
+        "name": "liquid-glass-design",
+        "description": "Dynamic glass material with backdrop blur, specular highlights, and tactile spring micro-interactions.",
+        "category": "design-system",
+        "tools": ["glass_panel", "shimmer_button", "radar_beacon"]
     }
 ]
 
@@ -72,6 +90,86 @@ CURATED_CATALOG = [
         "dependencies": ["framer-motion", "lucide-react"],
         "registry_cmd": "21st add lumi-design/hero-section-particle-glow",
         "framework": "React / Tailwind / Framer Motion"
+    },
+    {
+        "id": "magic-border-beam",
+        "name": "Magic UI Border Beam",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "An animated beam of light traveling along the perimeter of cards and panels.",
+        "dependencies": ["motion"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/border-beam.json\"",
+        "framework": "Motion / CSS Keyframes"
+    },
+    {
+        "id": "magic-particles-mesh",
+        "name": "Interactive Particle Constellation",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "Interactive HTML5 canvas particle field with distance connection lines and cursor magnetism.",
+        "dependencies": ["canvas-api"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/particles.json\"",
+        "framework": "Vanilla Canvas / React"
+    },
+    {
+        "id": "magic-confetti-cannon",
+        "name": "Celebration Confetti & Fireworks",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "Celebration confetti cannons and star showers for task completion and verified test runs.",
+        "dependencies": ["canvas-confetti"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/confetti.json\"",
+        "framework": "Canvas Confetti"
+    },
+    {
+        "id": "magic-hyper-text",
+        "name": "Cyberpunk Hyper-Text Decryption",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "Letter scrambling matrix effect that decodes text characters progressively.",
+        "dependencies": ["motion"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/hyper-text.json\"",
+        "framework": "Motion / React"
+    },
+    {
+        "id": "submillisecond-speedometer",
+        "name": "Sub-millisecond Latency Speedometer",
+        "category": "animation",
+        "author": "switch-motion",
+        "description": "Radial SVG gauge with spring needle and rolling counter for sub-5ms decision display.",
+        "dependencies": ["svg", "requestAnimationFrame"],
+        "registry_cmd": "switch add motion/submillisecond-speedometer",
+        "framework": "SVG / CSS Spring"
+    },
+    {
+        "id": "magic-aurora-text",
+        "name": "Magic UI Aurora Text",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "Dynamic fluid aurora gradient text effect with smooth continuous hue shifting.",
+        "dependencies": ["css-gradient"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/aurora-text.json\"",
+        "framework": "CSS Animated Gradient"
+    },
+    {
+        "id": "magic-neon-gradient-card",
+        "name": "Magic UI Neon Gradient Card",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "High-intensity luminous neon glow card with blurred volumetric backdrop bloom.",
+        "dependencies": ["css-filters"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/neon-gradient-card.json\"",
+        "framework": "CSS Neon Glow / Glass"
+    },
+    {
+        "id": "magic-meteors-shower",
+        "name": "Magic UI Meteors Shower",
+        "category": "animation",
+        "author": "magic-ui",
+        "description": "Diagonal cosmic meteor shower with trailing linear gradient light tails.",
+        "dependencies": ["css-transforms"],
+        "registry_cmd": "npx shadcn@latest add \"https://magicui.design/r/meteors.json\"",
+        "framework": "CSS Keyframes / GPU"
     }
 ]
 
@@ -284,5 +382,84 @@ async def get_ui_component_details(req: ComponentDetailRequest) -> Dict[str, Any
             "shadcn_compatible": True,
             "target_path": "components/ui/"
         }
+    }
+
+
+@router.get("/animations")
+async def get_animation_suite() -> Dict[str, Any]:
+    """Returns motion tokens, spring presets, and active animation plugins."""
+    return {
+        "status": "success",
+        "engine": "Motion Foundations + Magic UI Suite",
+        "tokens": {
+            "duration": {
+                "instant": 0.08,
+                "fast": 0.18,
+                "normal": 0.35,
+                "slow": 0.5,
+                "crawl": 1.0
+            },
+            "easing": {
+                "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                "snappy": "cubic-bezier(0.16, 1, 0.3, 1)",
+                "smooth": "cubic-bezier(0.4, 0, 0.2, 1)"
+            }
+        },
+        "active_plugins": [
+            {
+                "id": "border-beam",
+                "name": "Magic UI Border Beam",
+                "description": "Continuous perimeter laser beam orbiting cards",
+                "status": "active"
+            },
+            {
+                "id": "ambient-particles",
+                "name": "Canvas Particle Mesh",
+                "description": "Interactive constellation background with cursor magnetic drift",
+                "status": "active"
+            },
+            {
+                "id": "confetti-cannon",
+                "name": "Celebration Confetti Fireworks",
+                "description": "Particle explosions on test pass and Ralph loop completion",
+                "status": "active"
+            },
+            {
+                "id": "hyper-text",
+                "name": "Cyberpunk Hyper-Text Decryption",
+                "description": "Letter scrambling matrix effect for high-tech telemetry",
+                "status": "active"
+            },
+            {
+                "id": "speedometer-gauge",
+                "name": "Radial Sub-millisecond Latency Speedometer",
+                "description": "Interactive SVG speedometer with spring needle and rolling counter",
+                "status": "active"
+            },
+            {
+                "id": "liquid-glass",
+                "name": "iOS 26 Liquid Glass UI",
+                "description": "Frosted glass panels with backdrop blur and specular highlights",
+                "status": "active"
+            },
+            {
+                "id": "aurora-text",
+                "name": "Magic UI Aurora Text",
+                "description": "Fluid animated chromatic aurora gradient text",
+                "status": "active"
+            },
+            {
+                "id": "neon-gradient-card",
+                "name": "Magic UI Neon Gradient Card",
+                "description": "Volumetric neon bloom and luminous edge glows",
+                "status": "active"
+            },
+            {
+                "id": "meteors-shower",
+                "name": "Magic UI Meteors Shower",
+                "description": "Cosmic shooting stars with trailing linear gradients",
+                "status": "active"
+            }
+        ]
     }
 

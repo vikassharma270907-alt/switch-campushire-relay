@@ -32,7 +32,18 @@ async def switch_agent_discovery():
         "avatar": CONFIG.bot_avatar,
         "description": CONFIG.bot_description,
         "protocol": "switch-v1",
-        "capabilities": ["triage", "guardrails", "autonomous-coding", "human-in-the-loop", "campushire-placement", "wispr-voice"]
+        "capabilities": [
+            "triage",
+            "guardrails",
+            "autonomous-coding",
+            "human-in-the-loop",
+            "campushire-placement",
+            "wispr-voice",
+            "notebooklm-briefing",
+            "strix-pentest",
+            "500-ai-projects",
+            "armoriq-receipts"
+        ]
     }
 
 

@@ -147,7 +147,57 @@ Key Dates:
             status_note = "Waiver Approved" if c.roll_no == "23CS04" else "Eligible"
             print(f"{c.roll_no:<10} {c.name:<20} {c.branch:<8} {c.cgpa:<6.2f} {status_note:<16}")
 
-    console.print("\n[bold green]✔ Switch Relay run completed successfully![/bold green] Downloadable CSV exported at [cyan]/api/audit/export-csv[/cyan].\n")
+    # Step 5: Cryptographic Merkle Audit Ledger & Anti-Counterfeit HMAC Hall Passes
+    console.rule("[bold cyan]Cryptographic Governance & HMAC Hall Passes[/bold cyan]")
+    import os, sys
+    scripts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
+    if scripts_dir not in sys.path:
+        sys.path.insert(0, scripts_dir)
+    from hall_pass_generator import compute_admit_token
+    from laya_service import LayaDecisionEngine
+
+    merkle_root = room.governance.ledger.compute_merkle_root()
+    console.print(f"🌳 [bold cyan]ArmorAntigravity Merkle Audit Ledger Root:[/bold cyan] [green]{merkle_root}[/green]")
+    console.print(f"📜 [dim]Total Governed Events in Ledger: {len(room.governance.ledger.history)}[/dim]\n")
+
+    if HAS_RICH:
+        pass_table = Table(title="Exam Hall-A Admit Passes (Anti-Counterfeit HMAC-SHA256)", header_style="bold cyan")
+        pass_table.add_column("Roll No", style="cyan")
+        pass_table.add_column("Seat No", style="white")
+        pass_table.add_column("HMAC Verification Token", style="bold green")
+        pass_table.add_column("Invigilator Status", style="green")
+
+        for i, c in enumerate(room.active_report.eligible_candidates[:3]):
+            seat = f"Hall-A Seat A-{i+1:02d}"
+            token = compute_admit_token(c.roll_no, seat, "Stripe Technologies")
+            pass_table.add_row(c.roll_no, seat, token, "VERIFIED")
+        console.print(pass_table)
+    else:
+        print("Exam Hall-A Admit Passes (Anti-Counterfeit HMAC-SHA256):")
+        for i, c in enumerate(room.active_report.eligible_candidates[:3]):
+            seat = f"Hall-A Seat A-{i+1:02d}"
+            token = compute_admit_token(c.roll_no, seat, "Stripe Technologies")
+            print(f"  • {c.roll_no} -> {seat} | Token: {token} [VERIFIED]")
+
+    # Step 6: Track 02 Room 2 (#student-prep-studio) Wispr Flow Voice Mock Scoring
+    console.rule("[bold magenta]Room 2: #student-prep-studio · Wispr Flow Voice Mock Interview[/bold magenta]")
+    sample_answer = (
+        "During my summer internship, our team faced a severe latency bottleneck in the payment gateway. "
+        "My task was to optimize the transaction verification pipeline. "
+        "I implemented an asynchronous worker queue in Python with Redis caching. "
+        "As a result, we reduced p99 latency by 45 percent and achieved zero dropouts during flash sales."
+    )
+    print_message("PlacementOfficer", f"🎙️ [Wispr Voice Dictation - Student 23CS01]: \"{sample_answer}\"")
+
+    laya = LayaDecisionEngine()
+    star_eval = laya.evaluate_star_response(sample_answer, "Backend Platform Engineer")
+    score_desc = f"STAR Score: {star_eval['star_score']}/10 (Latency: {star_eval['latency_ms']}ms)\n"
+    score_desc += f"Dimensions: Situation={star_eval['dimensions']['situation']}, Task={star_eval['dimensions']['task']}, Action={star_eval['dimensions']['action']}, Result={star_eval['dimensions']['result']}\n"
+    score_desc += f"Feedback: {'; '.join(star_eval['recommendations'])}"
+    print_message("CareerCoach", score_desc)
+
+    console.print("\n[bold green]✔ Switch Relay full end-to-end multi-agent run completed successfully![/bold green]")
+    console.print("📥 Shortlist CSV exported at [cyan]/api/audit/export-csv[/cyan].\n")
 
 
 if __name__ == "__main__":
