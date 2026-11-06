@@ -1,7 +1,8 @@
 # CampusHire Relay — Multi-Agent Campus Placement & Career Prep Workflow on Switch AI
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![PyTest Suite](https://img.shields.io/badge/pytest-20%2F20%20passed%20(100%25)-brightgreen.svg)](tests/test_eligibility.py)
+[![PyTest Suite](https://img.shields.io/badge/pytest-41%2F41%20passed%20(100%25)-brightgreen.svg)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](tests/)
 [![Switch AI Console](https://img.shields.io/badge/Switch%20Console-v0.31+-purple.svg)](https://docs.switchagents.ai/)
 [![System 1 Engine](https://img.shields.io/badge/System%201-Laya%20Reflex%20(<50ms)-red.svg)](scripts/laya_service.py)
 [![Hackathon Track](https://img.shields.io/badge/WeMakeDevs%20Hackathon-Track%2001%20%7C%20Track%2002%20%7C%20Wispr-orange.svg)](https://www.wemakedevs.org/hackathons/switch)
@@ -158,29 +159,17 @@ cd campushire-relay
 pip install -r requirements.txt
 pytest -v
 ```
-All **20 PyTest unit tests pass with 100% boundary, branch & reflex coverage**:
+All **41 PyTest unit & integration tests pass with 95% coverage**:
 ```
-tests/test_eligibility.py::test_eligible PASSED                          [  5%]
-tests/test_eligibility.py::test_boundary_cgpa_exact_threshold PASSED     [ 10%]
-tests/test_eligibility.py::test_not_eligible_branch PASSED               [ 15%]
-tests/test_eligibility.py::test_not_eligible_cgpa PASSED                 [ 20%]
-tests/test_eligibility.py::test_not_eligible_backlog PASSED              [ 25%]
-tests/test_eligibility.py::test_needs_review_cgpa PASSED                 [ 30%]
-tests/test_eligibility.py::test_not_eligible_year PASSED                 [ 35%]
-tests/test_eligibility.py::test_duplicate_student_ids_flagged PASSED     [ 40%]
-tests/test_eligibility.py::test_missing_or_nan_student_id PASSED         [ 45%]
-tests/test_eligibility.py::test_malformed_non_numeric_values PASSED      [ 50%]
-tests/test_eligibility.py::test_compute_sha256 PASSED                    [ 55%]
-tests/test_eligibility.py::test_extract_notice_ambiguous_flags_clarification PASSED [ 60%]
-tests/test_eligibility.py::test_extract_notice_complete PASSED           [ 65%]
-tests/test_eligibility.py::test_generate_all_reports PASSED              [ 70%]
-tests/test_eligibility.py::test_generate_student_prep_pack PASSED        [ 75%]
-tests/test_eligibility.py::test_laya_guardrail_safe_notice PASSED        [ 80%]
-tests/test_eligibility.py::test_laya_guardrail_adversarial_blocked PASSED [ 85%]
-tests/test_eligibility.py::test_laya_intent_routing_approval PASSED      [ 90%]
-tests/test_eligibility.py::test_laya_intent_routing_notice PASSED        [ 95%]
-tests/test_eligibility.py::test_laya_star_interview_evaluation PASSED    [100%]
-============================= 20 passed in 1.05s ==============================
+tests/test_drive_coordinator.py ...                                      [  7%]
+tests/test_eligibility.py ....................                           [ 56%]
+tests/test_eligibility_auditor.py ....                                   [ 65%]
+tests/test_models.py ....                                                [ 75%]
+tests/test_server.py ....                                                [ 85%]
+tests/test_student_db.py ...                                             [ 92%]
+tests/test_switch_room.py ...                                            [100%]
+
+======================= 41 passed, 95% coverage in 15.10s =======================
 ```
 
 ### Step 2: Run the CLI Pipeline Directly

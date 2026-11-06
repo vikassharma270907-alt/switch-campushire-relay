@@ -102,7 +102,7 @@ git clone https://github.com/your-username/campushire-relay.git
 cd campushire-relay
 pip install -r requirements.txt
 
-# 2. Run the 20-test unit test suite
+# 2. Run the 41-test unit test suite (95% coverage)
 pytest -v
 
 # 3. Execute the deterministic pipeline end-to-end

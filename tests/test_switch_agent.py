@@ -204,3 +204,61 @@ def test_ralph_runner_prd_lifecycle(tmp_path):
     assert prd["project"] == "SwitchHackathon"
     assert len(prd["userStories"]) == 1
     assert prd["userStories"][0]["id"] == "US-001"
+
+def test_api_ralph_execute_endpoint():
+    response = client.post("/api/ralph/execute", json={"task_name": "fix it", "description": "Auto fix"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] in ("completed", "passed")
+    assert "events" in data
+    assert len(data["events"]) >= 1
+    assert data["story_id"] == "US-001"
+
+def test_laya_gate_fix_it_intent():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "fix it")
+    assert decision.is_safe is True
+    assert decision.intent == "bug_fix"
+    assert decision.recommended_action == "DISPATCH_RALPH_LOOP"
+    assert decision.confidence >= 0.75
+    assert decision.requires_human_approval is False
+
+def test_laya_gate_unexpected_token_error_not_sensitive():
+    gate = LayaDecisionGate()
+    query = "❌ Request failed: Unexpected token 'I', \"Internal S\"... is not valid JSON"
+    decision = gate.evaluate_request("user", query)
+    assert decision.is_safe is True
+    assert decision.is_sensitive is False
+    assert decision.requires_human_approval is False
+    assert decision.intent == "bug_fix"
+    assert decision.recommended_action == "DISPATCH_RALPH_LOOP"
+
+def test_laya_gate_run_test_with_data_intent():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "run test run with data")
+    assert decision.is_safe is True
+    assert decision.intent == "data_pipeline"
+    assert decision.recommended_action == "RUN_DATA_PIPELINE"
+
+def test_laya_gate_use_my_research_intent():
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "use all my analysis and reserach and analyse this")
+    assert decision.is_safe is True
+    assert decision.intent == "research_grounding"
+    assert decision.recommended_action == "DIRECT_ANSWER"
+    assert "MAST" in decision.reason
+
+def test_ralph_runner_readonly_fallback(monkeypatch, tmp_path):
+    # Simulate a read-only root directory where os.makedirs or file open raises PermissionError
+    real_open = open
+    def mock_open(file, *args, **kwargs):
+        if "scripts" in str(file) and ("w" in args or "a" in args):
+            raise PermissionError("Simulated read-only filesystem")
+        return real_open(file, *args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", mock_open)
+    runner = RalphCollaborativeRunner(workspace_root=str(tmp_path))
+    # Runner should gracefully fall back to tmpdir
+    prd = runner.get_or_create_prd("ReadOnlyTask", "Serverless Lambda test")
+    assert prd["project"] == "SwitchHackathon"
+    assert len(prd["userStories"]) == 1

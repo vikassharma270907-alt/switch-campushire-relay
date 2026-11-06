@@ -21,8 +21,11 @@ else:
 
 # Cross-platform Python venv resolution
 candidate_bins = [
+    os.path.join(WORKSPACE, "laya-repo", ".venv312", "Scripts", "python.exe"),
+    os.path.join(WORKSPACE, ".venv312", "Scripts", "python.exe"),
     os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
     os.path.join(WORKSPACE, "laya-repo", ".venv", "bin", "python"),
+    r"C:\Users\vikas sharma\AppData\Local\Programs\Python\Python312\python.exe",
 ]
 PYTHON_EXE = next((p for p in candidate_bins if os.path.exists(p)), sys.executable)
 

@@ -16,6 +16,8 @@ $ErrorActionPreference = 'Stop'
 
 $MasterEcc = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\everything-claude-code'
 $MasterCodeRabbit = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\coderabbit'
+$MasterPonytail = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\ponytail'
+$MasterLemo = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\lemo-opuscar'
 $MasterSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\skills'
 $ProjectsJsonPath = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\projects.json'
 
@@ -260,7 +262,7 @@ jobs:
         target = 'antigravity'
         mode = 'full-power'
         installedAt = (Get-Date -Format 'o')
-        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity')
+        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar')
         sourceVersion = '2.2.3'
     }
     $stateJson = $stateObj | ConvertTo-Json -Depth 4
@@ -290,10 +292,13 @@ jobs:
     }
 
     Write-Host "[Antigravity Full-Power] Successfully configured: $Resolved" -ForegroundColor Green
-    Write-Host "  - Skills: 434+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify)"
-    Write-Host "  - Agents: 107+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Autofix + Ralph-Agent)"
-    Write-Host "  - Rules: 126+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ralph, GSD Methodology)"
-    Write-Host "  - Workflows: 99+ (Slash commands & autonomous pipelines)"
+    Write-Host "  - Skills: 443+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar)"
+    Write-Host "  - Agents: 108+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Autofix + Ralph-Agent + Film-Director)"
+    Write-Host "  - Rules: 129+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules)"
+    Write-Host "  - Workflows: 101+ (Slash commands, /reach, /agent-reach, autonomous pipelines)"
+    Write-Host "  - Lemo-Opuscar Studio: Active (66+ film styles, HTML5 Canvas/WebGL code animation, Kokoro/Edge TTS, FFmpeg muxing, film-director agent)"
+    Write-Host "  - Agent-Reach Live Internet Layer: Active (YouTube transcripts, GitHub, Reddit, Twitter/X, V2EX, Web search)"
+    Write-Host "  - Ponytail Engine: Active (YAGNI, stdlib first, /ponytail, /ponytail-review, /ponytail-audit, /ponytail-debt, /ponytail-gain, /ponytail-help)"
     Write-Host "  - GSD Spec-Driven Engine: Active (/gsd-new-project, /gsd-plan-phase, /gsd-execute-phase, /gsd-progress, /gsd-verify-work)"
     Write-Host "  - MCP Servers: Active (.mcp.json configured with Figma & Laya)"
     Write-Host "  - Ralph Scaffolding: Active (scripts\ralph\ralph.ps1, ralph.sh)"

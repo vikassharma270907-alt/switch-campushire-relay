@@ -33,4 +33,7 @@ scripts/ralph/.last-branch
 # Graphify
 graphify-out/
 
+# Temporary tools
+.skillspector-temp/
+
 .vercel

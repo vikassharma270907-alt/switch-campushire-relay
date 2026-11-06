@@ -19,10 +19,17 @@ if os.path.basename(current_dir) == "scripts":
 else:
     WORKSPACE = current_dir
 
-# Prefer venv python if available, else sys.executable
-PYTHON_EXE = os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe")
-if not os.path.exists(PYTHON_EXE):
-    PYTHON_EXE = sys.executable
+import shutil
+
+candidate_bins = [
+    os.path.join(WORKSPACE, "laya-repo", ".venv312", "Scripts", "python.exe"),
+    os.path.join(WORKSPACE, ".venv312", "Scripts", "python.exe"),
+    os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
+    os.path.join(WORKSPACE, "laya-repo", ".venv", "bin", "python"),
+    shutil.which("python3"),
+    shutil.which("python"),
+]
+PYTHON_EXE = next((p for p in candidate_bins if p and os.path.exists(p)), sys.executable)
 
 
 def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
@@ -32,15 +39,17 @@ def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
     print(f"=======================================================")
 
     env = os.environ.copy()
-    if PYTHON_EXE == sys.executable:
-        site_packages = r"C:\Users\vikas sharma\AppData\Roaming\Python\Python314\site-packages"
-        env["PYTHONPATH"] = f"{site_packages};{cwd};{WORKSPACE};{os.path.join(WORKSPACE, 'campushire-relay')};{env.get('PYTHONPATH', '')}"
-    else:
-        env["PYTHONPATH"] = f"{cwd};{WORKSPACE};{os.path.join(WORKSPACE, 'campushire-relay')};{env.get('PYTHONPATH', '')}"
+    env["PYTHONNOUSERSITE"] = "1"
+    # Ensure clean PYTHONPATH without global Python314 collision
+    base_paths = [cwd, WORKSPACE, os.path.join(WORKSPACE, "campushire-relay")]
+    existing_paths = [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p and "Python314" not in p]
+    env["PYTHONPATH"] = os.pathsep.join(base_paths + existing_paths)
+
+    pytest_args = ["-p", "no:hypothesis", "-p", "no:_hypothesis_pytestplugin"] + list(args)
 
     t0 = time.perf_counter()
     res = subprocess.run(
-        [PYTHON_EXE, "-m", "pytest"] + args,
+        [PYTHON_EXE, "-m", "pytest"] + pytest_args,
         cwd=cwd,
         capture_output=True,
         text=True,
