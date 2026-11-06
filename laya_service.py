@@ -22,7 +22,15 @@ except ImportError:
     repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "laya-repo")
     if os.path.isdir(repo_path) and repo_path not in sys.path:
         sys.path.insert(0, repo_path)
-    import laya
+    try:
+        import laya
+    except ImportError:
+        import types
+        laya = types.ModuleType("laya")
+        laya.Router = type("Router", (), {})
+        laya.guard_questions = lambda: {}
+        laya.decision_questions = lambda: {}
+        sys.modules["laya"] = laya
 
 
 class LayaDecisionEngine:
