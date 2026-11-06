@@ -26,3 +26,10 @@ class RalphExecuteRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
     task_name: str
     description: str = ""
+
+
+class DocsLookupRequest(BaseModel):
+    """Context7 documentation lookup request schema."""
+    model_config = ConfigDict(frozen=True)
+    library: str = Field(..., min_length=1)
+    query: str = Field(..., min_length=1)

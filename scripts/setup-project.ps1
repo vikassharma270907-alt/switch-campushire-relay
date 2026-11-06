@@ -285,6 +285,18 @@ function Configure-SingleProject {
         } catch {}
     }
 
+    # Install git hooks if .git directory exists
+    $gitHooksDir = Join-Path -Path $Resolved -ChildPath '.git\hooks'
+    if (Test-Path -LiteralPath $gitHooksDir) {
+        $gitTemplateHooks = "C:\Users\vikas sharma\.gemini\git-template\hooks"
+        if (Test-Path -LiteralPath $gitTemplateHooks) {
+            Get-ChildItem -LiteralPath $gitTemplateHooks -File | ForEach-Object {
+                $hookDst = Join-Path $gitHooksDir $_.Name
+                Copy-Item -LiteralPath $_.FullName -Destination $hookDst -Force
+            }
+        }
+    }
+
     # Copy antigravity-sync helper scripts to scripts/
     $scriptsDir = Join-Path -Path $Resolved -ChildPath 'scripts'
     if (-not (Test-Path -LiteralPath $scriptsDir)) {

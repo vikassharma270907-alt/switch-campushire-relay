@@ -33,14 +33,14 @@ def list_candidates() -> List[Dict[str, Any]]:
 
 @router.post("/api/campushire/events")
 @router.post("/api/switch/events")
-def handle_switch_event(event: Dict[str, Any]) -> Dict[str, Any]:
+def handle_switch_event(event: CampusHireEventRequest) -> Dict[str, Any]:
     """Handle incoming Switch Room webhooks and return multi-agent coordination responses."""
     try:
         msg = SwitchMessage(
-            sender=event.get("sender", "PlacementOfficer"),
-            content=event.get("content", ""),
-            room=event.get("room", room.room_name),
-            mentions=event.get("mentions", []),
+            sender=event.sender,
+            content=event.content,
+            room=event.room,
+            mentions=event.mentions,
         )
         responses = room.handle_message(msg)
         return {

@@ -29,6 +29,7 @@ from .routers.campushire_router import router as campushire_router
 from .routers.wispr_router import router as wispr_router
 from .routers.ralph_router import router as ralph_router, runner
 from .routers.telemetry_router import router as telemetry_router
+from .routers.docs_router import router as docs_router
 
 app = FastAPI(
     title="SwitchGuard & CampusHire Unified AI Platform",
@@ -40,7 +41,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -52,6 +53,8 @@ app.include_router(campushire_router)
 app.include_router(wispr_router)
 app.include_router(ralph_router)
 app.include_router(telemetry_router)
+app.include_router(docs_router)
+app.include_router(docs_router)
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 

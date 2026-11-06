@@ -153,6 +153,12 @@ class LayaDecisionGate:
             difficulty = 1.8
             needs_tools = True
             confidence = 0.93
+        elif any(w in lower_msg for w in ("docs", "documentation", "api reference", "syntax for", "how to use", "context7", "library docs")):
+            intent = "docs_lookup"
+            domain = "documentation"
+            difficulty = 0.5
+            needs_tools = True
+            confidence = 0.96
         elif any(w in lower_msg for w in ("date", "time", "clock", "today", "now", "calendar")):
             import datetime
             now_str = datetime.datetime.now().strftime("%A, %B %d, %Y, %I:%M %p")
@@ -235,6 +241,9 @@ class LayaDecisionGate:
         elif intent == "data_pipeline":
             recommended_action = "RUN_DATA_PIPELINE"
             reason = "Deterministic CampusHire student eligibility audit initiated against data/sample_students.csv (7 synthetic candidates) and data/eligibility_rules.json."
+        elif intent == "docs_lookup":
+            recommended_action = "CONTEXT7_DOCS_LOOKUP"
+            reason = "Live documentation inquiry; resolving library and fetching verified syntax via Context7."
         elif intent == "help":
             recommended_action = "DIRECT_ANSWER"
             reason = "🤖 SwitchGuard Quick Commands: Type 'location' for runtime details, 'date today' for clock, 'research' for literature grounding, or click the buttons below to run Pytest or audit candidate data."

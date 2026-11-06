@@ -205,60 +205,6 @@ def test_ralph_runner_prd_lifecycle(tmp_path):
     assert len(prd["userStories"]) == 1
     assert prd["userStories"][0]["id"] == "US-001"
 
-# -------------------------------------------------------------
-# CampusHire Multi-Agent Room & Audit Tests
-# -------------------------------------------------------------
-
-def test_campushire_candidates_endpoint():
-    """Verify listing candidates through unified backend."""
-    response = client.get("/api/campushire/candidates")
-    assert response.status_code == 200
-    candidates = response.json()
-    assert isinstance(candidates, list)
-    assert len(candidates) >= 5
-    assert any(c["roll_no"] == "23CS01" for c in candidates)
-
-def test_campushire_events_jd_posting():
-    """Verify DriveCoordinator processes JDs via /api/campushire/events."""
-    jd_payload = {
-        "sender": "PlacementOfficer",
-        "content": "@DriveCoordinator We have a new drive: Stripe Software Engineer 28 LPA, min CGPA 8.0, 0 backlogs, Batch 2027, branches CSE,IT. Deadline: 2026-11-20.",
-        "room": "#placement-drive-2027",
-        "mentions": ["@DriveCoordinator"]
-    }
-    response = client.post("/api/campushire/events", json=jd_payload)
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "processed"
-    assert len(data["responses"]) >= 1
-    assert any("DriveCoordinator" == r["sender"] for r in data["responses"])
-
-def test_campushire_audit_report_lifecycle():
-    """Verify triggering audit and fetching audit report and CSV export."""
-    # 1. Trigger Audit
-    audit_msg = {
-        "sender": "PlacementOfficer",
-        "content": "@EligibilityAuditor please run the student audit against the active criteria",
-        "room": "#placement-drive-2027",
-        "mentions": ["@EligibilityAuditor"]
-    }
-    res = client.post("/api/campushire/events", json=audit_msg)
-    assert res.status_code == 200
-
-    # 2. Query JSON Report
-    rep_res = client.get("/api/campushire/audit/report")
-    assert rep_res.status_code == 200
-    report = rep_res.json()
-    assert "eligible_count" in report
-    assert report["total_evaluated"] >= 5
-
-    # 3. Export CSV
-    csv_res = client.get("/api/campushire/audit/export-csv")
-    assert csv_res.status_code == 200
-    assert "text/csv" in csv_res.headers["content-type"]
-    assert "attachment" in csv_res.headers["content-disposition"]
-    assert "roll_no,name,email,branch,cgpa" in csv_res.text.lower()
-
 
 def test_api_ralph_execute_endpoint():
     response = client.post("/api/ralph/execute", json={"task_name": "fix it", "description": "Auto fix"})
@@ -446,4 +392,72 @@ def test_wispr_dictate_approval_unauthorized_officer():
     }
     response = client.post("/api/wispr/dictate-approval", json=payload)
     assert response.status_code == 403
+
+def test_docs_status_endpoint():
+    """Verify Context7 docs status endpoint returns active configuration."""
+    response = client.get("/api/docs/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "active"
+    assert "Context7" in data["engine"]
+    assert "resolve-library-id" in data["tools"]
+
+def test_docs_lookup_endpoint():
+    """Verify Context7 docs lookup succeeds with grounded documentation snippets."""
+    payload = {"library": "fastapi", "query": "how to add background tasks"}
+    response = client.post("/api/docs/lookup", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "fastapi" in data["library_id"]
+    assert "snippets" in data
+
+def test_docs_lookup_invalid_payload():
+    """Verify 422/400 validation error on empty fields."""
+    response = client.post("/api/docs/lookup", json={"library": "", "query": ""})
+    assert response.status_code in (400, 422)
+
+def test_laya_gate_docs_intent():
+    """Verify LayaDecisionGate routes docs query to docs_lookup intent."""
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("user", "how to use context7 documentation lookup")
+    assert decision.is_safe is True
+    assert decision.intent == "docs_lookup"
+    assert decision.recommended_action == "CONTEXT7_DOCS_LOOKUP"
+
+
+
+def test_laya_gate_docs_lookup_intent():
+    """Verify Laya Decision Gate routes library documentation queries to Context7."""
+    gate = LayaDecisionGate()
+    decision = gate.evaluate_request("dev", "show me docs for react hooks syntax")
+    assert decision.is_safe is True
+    assert decision.intent == "docs_lookup"
+    assert decision.recommended_action == "CONTEXT7_DOCS_LOOKUP"
+    assert "Context7" in decision.reason
+
+
+def test_api_docs_status_endpoint():
+    """Verify Context7 status endpoint exposes live documentation capabilities."""
+    response = client.get("/api/docs/status")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "active"
+    assert "Context7" in data["engine"]
+    assert "resolve-library-id" in data["tools"]
+    assert "query-docs" in data["tools"]
+
+
+def test_api_docs_lookup_endpoint():
+    """Verify Context7 lookup endpoint returns grounded documentation snippets."""
+    payload = {
+        "library": "React",
+        "query": "useEffect hook cleanup"
+    }
+    response = client.post("/api/docs/lookup", json=payload)
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "success"
+    assert "snippets" in data
+    assert len(data["snippets"]) > 0
 

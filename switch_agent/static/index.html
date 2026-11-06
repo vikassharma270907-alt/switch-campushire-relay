@@ -387,6 +387,9 @@
                     Pytest Verification</button>
                 <button class="quick-btn" onclick="sendSample('run data pipeline')">📊 Audit Placement Data &
                     Receipts</button>
+                <button class="quick-btn" onclick="sendSample('list all placement candidates')">👥 Placement Candidates</button>
+                <button class="quick-btn" onclick="sendSample('evaluate mock interview answer using star rubric')">🎙️ Wispr STAR Evaluation</button>
+                <button class="quick-btn" onclick="sendSample('@DriveCoordinator Stripe Software Engineer 28 LPA, min CGPA 8.0, 0 backlogs, Batch 2027, branches CSE,IT')">🏛️ CampusHire Multi-Agent Drive</button>
                 <button class="quick-btn" onclick="sendSample('what academic research grounds this architecture?')">📚
                     Research Grounding</button>
                 <button class="quick-btn" onclick="sendSample('location')">📍 System Location</button>
@@ -567,6 +570,55 @@
                     const pipeRes = await fetch("/api/pipeline/run", { method: "POST" });
                     const pData = await pipeRes.json();
                     appendMessage("SwitchGuard", `🧾 <strong>Audit Results & Cryptographic Receipt:</strong><br><pre style="margin-top:6px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; background:#0d1117; padding:8px; border-radius:4px; white-space:pre-wrap;">${escapeHtml(pData.output)}</pre>`, true, d);
+                } else if (text.toLowerCase().includes("candidate") || text.toLowerCase().includes("students")) {
+                    log("Fetching student database records...", "cyan");
+                    const cRes = await fetch("/api/campushire/candidates");
+                    const cList = await cRes.json();
+                    let html = `👥 <strong>CampusHire Placement Candidate Registry (${cList.length} Students):</strong><br>`;
+                    html += `<table style="width:100%; margin-top:8px; border-collapse:collapse; font-size:0.8rem; font-family:'JetBrains Mono',monospace;">`;
+                    html += `<tr style="border-bottom:1px solid var(--border); color:var(--text-muted); text-align:left;"><th style="padding:4px;">Roll No</th><th>Name</th><th>Branch</th><th>CGPA</th><th>Backlogs</th></tr>`;
+                    cList.slice(0, 7).forEach(c => {
+                        const eligible = c.cgpa >= 7.0 && c.active_backlogs === 0;
+                        const badgeColor = eligible ? "var(--accent-green)" : "var(--accent-red)";
+                        html += `<tr style="border-bottom:1px solid #21262d;"><td style="padding:4px;">${escapeHtml(c.roll_no)}</td><td>${escapeHtml(c.name)}</td><td>${escapeHtml(c.branch)}</td><td style="color:${badgeColor}; font-weight:600;">${c.cgpa}</td><td>${c.active_backlogs}</td></tr>`;
+                    });
+                    html += `</table>`;
+                    appendMessage("SwitchGuard", html, true, d);
+                } else if (text.toLowerCase().includes("star") || text.toLowerCase().includes("interview")) {
+                    log("Evaluating mock interview response against STAR rubric...", "cyan");
+                    const starPayload = {
+                        student_id: "23CS01",
+                        spoken_text: "During my summer internship, our team faced a severe latency bottleneck in the payment gateway. My task was to optimize the transaction verification pipeline. I implemented an asynchronous worker queue in Python with Redis caching. As a result, we reduced p99 latency by 45 percent and achieved zero dropouts during flash sales.",
+                        target_role: "Backend Engineer"
+                    };
+                    const sRes = await fetch("/api/wispr/star-evaluate", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(starPayload)
+                    });
+                    const sData = await sRes.json();
+                    let starHtml = `🎙️ <strong>Wispr Flow STAR Evaluation (${sData.star_score}/10):</strong><br>`;
+                    starHtml += `<div style="display:flex; gap:8px; margin:8px 0; font-family:'JetBrains Mono',monospace; font-size:0.75rem;">`;
+                    for (const [dim, pass] of Object.entries(sData.dimensions)) {
+                        const col = pass ? "var(--accent-green)" : "var(--accent-red)";
+                        starHtml += `<span style="border:1px solid ${col}; color:${col}; padding:2px 6px; border-radius:4px;">${dim.toUpperCase()}: ${pass ? '✔ PASS' : '✘ MISSING'}</span>`;
+                    }
+                    starHtml += `</div>`;
+                    starHtml += `<span style="font-size:0.8rem; color:var(--text-muted);">Latency: ${sData.latency_ms}ms | Word Count: ${sData.word_count} words</span>`;
+                    appendMessage("SwitchGuard", starHtml, true, d);
+                } else if (text.includes("@DriveCoordinator") || text.includes("@EligibilityAuditor")) {
+                    log("Relaying message to CampusHire Switch Room...", "cyan");
+                    const roomRes = await fetch("/api/campushire/events", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ sender: "PlacementOfficer", content: text, room: "#placement-drive-2027", mentions: ["@DriveCoordinator"] })
+                    });
+                    const rData = await roomRes.json();
+                    let roomHtml = `🏛️ <strong>CampusHire Multi-Agent Room Response:</strong><br>`;
+                    (rData.responses || []).forEach(r => {
+                        roomHtml += `<div style="margin-top:6px; padding:6px 10px; background:#0d1117; border-left:3px solid var(--accent); border-radius:4px;"><strong>@${escapeHtml(r.sender)}:</strong> ${escapeHtml(r.content)}</div>`;
+                    });
+                    appendMessage("SwitchGuard", roomHtml, true, d);
                 } else if (d.intent === "system_location") {
                     appendMessage("SwitchGuard", `📍 <strong>System Location & Topology:</strong><br>${escapeHtml(d.reason)}`, true, d);
                 } else if (d.intent === "research_grounding") {
