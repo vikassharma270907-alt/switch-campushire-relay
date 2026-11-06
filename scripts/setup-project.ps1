@@ -237,7 +237,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f campushire-relay/pyproject.toml ]; then pip install pytest pydantic fastapi httpx uvicorn; fi
+          if [ -f campushire-relay/requirements.txt ]; then pip install -r campushire-relay/requirements.txt; fi
+          pip install pytest pytest-asyncio anyio httpx
 
       - name: Run Master Verification Suite
         run: |
