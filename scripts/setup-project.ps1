@@ -18,6 +18,7 @@ $MasterEcc = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins
 $MasterCodeRabbit = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\coderabbit'
 $MasterPonytail = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\ponytail'
 $MasterLemo = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\lemo-opuscar'
+$MasterAgentSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\plugins\agent-skills'
 $MasterSkills = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\config\skills'
 $ProjectsJsonPath = Join-Path -Path $env:USERPROFILE -ChildPath '.gemini\projects.json'
 
@@ -26,7 +27,41 @@ if (-not (Test-Path -LiteralPath $MasterEcc)) {
     exit 1
 }
 
-# 1. Sync global skills into Master ECC skills so all 434+ skills are discoverable
+# 1. Sync Agent-Skills into Master ECC & Global Skills
+if (Test-Path -LiteralPath $MasterAgentSkills) {
+    $asSkillsDir = Join-Path -Path $MasterAgentSkills -ChildPath 'skills'
+    if (Test-Path -LiteralPath $asSkillsDir) {
+        $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
+        Get-ChildItem -LiteralPath $asSkillsDir -Directory | ForEach-Object {
+            # Sync to global skills
+            $gDest = Join-Path -Path $MasterSkills -ChildPath $_.Name
+            if (-not (Test-Path -LiteralPath $gDest)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $gDest -Recurse -Force
+            }
+            # Sync to ECC skills
+            if (Test-Path -LiteralPath $eccSkillsDir) {
+                $eDest = Join-Path -Path $eccSkillsDir -ChildPath $_.Name
+                if (-not (Test-Path -LiteralPath $eDest)) {
+                    Copy-Item -LiteralPath $_.FullName -Destination $eDest -Recurse -Force
+                }
+            }
+        }
+    }
+    # Sync agents
+    $asAgentsDir = Join-Path -Path $MasterAgentSkills -ChildPath 'agents'
+    $eccAgentsDir = Join-Path -Path $MasterEcc -ChildPath 'agents'
+    if ((Test-Path -LiteralPath $asAgentsDir) -and (Test-Path -LiteralPath $eccAgentsDir)) {
+        Get-ChildItem -LiteralPath $asAgentsDir -Filter "*.md" | ForEach-Object {
+            $destName = if ($_.Name -eq "code-reviewer.md") { "addy-code-reviewer.md" } else { $_.Name }
+            $dstFile = Join-Path -Path $eccAgentsDir -ChildPath $destName
+            if (-not (Test-Path -LiteralPath $dstFile)) {
+                Copy-Item -LiteralPath $_.FullName -Destination $dstFile -Force
+            }
+        }
+    }
+}
+
+# 2. Sync global skills into Master ECC skills so all 468+ skills are discoverable
 if (Test-Path -LiteralPath $MasterSkills) {
     $eccSkillsDir = Join-Path -Path $MasterEcc -ChildPath 'skills'
     if (Test-Path -LiteralPath $eccSkillsDir) {
@@ -262,7 +297,7 @@ jobs:
         target = 'antigravity'
         mode = 'full-power'
         installedAt = (Get-Date -Format 'o')
-        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar')
+        plugins = @('everything-claude-code', 'coderabbit', 'firebase', 'wispr-flow', 'ralph', 'graphify', 'laya', 'get-shit-done', 'armorantigravity', 'ponytail', 'agent-reach', 'lemo-opuscar', 'agent-skills')
         sourceVersion = '2.2.3'
     }
     $stateJson = $stateObj | ConvertTo-Json -Depth 4
@@ -292,10 +327,11 @@ jobs:
     }
 
     Write-Host "[Antigravity Full-Power] Successfully configured: $Resolved" -ForegroundColor Green
-    Write-Host "  - Skills: 443+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar)"
-    Write-Host "  - Agents: 108+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Autofix + Ralph-Agent + Film-Director)"
-    Write-Host "  - Rules: 129+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules)"
-    Write-Host "  - Workflows: 101+ (Slash commands, /reach, /agent-reach, autonomous pipelines)"
+    Write-Host "  - Skills: 468+ (ECC + GSD + CodeRabbit + Firebase + Ralph + Laya + Graphify + Ponytail + Agent-Reach + Lemo-Opuscar + Agent-Skills)"
+    Write-Host "  - Agents: 112+ (Domain Specialists + GSD Spec Planners/Executors + Code-Reviewer + Security-Auditor + Test-Engineer + Web-Perf-Auditor + Film-Director)"
+    Write-Host "  - Rules: 130+ (TDD, Security, Immutability, CodeRabbit Quality Gates, Ponytail, Ralph, GSD, Agent-Reach, Film-Rules, Agent-Skills)"
+    Write-Host "  - Workflows: 110+ (Slash commands, /spec, /ship, /webperf, /test, /review, /planning, /reach, autonomous pipelines)"
+    Write-Host "  - Addy Osmani Agent-Skills: Active (25 engineering skills, 4 agents, /spec, /ship, /webperf, /test, /review, /planning)"
     Write-Host "  - Lemo-Opuscar Studio: Active (66+ film styles, HTML5 Canvas/WebGL code animation, Kokoro/Edge TTS, FFmpeg muxing, film-director agent)"
     Write-Host "  - Agent-Reach Live Internet Layer: Active (YouTube transcripts, GitHub, Reddit, Twitter/X, V2EX, Web search)"
     Write-Host "  - Ponytail Engine: Active (YAGNI, stdlib first, /ponytail, /ponytail-review, /ponytail-audit, /ponytail-debt, /ponytail-gain, /ponytail-help)"

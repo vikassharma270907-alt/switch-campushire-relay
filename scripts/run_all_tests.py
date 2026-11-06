@@ -21,9 +21,9 @@ else:
 
 # Cross-platform Python venv resolution
 candidate_bins = [
+    os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
     os.path.join(WORKSPACE, "laya-repo", ".venv312", "Scripts", "python.exe"),
     os.path.join(WORKSPACE, ".venv312", "Scripts", "python.exe"),
-    os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
     os.path.join(WORKSPACE, "laya-repo", ".venv", "bin", "python"),
     r"C:\Users\vikas sharma\AppData\Local\Programs\Python\Python312\python.exe",
 ]
@@ -37,11 +37,8 @@ def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
     print(f"=======================================================")
 
     env = os.environ.copy()
-    if PYTHON_EXE == sys.executable:
-        site_packages = r"C:\Users\vikas sharma\AppData\Roaming\Python\Python314\site-packages"
-        env["PYTHONPATH"] = f"{site_packages};{cwd};{WORKSPACE};{os.path.join(WORKSPACE, 'campushire-relay')};{env.get('PYTHONPATH', '')}"
-    else:
-        env["PYTHONPATH"] = f"{cwd};{WORKSPACE};{os.path.join(WORKSPACE, 'campushire-relay')};{env.get('PYTHONPATH', '')}"
+    env["PYTHONNOUSERSITE"] = "1"
+    env["PYTHONPATH"] = f"{cwd};{WORKSPACE};{os.path.join(WORKSPACE, 'campushire-relay')};{env.get('PYTHONPATH', '')}"
 
     t0 = time.perf_counter()
     res = subprocess.run(
