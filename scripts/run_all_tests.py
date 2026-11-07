@@ -13,6 +13,12 @@ import subprocess
 import sys
 import time
 
+# Ensure UTF-8 console output encoding on Windows runners to prevent cp1252 UnicodeEncodeError
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if os.path.basename(current_dir) == "scripts":
     WORKSPACE = os.path.dirname(current_dir)
@@ -66,6 +72,8 @@ def run_e2e_verification() -> tuple[bool, str, float]:
     t0 = time.perf_counter()
     env = os.environ.copy()
     env["PYTHONNOUSERSITE"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
     base_paths = [WORKSPACE, os.path.join(WORKSPACE, "campushire-relay")]
     existing = [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p and "Python314" not in p]
     env["PYTHONPATH"] = os.pathsep.join(base_paths + existing)
@@ -99,6 +107,8 @@ def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
 
     env = os.environ.copy()
     env["PYTHONNOUSERSITE"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONUTF8"] = "1"
     # Ensure clean PYTHONPATH without global Python314 collision
     base_paths = [cwd, WORKSPACE, os.path.join(WORKSPACE, "campushire-relay")]
     existing_paths = [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p and "Python314" not in p]

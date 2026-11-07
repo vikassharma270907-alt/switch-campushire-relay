@@ -467,17 +467,14 @@
             box-shadow: 0 0 14px var(--accent);
             z-index: 2;
         }
+
+        [data-theme="obsidian"] .avatar-quantum .core-sphere,
+        [data-theme="carbon"] .avatar-quantum .core-sphere,
+        [data-theme="titanium"] .avatar-quantum .core-sphere {
             background: linear-gradient(135deg, #27272a, #09090b);
             border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
             box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-            z-index: 2;
         }
 
         @keyframes gyro-spin-1 {
@@ -1252,8 +1249,453 @@
         /* Animation Dock */
         .animation-dock {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
+        }
+
+        /* =====================================================================
+           MAGIC UI & 21ST FX & THEME SUITE DROPDOWN
+        ===================================================================== */
+        .fx-dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .fx-hub-trigger-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #ffffff;
+            font-size: 0.74rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+
+        .fx-hub-trigger-btn:hover,
+        .fx-dropdown-container.open .fx-hub-trigger-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(88, 166, 255, 0.22));
+            border-color: rgba(88, 166, 255, 0.5);
+            box-shadow: 0 0 16px rgba(88, 166, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        .fx-pulse-orb {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #3fb950;
+            box-shadow: 0 0 8px #3fb950;
+            animation: fx-orb-pulse 2s infinite ease-in-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes fx-orb-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.35); opacity: 0.4; }
+        }
+
+        .fx-count-pill {
+            font-size: 0.64rem;
+            background: rgba(88, 166, 255, 0.2);
+            border: 1px solid rgba(88, 166, 255, 0.4);
+            color: var(--accent);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .fx-chevron-icon {
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+        }
+
+        .fx-dropdown-container.open .fx-chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Floating Popover Panel */
+        .fx-dropdown-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 380px;
+            max-width: 92vw;
+            background: rgba(13, 16, 23, 0.97);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 14px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 35px rgba(88, 166, 255, 0.18);
+            z-index: 100000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px) scale(0.96);
+            transform-origin: top right;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            max-height: 85vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .fx-dropdown-container.open .fx-dropdown-panel {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        /* Magic UI Rotating Border Beam */
+        .fx-border-beam {
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 17px;
+            padding: 1.5px;
+            background: conic-gradient(from var(--beam-angle, 0deg), transparent 25%, #58a6ff 45%, #bc8cff 60%, #3fb950 75%, transparent 95%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            animation: fx-rotate-beam 5s linear infinite;
+        }
+
+        @keyframes fx-rotate-beam {
+            to { --beam-angle: 360deg; }
+        }
+
+        .fx-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .fx-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fx-pro-tag {
+            font-size: 0.58rem;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            padding: 1px 5px;
+            border-radius: 4px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .fx-reset-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .fx-reset-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .fx-section {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .fx-section-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* Theme Grid Swatches */
+        .fx-theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .fx-theme-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 9px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            user-select: none;
+        }
+
+        .fx-theme-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .fx-theme-card.active {
+            background: rgba(88, 166, 255, 0.12);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px rgba(88, 166, 255, 0.25);
+        }
+
+        .fx-theme-swatches {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .fx-theme-swatches span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fx-theme-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fx-theme-title {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fx-theme-desc {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fx-theme-check {
+            font-size: 0.72rem;
+            color: var(--accent-green);
+            display: none;
+            font-weight: bold;
+        }
+
+        .fx-theme-card.active .fx-theme-check {
+            display: block;
+        }
+
+        /* Toggle List Items */
+        .fx-toggle-list {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .fx-toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .fx-toggle-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .fx-toggle-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .fx-toggle-icon {
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .fx-toggle-name {
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .fx-toggle-hint {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+        }
+
+        /* Switch */
+        .fx-switch {
+            width: 36px;
+            height: 20px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+        }
+
+        .fx-switch.active {
+            background: linear-gradient(135deg, #2ea043, #3fb950);
+            border-color: #3fb950;
+            box-shadow: 0 0 10px rgba(63, 185, 80, 0.4);
+        }
+
+        .fx-switch-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .fx-switch.active .fx-switch-handle {
+            transform: translateX(16px);
+        }
+
+        /* Equalizer Bars */
+        .fx-equalizer {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+        }
+
+        .fx-equalizer span {
+            width: 2px;
+            height: 3px;
+            background: var(--text-muted);
+            border-radius: 2px;
+            transition: height 0.2s ease, background 0.2s ease;
+        }
+
+        .fx-equalizer.active span {
+            background: var(--accent-green);
+        }
+
+        .fx-equalizer.active span:nth-child(1) { animation: fx-soundbar 0.5s infinite ease-in-out alternate; }
+        .fx-equalizer.active span:nth-child(2) { animation: fx-soundbar 0.35s infinite ease-in-out alternate 0.15s; }
+        .fx-equalizer.active span:nth-child(3) { animation: fx-soundbar 0.65s infinite ease-in-out alternate 0.08s; }
+        .fx-equalizer.active span:nth-child(4) { animation: fx-soundbar 0.45s infinite ease-in-out alternate 0.22s; }
+
+        @keyframes fx-soundbar {
+            0% { height: 3px; }
+            100% { height: 12px; }
+        }
+
+        /* One-Click Burst Buttons */
+        .fx-burst-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
+
+        .fx-burst-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 6px 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            color: #f0f6fc;
+            font-size: 0.68rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fx-burst-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .fx-burst-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* CRT Scanlines Overlay */
+        .crt-scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.32) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 3px, 6px 100%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .crt-scanlines.active {
+            opacity: 0.85;
+        }
+
+        /* Breathing Aurora Ambient Lighting */
+        .aurora-mesh-pulse {
+            animation: aurora-mesh-breathe 8s ease-in-out infinite alternate !important;
+        }
+
+        @keyframes aurora-mesh-breathe {
+            0% {
+                opacity: 0.7;
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                filter: hue-rotate(45deg);
+            }
+            100% {
+                opacity: 0.8;
+                filter: hue-rotate(-30deg);
+            }
         }
 
         /* Interactive Circuit Modal / Drawer */
@@ -1262,7 +1704,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0.9);
-            width: 480px;
+            width: min(480px, calc(100vw - 24px));
+            max-height: 88vh;
+            overflow-y: auto;
             background: rgba(18, 18, 24, 0.96);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border-glow);
@@ -1727,6 +2171,418 @@
         .hex-line.cyan { color: #f4f4f5; font-weight: 600; }
         .hex-line.purple { color: #a1a1aa; }
         
+        /* ============================================================= */
+        /* RESPONSIVE DESIGN FOR MOBILE, TABLET & DESKTOP (BREAKPOINTS)  */
+        /* ============================================================= */
+
+        /* Responsive Mobile View Tabs */
+        .mobile-view-tabs {
+            display: none;
+            background: rgba(12, 14, 25, 0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-glass);
+            padding: 6px 12px;
+            gap: 8px;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .mobile-view-tab {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .mobile-view-tab.active {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.18);
+        }
+
+        /* Research Modal Grid & Benchmark Table */
+        .research-grid-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .benchmark-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            margin-top: 6px;
+            border-radius: 6px;
+        }
+
+        /* Hall Pass Modal Input & Header */
+        .hallpass-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .hallpass-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        /* Large Screens (1440px+) */
+        @media (min-width: 1440px) {
+            main {
+                grid-template-columns: 1fr 420px;
+            }
+            .slide {
+                max-width: 1240px;
+            }
+        }
+
+        /* Tablet & Mobile Screens (< 1024px) */
+        @media (max-width: 1023px) {
+            .mobile-view-tabs {
+                display: flex;
+            }
+
+            main {
+                display: block !important;
+                position: relative;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .chat-section {
+                display: flex !important;
+                width: 100% !important;
+                height: 100% !important;
+                border-right: none !important;
+            }
+
+            .analytics-sidebar {
+                display: none !important;
+                width: 100% !important;
+                height: 100% !important;
+                border-left: none !important;
+                padding: 14px 14px 60px 14px !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Switched to Telemetry & Audit view */
+            main.view-telemetry .chat-section {
+                display: none !important;
+            }
+
+            main.view-telemetry .analytics-sidebar {
+                display: flex !important;
+            }
+
+            .animation-dock {
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                max-width: calc(100vw - 220px);
+            }
+            .animation-dock::-webkit-scrollbar {
+                display: none;
+            }
+            .animation-pill-toggle {
+                flex-shrink: 0;
+            }
+        }
+
+        /* Mobile Screens (< 768px) */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .header-title {
+                gap: 8px;
+            }
+
+            .header-title h2 {
+                font-size: 1.05rem;
+            }
+
+            #titleSub {
+                display: none;
+            }
+
+            .hackathon-badge {
+                display: none;
+            }
+
+            .status-beacon span {
+                display: none;
+            }
+
+            .animation-dock {
+                max-width: calc(100vw - 160px);
+                gap: 5px;
+            }
+
+            .animation-pill-toggle {
+                padding: 4px 7px;
+                font-size: 0.68rem;
+            }
+
+            .circuit-tab-switcher {
+                padding: 4px 0.75rem 0 0.75rem;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+            }
+            .circuit-tab-switcher::-webkit-scrollbar {
+                display: none;
+            }
+
+            .circuit-tab {
+                flex-shrink: 0;
+                padding: 4px 8px;
+                font-size: 0.68rem;
+            }
+
+            .circuit-hud {
+                padding: 6px 0.75rem;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+                gap: 6px;
+                scrollbar-width: none;
+            }
+            .circuit-hud::-webkit-scrollbar {
+                display: none;
+            }
+
+            .circuit-node {
+                flex-shrink: 0;
+                padding: 3px 8px;
+                font-size: 0.68rem;
+                gap: 4px;
+            }
+
+            .circuit-wire {
+                min-width: 18px;
+                flex-shrink: 0;
+                margin: 0 2px;
+            }
+
+            .channel-header {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.75rem;
+            }
+            .channel-header > span:last-child {
+                display: none;
+            }
+
+            .messages-container {
+                padding: 0.75rem;
+                gap: 10px;
+            }
+
+            .message {
+                max-width: 96%;
+                gap: 8px;
+            }
+
+            .msg-content {
+                padding: 9px 12px;
+                font-size: 0.84rem;
+                line-height: 1.45;
+            }
+
+            .avatar-quantum {
+                width: 32px;
+                height: 32px;
+            }
+            .avatar-quantum .ring-1 {
+                width: 30px;
+                height: 30px;
+            }
+            .avatar-quantum .ring-2 {
+                width: 24px;
+                height: 24px;
+            }
+            .avatar-quantum .core-sphere {
+                width: 18px;
+                height: 18px;
+                font-size: 0.65rem;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+
+            .quick-actions-bar-wrap {
+                border-top: 1px solid var(--border-glass);
+            }
+
+            .quick-actions {
+                padding: 5px 8px;
+                gap: 5px;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .quick-btn {
+                min-height: 34px;
+                padding: 4px 9px;
+                font-size: 0.72rem;
+            }
+
+            .quick-actions.grid-mode {
+                max-height: 120px;
+            }
+
+            .chat-input-bar {
+                padding: 0.45rem 0.65rem max(0.5rem, env(safe-area-inset-bottom)) 0.65rem;
+                gap: 6px;
+            }
+
+            .chat-input {
+                font-size: 16px; /* Critical iOS Safari zoom prevention */
+                padding: 8px 10px;
+            }
+
+            .chat-input-bar .animation-pill-toggle {
+                padding: 6px 9px;
+                font-size: 0.72rem;
+                white-space: nowrap;
+            }
+
+            .shimmer-btn {
+                padding: 0 14px;
+                height: 38px;
+                font-size: 0.82rem;
+            }
+
+            .wispr-voice-panel {
+                margin: 0 0.5rem 8px 0.5rem;
+                padding: 8px 10px;
+            }
+
+            .wispr-panel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .wispr-speed-badge {
+                display: none;
+            }
+
+            .wispr-panel-actions {
+                width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: none;
+                padding-bottom: 2px;
+            }
+            .wispr-panel-actions::-webkit-scrollbar {
+                display: none;
+            }
+
+            .wispr-preset-btn {
+                flex-shrink: 0;
+                font-size: 0.68rem;
+                padding: 3px 8px;
+            }
+
+            .wispr-visualizer-container {
+                height: 45px;
+            }
+
+            .wispr-transcript-stream {
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+
+            /* Analytics Sidebar Mobile */
+            .analytics-sidebar {
+                padding: 12px 12px 50px 12px !important;
+                gap: 10px !important;
+            }
+
+            .border-beam-card {
+                padding: 10px 12px;
+            }
+
+            .metric-val {
+                font-size: 1.15rem;
+            }
+
+            .log-box {
+                min-height: 120px;
+                max-height: 200px;
+                font-size: 0.7rem;
+            }
+
+            /* Modals Mobile */
+            .merkle-modal-overlay {
+                padding: 10px;
+            }
+
+            .merkle-modal-card {
+                width: 100% !important;
+                max-width: 100% !important;
+                max-height: 90vh !important;
+                padding: 14px !important;
+                border-radius: 12px !important;
+                gap: 12px !important;
+            }
+
+            .merkle-grid-cols {
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
+            }
+
+            .research-grid-cols {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            .hex-stream-box {
+                max-height: 130px;
+                font-size: 0.7rem;
+            }
+
+            .circuit-modal {
+                width: calc(100vw - 20px) !important;
+                padding: 14px !important;
+            }
+        }
+
+        /* Very Small Phones (< 480px) */
+        @media (max-width: 480px) {
+            .hallpass-input-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .hallpass-card-header {
+                flex-direction: column;
+            }
+        }
+        
     </style>
 </head>
 
@@ -1816,7 +2672,7 @@
                 <button class="wispr-close-btn" onclick="closeResearchModal()">&times;</button>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="research-grid-cols">
                 <div class="merkle-stat-block" style="border-left: 3px solid var(--accent-green);">
                     <div class="m-label">MAST ERROR CASCADE REDUCTION</div>
                     <div class="m-val" style="color:var(--accent-green); font-size:1.3rem;">74% Error Reduction</div>
@@ -1833,6 +2689,7 @@
                 <h4 style="color:#f4f4f5; font-size:0.85rem; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                     <span>⚖️ Empirical Benchmark: Single LLM vs. CampusHire Relay Dual-Process</span>
                 </h4>
+                <div class="benchmark-table-wrapper">
                 <table style="width:100%; border-collapse:collapse; font-size:0.75rem; font-family:'JetBrains Mono',monospace;">
                     <thead>
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text-muted); text-align:left;">
@@ -1869,6 +2726,7 @@
                         </tr>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div style="background: rgba(18, 18, 24, 0.7); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px; font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
@@ -1903,13 +2761,13 @@
                 <button class="wispr-close-btn" onclick="closeHallPassModal()">&times;</button>
             </div>
 
-            <div style="display:flex; gap:10px; align-items:center;">
+            <div class="hallpass-input-row">
                 <input type="text" id="hallPassInput" class="chat-input" value="23CS01" placeholder="Enter Student Roll No (e.g. 23CS01, 23IT01, 23CS02)..." style="flex:1;">
                 <button class="shimmer-btn" onclick="scanHallPass()">🔍 Authenticate</button>
             </div>
 
             <div id="hallPassResultCard" style="background: rgba(10, 10, 14, 0.95); border: 1px solid var(--border-glass); border-radius: 12px; padding: 18px; display:flex; flex-direction:column; gap:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div class="hallpass-card-header">
                     <div>
                         <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">STUDENT ADMIT CARD</div>
                         <div style="font-size:1.15rem; font-weight:700; color:white;" id="hpStudentName">Aarav Sharma</div>
@@ -1942,6 +2800,8 @@
     <canvas id="confettiCanvas"></canvas>
     <!-- Magic UI Meteors Layer -->
     <div class="meteors-container" id="meteorsContainer"></div>
+    <!-- Cyberpunk CRT Scanline Layer -->
+    <div class="crt-scanlines" id="crtScanlines"></div>
 
     <!-- Circuit Detail Modal -->
     <div class="circuit-modal-backdrop" id="modalBackdrop" onclick="closeCircuitModal()"></div>
@@ -1960,15 +2820,236 @@
         </div>
         <div style="display:flex; align-items:center; gap:14px;">
             <div class="animation-dock">
-                <button class="animation-pill-toggle theme-pill-btn" onclick="cycleTheme()" id="themeToggleBtn" title="Toggle Grey & Black Theme Variations (Obsidian / Titanium / Carbon)">🌑 Theme: Obsidian Black</button>
-                <button class="animation-pill-toggle" onclick="toggleAudio()" id="audioToggleBtn" title="Toggle Sci-Fi Web Audio Synthesizer">🔇 Audio: OFF</button>
-                <button class="animation-pill-toggle" onclick="toggleMatrix()" id="matrixToggleBtn" title="Toggle Matrix Digital Code Rain">🟢 Matrix: OFF</button>
-                <button class="animation-pill-toggle" onclick="toggleMeteors()" id="meteorsToggleBtn" title="Toggle Magic UI Meteors Shower">🌠 Meteors: ON</button>
-                <button class="animation-pill-toggle" onclick="toggleParticles()" id="particlesToggleBtn" title="Toggle Interactive Mesh Particles">✨ Particles: ON</button>
-                <button class="animation-pill-toggle" onclick="fireCelebrationConfetti()" title="Trigger Magic UI Confetti Cannon">🎉 Confetti</button>
-                <button class="animation-pill-toggle" onclick="startJudgeAutoTour()" id="tourHeaderBtn" style="background: linear-gradient(135deg, rgba(88,166,255,0.25), rgba(63,185,80,0.25)); border-color: var(--accent); color: white; font-weight: 700; box-shadow: 0 0 12px rgba(88,166,255,0.4);" title="Run 30-Second Interactive Judge Showcase">⭐ 30s Judge Tour</button>
-                <button class="animation-pill-toggle" onclick="openResearchModal()" title="View Academic Research Grounding & MAST Benchmarks">📚 Research</button>
-                <button class="animation-pill-toggle" onclick="openHallPassModal()" title="Scan & Verify Candidate HMAC Hall Pass">🛡️ Hall Pass</button>
+                <!-- 30-Second Guided Judge Showcase -->
+                <button class="animation-pill-toggle" onclick="startJudgeAutoTour()" id="tourHeaderBtn" style="background: linear-gradient(135deg, rgba(88,166,255,0.28), rgba(63,185,80,0.28)); border-color: var(--accent); color: white; font-weight: 700; box-shadow: 0 0 14px rgba(88,166,255,0.35);" title="Run 30-Second Interactive Judge Showcase">⭐ 30s Judge Tour</button>
+
+                <!-- Interactive Visual FX & Themes Dropdown Popover Hub -->
+                <div class="fx-dropdown-container" id="fxDropdownContainer">
+                    <button class="fx-hub-trigger-btn" id="fxHubTriggerBtn" onclick="toggleFxDropdown(event)" aria-haspopup="true" aria-expanded="false" title="Click or hover to configure Visual FX, Themes, Animations & Audio">
+                        <span class="fx-pulse-orb"></span>
+                        <span class="fx-sparkle-icon">✨</span>
+                        <span class="fx-hub-label">Visual FX &amp; Themes</span>
+                        <span class="fx-count-pill" id="fxActiveCountBadge">3 Active</span>
+                        <svg class="fx-chevron-icon" id="fxChevronIcon" viewBox="0 0 20 20" fill="currentColor" width="12" height="12">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+
+                    <!-- Floating Dropdown Popover List -->
+                    <div class="fx-dropdown-panel" id="fxDropdownPanel">
+                        <!-- Magic UI Rotating Border Beam -->
+                        <div class="fx-border-beam"></div>
+
+                        <!-- Panel Header -->
+                        <div class="fx-panel-header">
+                            <div class="fx-panel-title">
+                                <span style="font-size:1.1rem;">🎨</span>
+                                <div>
+                                    <div style="font-weight:700; font-size:0.85rem; color:#fff; display:flex; align-items:center; gap:6px;">
+                                        Visual &amp; Audio FX Suite
+                                        <span class="fx-pro-tag">MAGIC UI</span>
+                                    </div>
+                                    <div style="font-size:0.68rem; color:var(--text-muted);">Real-time canvas shaders, theme palettes &amp; soundscapes</div>
+                                </div>
+                            </div>
+                            <button class="fx-reset-btn" onclick="resetDefaultFx(event)" title="Reset all animations to default">↺ Reset</button>
+                        </div>
+
+                        <!-- Section 1: Themes Palette -->
+                        <div class="fx-section">
+                            <div class="fx-section-label">
+                                <span>🎨 THEME PRESET</span>
+                                <span id="fxCurrentThemeName" style="color:var(--accent); font-weight:600; text-transform:none;">Obsidian Noir</span>
+                            </div>
+                            <div class="fx-theme-grid">
+                                <div class="fx-theme-card active" id="themeCard-obsidian" onclick="selectThemeFromMenu('obsidian')">
+                                    <div class="fx-theme-swatches">
+                                        <span style="background:#070709;"></span>
+                                        <span style="background:#18181b;"></span>
+                                        <span style="background:#ffffff;"></span>
+                                    </div>
+                                    <div class="fx-theme-info">
+                                        <span class="fx-theme-title">🌑 Obsidian</span>
+                                        <span class="fx-theme-desc">Grey &amp; OLED Black</span>
+                                    </div>
+                                    <span class="fx-theme-check">✓</span>
+                                </div>
+                                <div class="fx-theme-card" id="themeCard-carbon" onclick="selectThemeFromMenu('carbon')">
+                                    <div class="fx-theme-swatches">
+                                        <span style="background:#000000;"></span>
+                                        <span style="background:#09090b;"></span>
+                                        <span style="background:#a1a1aa;"></span>
+                                    </div>
+                                    <div class="fx-theme-info">
+                                        <span class="fx-theme-title">🖤 Carbon</span>
+                                        <span class="fx-theme-desc">Minimalist OLED</span>
+                                    </div>
+                                    <span class="fx-theme-check">✓</span>
+                                </div>
+                                <div class="fx-theme-card" id="themeCard-cyber-neon" onclick="selectThemeFromMenu('cyber-neon')">
+                                    <div class="fx-theme-swatches">
+                                        <span style="background:#090d16;"></span>
+                                        <span style="background:#00f2fe;"></span>
+                                        <span style="background:#4facfe;"></span>
+                                    </div>
+                                    <div class="fx-theme-info">
+                                        <span class="fx-theme-title">⚡ Cyber Neon</span>
+                                        <span class="fx-theme-desc">Electric Cyan High-Tech</span>
+                                    </div>
+                                    <span class="fx-theme-check">✓</span>
+                                </div>
+                                <div class="fx-theme-card" id="themeCard-synthwave" onclick="selectThemeFromMenu('synthwave')">
+                                    <div class="fx-theme-swatches">
+                                        <span style="background:#130b1e;"></span>
+                                        <span style="background:#ff007f;"></span>
+                                        <span style="background:#7928ca;"></span>
+                                    </div>
+                                    <div class="fx-theme-info">
+                                        <span class="fx-theme-title">🌆 Synthwave</span>
+                                        <span class="fx-theme-desc">Vibrant Purple Glow</span>
+                                    </div>
+                                    <span class="fx-theme-check">✓</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Canvas Visual Effects -->
+                        <div class="fx-section">
+                            <div class="fx-section-label">
+                                <span>✨ LIVE VISUAL SHADERS &amp; ANIMATIONS</span>
+                            </div>
+                            <div class="fx-toggle-list">
+                                
+                                <!-- Meteors Shower -->
+                                <div class="fx-toggle-item" onclick="toggleMeteorsFromMenu()">
+                                    <div class="fx-toggle-left">
+                                        <div class="fx-toggle-icon">🌠</div>
+                                        <div>
+                                            <div class="fx-toggle-name">Magic UI Meteors Shower</div>
+                                            <div class="fx-toggle-hint">Falling meteor streaks traversing the viewport</div>
+                                        </div>
+                                    </div>
+                                    <div class="fx-switch active" id="menuSwitchMeteors">
+                                        <div class="fx-switch-handle"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Particle Mesh -->
+                                <div class="fx-toggle-item" onclick="toggleParticlesFromMenu()">
+                                    <div class="fx-toggle-left">
+                                        <div class="fx-toggle-icon">✨</div>
+                                        <div>
+                                            <div class="fx-toggle-name">Interactive Particle Mesh</div>
+                                            <div class="fx-toggle-hint">Interactive physics nodes with cursor magnetic lines</div>
+                                        </div>
+                                    </div>
+                                    <div class="fx-switch active" id="menuSwitchParticles">
+                                        <div class="fx-switch-handle"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Matrix Rain -->
+                                <div class="fx-toggle-item" onclick="toggleMatrixFromMenu()">
+                                    <div class="fx-toggle-left">
+                                        <div class="fx-toggle-icon">🟢</div>
+                                        <div>
+                                            <div class="fx-toggle-name">Cyber Matrix Code Rain</div>
+                                            <div class="fx-toggle-hint">Falling cryptographic alphanumeric glyph rain</div>
+                                        </div>
+                                    </div>
+                                    <div class="fx-switch" id="menuSwitchMatrix">
+                                        <div class="fx-switch-handle"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Cyber CRT Scanlines -->
+                                <div class="fx-toggle-item" onclick="toggleScanlinesFromMenu()">
+                                    <div class="fx-toggle-left">
+                                        <div class="fx-toggle-icon">📺</div>
+                                        <div>
+                                            <div class="fx-toggle-name">Cyberpunk CRT Scanline Grid</div>
+                                            <div class="fx-toggle-hint">Retro CRT raster scanlines with phosphor glow</div>
+                                        </div>
+                                    </div>
+                                    <div class="fx-switch" id="menuSwitchScanlines">
+                                        <div class="fx-switch-handle"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Atmospheric Aurora Glow -->
+                                <div class="fx-toggle-item" onclick="toggleAuroraGlowFromMenu()">
+                                    <div class="fx-toggle-left">
+                                        <div class="fx-toggle-icon">🌌</div>
+                                        <div>
+                                            <div class="fx-toggle-name">Atmospheric Aurora Bloom</div>
+                                            <div class="fx-toggle-hint">Dynamic breathing multi-color ambient lighting mesh</div>
+                                        </div>
+                                    </div>
+                                    <div class="fx-switch active" id="menuSwitchAurora">
+                                        <div class="fx-switch-handle"></div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Audio & Soundscapes -->
+                        <div class="fx-section">
+                            <div class="fx-section-label">
+                                <span>🔊 SYNTHESIZER &amp; SOUNDSCAPES</span>
+                            </div>
+                            <div class="fx-toggle-item" onclick="toggleAudioFromMenu()">
+                                <div class="fx-toggle-left">
+                                    <div class="fx-toggle-icon">🎧</div>
+                                    <div>
+                                        <div class="fx-toggle-name" style="display:flex; align-items:center; gap:8px;">
+                                            Sci-Fi Web Audio Synthesizer
+                                            <span class="fx-equalizer" id="fxEqualizerBars">
+                                                <span></span><span></span><span></span><span></span>
+                                            </span>
+                                        </div>
+                                        <div class="fx-toggle-hint">Generates real-time sine/square wave haptic soundscapes on triage</div>
+                                    </div>
+                                </div>
+                                <div class="fx-switch" id="menuSwitchAudio">
+                                    <div class="fx-switch-handle"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 4: Instant FX Bursts -->
+                        <div class="fx-section" style="border-bottom:none; padding-bottom:4px; margin-bottom:0;">
+                            <div class="fx-section-label">
+                                <span>⚡ ONE-CLICK FX BURSTS</span>
+                            </div>
+                            <div class="fx-burst-grid">
+                                <button class="fx-burst-btn" onclick="fireCelebrationConfetti(); playSuccessChord();" title="Fire Magic UI Dual Confetti Cannon">
+                                    <span>🎉</span> Confetti Burst
+                                </button>
+                                <button class="fx-burst-btn" onclick="triggerScrambleTitle();" title="Trigger Cyberpunk Title Decryption">
+                                    <span>⚡</span> Decrypt Title
+                                </button>
+                                <button class="fx-burst-btn" onclick="triggerGridWarp(1800);" title="Trigger Retro Grid Warp Surge">
+                                    <span>🌀</span> Warp Speed
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Hidden sync anchors for full compatibility -->
+                <div style="display:none;" aria-hidden="true">
+                    <button id="themeToggleBtn"></button>
+                    <button id="audioToggleBtn"></button>
+                    <button id="matrixToggleBtn"></button>
+                    <button id="meteorsToggleBtn"></button>
+                    <button id="particlesToggleBtn"></button>
+                </div>
+
+                <!-- Modals & Links -->
+                <button class="animation-pill-toggle" onclick="openResearchModal()" title="View Academic Research Grounding &amp; MAST Benchmarks">📚 Research</button>
+                <button class="animation-pill-toggle" onclick="openHallPassModal()" title="Scan &amp; Verify Candidate HMAC Hall Pass">🛡️ Hall Pass</button>
                 <a href="/slides" target="_blank" class="animation-pill-toggle" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:600; color:var(--accent);" title="Open Official Pitch Deck">📊 Pitch Deck</a>
                 <a href="/api/campushire/audit/export-csv" class="animation-pill-toggle" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:600; color:var(--accent-green);" title="Export Verified Candidate Shortlist CSV">📥 Shortlist CSV</a>
             </div>
@@ -2050,6 +3131,16 @@
                 <span class="node-role-badge">HMAC Anti-Fraud</span>
             </div>
         </div>
+    </div>
+
+    <!-- Responsive Mobile/Tablet Workspace Switcher -->
+    <div class="mobile-view-tabs" id="mobileViewTabs">
+        <button class="mobile-view-tab active" id="btnTabChat" onclick="switchMobileView('chat')">
+            <span style="font-size:1rem;">💬</span> <span>War Room Chat</span>
+        </button>
+        <button class="mobile-view-tab" id="btnTabTelemetry" onclick="switchMobileView('telemetry')">
+            <span style="font-size:1rem;">📊</span> <span>Live Telemetry &amp; Audit</span>
+        </button>
     </div>
 
     <main>
@@ -2240,6 +3331,129 @@
         const auditLogs = document.getElementById("auditLogs");
 
         // -------------------------------------------------------------
+        // Visual FX & Themes Dropdown Logic
+        // -------------------------------------------------------------
+        let isFxOpen = false;
+        let isFxPinned = false;
+        let fxHoverTimeout = null;
+        let scanlinesEnabled = false;
+        let auroraGlowEnabled = true;
+
+        function updateFxActiveCountBadge() {
+            let count = 0;
+            if (typeof meteorsEnabled !== 'undefined' && meteorsEnabled) count++;
+            if (typeof particlesEnabled !== 'undefined' && particlesEnabled) count++;
+            if (typeof matrixEnabled !== 'undefined' && matrixEnabled) count++;
+            if (typeof audioEnabled !== 'undefined' && audioEnabled) count++;
+            if (scanlinesEnabled) count++;
+            if (auroraGlowEnabled) count++;
+            const badge = document.getElementById("fxActiveCountBadge");
+            if (badge) badge.textContent = `${count} Active`;
+        }
+
+        function openFxDropdown() {
+            const container = document.getElementById("fxDropdownContainer");
+            const btn = document.getElementById("fxHubTriggerBtn");
+            if (!container) return;
+            container.classList.add("open");
+            isFxOpen = true;
+            if (btn) btn.setAttribute("aria-expanded", "true");
+        }
+
+        function closeFxDropdown() {
+            const container = document.getElementById("fxDropdownContainer");
+            const btn = document.getElementById("fxHubTriggerBtn");
+            if (!container) return;
+            container.classList.remove("open");
+            isFxOpen = false;
+            if (btn) btn.setAttribute("aria-expanded", "false");
+        }
+
+        function toggleFxDropdown(e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            if (isFxOpen && isFxPinned) {
+                closeFxDropdown();
+                isFxPinned = false;
+            } else {
+                openFxDropdown();
+                isFxPinned = true;
+            }
+        }
+
+        function selectThemeFromMenu(themeId) {
+            setTheme(themeId, true);
+            document.querySelectorAll(".fx-theme-card").forEach(c => c.classList.remove("active"));
+            const card = document.getElementById(`themeCard-${themeId}`);
+            if (card) card.classList.add("active");
+            const themeLabel = document.getElementById("fxCurrentThemeName");
+            const found = THEME_VARIANTS.find(t => t.id === themeId);
+            if (themeLabel && found) themeLabel.textContent = found.name;
+        }
+
+        function toggleMeteorsFromMenu() {
+            toggleMeteors();
+            const sw = document.getElementById("menuSwitchMeteors");
+            if (sw) sw.classList.toggle("active", meteorsEnabled);
+            updateFxActiveCountBadge();
+        }
+
+        function toggleParticlesFromMenu() {
+            toggleParticles();
+            const sw = document.getElementById("menuSwitchParticles");
+            if (sw) sw.classList.toggle("active", particlesEnabled);
+            updateFxActiveCountBadge();
+        }
+
+        function toggleMatrixFromMenu() {
+            toggleMatrix();
+            const sw = document.getElementById("menuSwitchMatrix");
+            if (sw) sw.classList.toggle("active", matrixEnabled);
+            updateFxActiveCountBadge();
+        }
+
+        function toggleAudioFromMenu() {
+            toggleAudio();
+        }
+
+        function toggleScanlinesFromMenu() {
+            scanlinesEnabled = !scanlinesEnabled;
+            const scan = document.getElementById("crtScanlines");
+            if (scan) scan.classList.toggle("active", scanlinesEnabled);
+            const sw = document.getElementById("menuSwitchScanlines");
+            if (sw) sw.classList.toggle("active", scanlinesEnabled);
+            updateFxActiveCountBadge();
+            if (scanlinesEnabled) playChirp(920, 0.06);
+            log(scanlinesEnabled ? "📺 Cyberpunk CRT Scanline Grid Active" : "📺 CRT Scanlines Deactivated", "cyan");
+        }
+
+        function toggleAuroraGlowFromMenu() {
+            auroraGlowEnabled = !auroraGlowEnabled;
+            const orbs = document.querySelector(".ambient-orbs-container");
+            if (orbs) orbs.classList.toggle("aurora-mesh-pulse", auroraGlowEnabled);
+            const sw = document.getElementById("menuSwitchAurora");
+            if (sw) sw.classList.toggle("active", auroraGlowEnabled);
+            updateFxActiveCountBadge();
+            log(auroraGlowEnabled ? "🌌 Atmospheric Aurora Bloom Active" : "🌌 Aurora Bloom Deactivated", "cyan");
+        }
+
+        function resetDefaultFx(e) {
+            if (e) e.stopPropagation();
+            if (typeof meteorsEnabled !== 'undefined' && !meteorsEnabled) toggleMeteors();
+            if (typeof particlesEnabled !== 'undefined' && !particlesEnabled) toggleParticles();
+            if (typeof matrixEnabled !== 'undefined' && matrixEnabled) toggleMatrix();
+            if (typeof audioEnabled !== 'undefined' && audioEnabled) toggleAudio();
+            if (scanlinesEnabled) toggleScanlinesFromMenu();
+            if (!auroraGlowEnabled) toggleAuroraGlowFromMenu();
+            selectThemeFromMenu("obsidian");
+            updateFxActiveCountBadge();
+            playSuccessChord();
+            log("✨ Visual & Audio FX Suite restored to optimal defaults", "cyan");
+        }
+
+        // -------------------------------------------------------------
         // Web Audio API Native Synthesizer (Optional Sci-Fi Haptics)
         // -------------------------------------------------------------
         let audioCtx = null;
@@ -2261,13 +3475,22 @@
             const btn = document.getElementById("audioToggleBtn");
             if (audioEnabled) {
                 getAudioContext();
-                btn.textContent = "🔊 Audio: ON";
-                btn.style.color = "var(--accent-green)";
+                if (btn) {
+                    btn.textContent = "🔊 Audio: ON";
+                    btn.style.color = "var(--accent-green)";
+                }
                 playSuccessChord();
             } else {
-                btn.textContent = "🔇 Audio: OFF";
-                btn.style.color = "var(--text-muted)";
+                if (btn) {
+                    btn.textContent = "🔇 Audio: OFF";
+                    btn.style.color = "var(--text-muted)";
+                }
             }
+            const sw = document.getElementById("menuSwitchAudio");
+            const eq = document.getElementById("fxEqualizerBars");
+            if (sw) sw.classList.toggle("active", audioEnabled);
+            if (eq) eq.classList.toggle("active", audioEnabled);
+            updateFxActiveCountBadge();
         }
 
         function playChirp(freq = 880, duration = 0.08) {
@@ -2368,6 +3591,13 @@
             const found = THEME_VARIANTS.find(t => t.id === themeId) || THEME_VARIANTS[0];
             const btn = document.getElementById("themeToggleBtn");
             if (btn) btn.textContent = found.label;
+
+            // Sync menu theme card and label
+            document.querySelectorAll(".fx-theme-card").forEach(c => c.classList.remove("active"));
+            const card = document.getElementById(`themeCard-${themeId}`);
+            if (card) card.classList.add("active");
+            const themeLabel = document.getElementById("fxCurrentThemeName");
+            if (themeLabel) themeLabel.textContent = found.name;
 
             if (withHaptics) {
                 playChirp(780, 0.08);
@@ -2588,15 +3818,22 @@
             particlesEnabled = !particlesEnabled;
             const btn = document.getElementById("particlesToggleBtn");
             if (particlesEnabled) {
-                btn.textContent = "✨ Particles: ON";
-                btn.style.color = "var(--accent)";
+                if (btn) {
+                    btn.textContent = "✨ Particles: ON";
+                    btn.style.color = "var(--accent)";
+                }
                 animateParticles();
             } else {
-                btn.textContent = "✨ Particles: OFF";
-                btn.style.color = "var(--text-muted)";
+                if (btn) {
+                    btn.textContent = "✨ Particles: OFF";
+                    btn.style.color = "var(--text-muted)";
+                }
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
             }
+            const sw = document.getElementById("menuSwitchParticles");
+            if (sw) sw.classList.toggle("active", particlesEnabled);
+            if (typeof updateFxActiveCountBadge === "function") updateFxActiveCountBadge();
         }
 
         // -------------------------------------------------------------
@@ -2642,14 +3879,18 @@
             matrixEnabled = !matrixEnabled;
             const btn = document.getElementById("matrixToggleBtn");
             if (matrixEnabled) {
-                btn.textContent = "🟢 Matrix: ON";
-                btn.style.color = "var(--accent-green)";
+                if (btn) {
+                    btn.textContent = "🟢 Matrix: ON";
+                    btn.style.color = "var(--accent-green)";
+                }
                 mCanvas.style.opacity = "0.75";
                 if (!matrixIntervalId) matrixIntervalId = setInterval(drawMatrixFrame, 40);
                 log("🟢 Matrix Cybersecurity Code Rain Activated", "green");
             } else {
-                btn.textContent = "🟢 Matrix: OFF";
-                btn.style.color = "var(--text-muted)";
+                if (btn) {
+                    btn.textContent = "🟢 Matrix: OFF";
+                    btn.style.color = "var(--text-muted)";
+                }
                 mCanvas.style.opacity = "0";
                 if (matrixIntervalId) {
                     clearInterval(matrixIntervalId);
@@ -2657,6 +3898,9 @@
                 }
                 mCtx.clearRect(0, 0, mCanvas.width, mCanvas.height);
             }
+            const sw = document.getElementById("menuSwitchMatrix");
+            if (sw) sw.classList.toggle("active", matrixEnabled);
+            if (typeof updateFxActiveCountBadge === "function") updateFxActiveCountBadge();
         }
 
         // -------------------------------------------------------------
@@ -2682,14 +3926,21 @@
             meteorsEnabled = !meteorsEnabled;
             const btn = document.getElementById("meteorsToggleBtn");
             if (meteorsEnabled) {
-                btn.textContent = "🌠 Meteors: ON";
-                btn.style.color = "var(--accent)";
+                if (btn) {
+                    btn.textContent = "🌠 Meteors: ON";
+                    btn.style.color = "var(--accent)";
+                }
                 createMeteors(24);
             } else {
-                btn.textContent = "🌠 Meteors: OFF";
-                btn.style.color = "var(--text-muted)";
+                if (btn) {
+                    btn.textContent = "🌠 Meteors: OFF";
+                    btn.style.color = "var(--text-muted)";
+                }
                 meteorsContainer.innerHTML = "";
             }
+            const sw = document.getElementById("menuSwitchMeteors");
+            if (sw) sw.classList.toggle("active", meteorsEnabled);
+            if (typeof updateFxActiveCountBadge === "function") updateFxActiveCountBadge();
         }
 
         function triggerMeteorsShowerBurst() {
@@ -3369,6 +4620,30 @@
         }
 
         // =============================================================
+        // 8B. Responsive Mobile Workspace Tab Switcher
+        // =============================================================
+        function switchMobileView(view) {
+            const mainEl = document.querySelector("main");
+            const btnChat = document.getElementById("btnTabChat");
+            const btnTelem = document.getElementById("btnTabTelemetry");
+            if (!mainEl || !btnChat || !btnTelem) return;
+
+            if (view === "telemetry") {
+                mainEl.classList.add("view-telemetry");
+                btnTelem.classList.add("active");
+                btnChat.classList.remove("active");
+                playChirp(720, 0.06);
+                log("📱 Switched to Live Telemetry & Audit view", "cyan");
+            } else {
+                mainEl.classList.remove("view-telemetry");
+                btnChat.classList.add("active");
+                btnTelem.classList.remove("active");
+                playChirp(580, 0.06);
+                log("📱 Switched to War Room Chat view", "cyan");
+            }
+        }
+
+        // =============================================================
         // 9. Dual Circuit Mode Switcher & Node Inspector
         // =============================================================
         let currentCircuitMode = "laya";
@@ -3451,6 +4726,12 @@
             if (!wCanvas) return;
             const wCtx = wCanvas.getContext("2d");
             const eqContainer = document.getElementById("wisprEqBars");
+
+            // Auto-resize internal canvas buffer to match responsive rendered width
+            if (wCanvas.parentElement) {
+                wCanvas.width = wCanvas.parentElement.offsetWidth || 800;
+                wCanvas.height = wCanvas.parentElement.offsetHeight || 60;
+            }
 
             // Setup 28 equalizer bars
             if (eqContainer && eqContainer.children.length === 0) {
@@ -3756,6 +5037,50 @@
             chatInput.value = text;
             sendMessage();
         }
+
+        // -------------------------------------------------------------
+        // FX Dropdown Hover, Click & Dismiss Event Listeners
+        // -------------------------------------------------------------
+        const fxContainer = document.getElementById("fxDropdownContainer");
+        if (fxContainer) {
+            fxContainer.addEventListener("mouseenter", () => {
+                clearTimeout(fxHoverTimeout);
+                openFxDropdown();
+            });
+            fxContainer.addEventListener("mouseleave", () => {
+                if (!isFxPinned) {
+                    fxHoverTimeout = setTimeout(() => {
+                        closeFxDropdown();
+                    }, 260);
+                }
+            });
+        }
+
+        document.addEventListener("click", (e) => {
+            const container = document.getElementById("fxDropdownContainer");
+            if (container && !container.contains(e.target)) {
+                closeFxDropdown();
+                isFxPinned = false;
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && isFxOpen) {
+                closeFxDropdown();
+                isFxPinned = false;
+            }
+        });
+
+        // Initialize active count badge & active theme card
+        setTimeout(() => {
+            if (typeof updateFxActiveCountBadge === "function") updateFxActiveCountBadge();
+            const current = currentTheme || "obsidian";
+            const card = document.getElementById(`themeCard-${current}`);
+            if (card) card.classList.add("active");
+            const themeLabel = document.getElementById("fxCurrentThemeName");
+            const found = THEME_VARIANTS.find(t => t.id === current);
+            if (themeLabel && found) themeLabel.textContent = found.name;
+        }, 100);
     </script>
 </body>
 

@@ -225,6 +225,30 @@ class TestLayaDecisionEngine(unittest.TestCase):
             res = engine._init_router()
             self.assertEqual(res, mock_router)
 
+    def test_check_guardrails_fallback_when_torch_unavailable(self):
+        """Verify check_guardrails gracefully falls back when torch/Router is unavailable."""
+        with patch.object(self.engine, "_init_router", side_effect=RuntimeError("No module named 'torch'")):
+            res = self.engine.check_guardrails("Northstar Technologies invites applications for batch 2027")
+            self.assertTrue(res["safe"])
+            self.assertLess(res["risk_score"], 0.50)
+            self.assertEqual(res["flags"], [])
+            self.assertEqual(res["engine"], "laya-heuristic-fallback")
+
+    def test_route_intent_fallback_when_torch_unavailable(self):
+        """Verify route_intent falls back to heuristic matching when torch is unavailable."""
+        with patch.object(self.engine, "_init_router", side_effect=RuntimeError("No module named 'torch'")):
+            res = self.engine.route_intent("Please verify student eligibility", possible_intents=["student_query", "admin_task"])
+            self.assertIn("selected_intent", res)
+            self.assertGreaterEqual(res["confidence"], 0.80)
+
+    def test_triage_request_fallback_when_torch_unavailable(self):
+        """Verify triage_request falls back cleanly when torch is unavailable."""
+        with patch.object(self.engine, "_init_router", side_effect=RuntimeError("No module named 'torch'")):
+            res = self.engine.triage_request("Urgent refund request please")
+            self.assertIn("answers", res)
+            self.assertEqual(res["answers"]["intent"]["choice"], "refund")
+            self.assertEqual(res["engine"], "laya-heuristic-fallback")
+
 
 if __name__ == "__main__":
     unittest.main()

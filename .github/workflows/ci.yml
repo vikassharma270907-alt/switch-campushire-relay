@@ -16,6 +16,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest]
         python-version: ['3.11', '3.12']
+    env:
+      PYTHONPATH: .
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+      PYTHONUNBUFFERED: "1"
 
     steps:
       - name: Checkout repository
