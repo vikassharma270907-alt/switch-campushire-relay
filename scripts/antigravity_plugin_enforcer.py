@@ -223,6 +223,14 @@ def sync_project(project_path: Path) -> Dict[str, Any]:
             shutil.copy2(mandatory_rule_src, mandatory_rule_dst)
         except Exception:
             pass
+    elif not mandatory_rule_dst.exists():
+        try:
+            mandatory_rule_dst.write_text(
+                "# Mandatory Antigravity Plugins & Skills Policy\n\nAll tools and skills are enforced.\n",
+                encoding="utf-8"
+            )
+        except Exception:
+            pass
 
     # 3. Scaffold / Update .mcp.json
     mcp_file = target / ".mcp.json"

@@ -1,58 +1,54 @@
-﻿{
-    "mcpServers":  {
-                       "figma":  {
-                                     "type":  "http",
-                                     "url":  "https://mcp.figma.com/mcp"
-                                 },
-                       "laya":  {
-                                    "command":  "D:\\switch wemakedev hackathon\\laya-repo\\.venv\\Scripts\\python.exe",
-                                    "args":  [
-                                                 "-m",
-                                                 "laya.mcp.server"
-                                             ],
-                                    "env":  {
-                                                "LAYA_DEVICE":  "cpu",
-                                                "LAYA_PRELOAD":  "0",
-                                                "LAYA_THREADS":  "8"
-                                            }
-                                },
-                       "skillspector":  {
-                                            "command":  "C:\\Users\\vikas sharma\\AppData\\Roaming\\uv\\tools\\skillspector\\Scripts\\python.exe",
-                                            "args":  [
-                                                         "-m",
-                                                         "skillspector.cli",
-                                                         "mcp"
-                                                     ],
-                                            "env":  {
-                                                        "PYTHONIOENCODING":  "utf-8",
-                                                        "PYTHONUNBUFFERED":  "1"
-                                                    }
-                                        },
-                       "context7":  {
-                                        "command":  "npx",
-                                        "args":  [
-                                                     "-y",
-                                                     "@upstash/context7-mcp"
-                                                 ],
-                                        "env":  {
-
-                                                }
-                                    },
-                       "magic":  {
-                                     "args":  [
-                                                  "C:\\Users\\vikas sharma\\.gemini\\config\\plugins\\magic\\dist\\index.js"
-                                              ],
-                                     "env":  {
-
-                                             },
-                                     "command":  "node"
-                                 },
-                       "21st":  {
-                                    "url":  "https://21st.dev/api/mcp",
-                                    "headers":  {
-                                                    "x-api-key":  "${API_KEY_21ST}"
-                                                },
-                                    "type":  "http"
-                                }
-                   }
+{
+  "mcpServers": {
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "laya": {
+      "command": "D:\\switch wemakedev hackathon\\laya-repo\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "laya.mcp.server"
+      ],
+      "env": {
+        "LAYA_DEVICE": "cpu",
+        "LAYA_PRELOAD": "0",
+        "LAYA_THREADS": "8"
+      }
+    },
+    "skillspector": {
+      "command": "C:\\Users\\vikas sharma\\AppData\\Roaming\\uv\\tools\\skillspector\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "skillspector.cli",
+        "mcp"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
+    "magic": {
+      "args": [
+        "C:\\Users\\vikas sharma\\.gemini\\config\\plugins\\magic\\dist\\index.js"
+      ],
+      "env": {},
+      "command": "node"
+    },
+    "21st": {
+      "url": "https://21st.dev/api/mcp",
+      "headers": {
+        "x-api-key": "${API_KEY_21ST}"
+      },
+      "type": "http"
+    }
+  }
 }
