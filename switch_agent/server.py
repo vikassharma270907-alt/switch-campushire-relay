@@ -75,6 +75,7 @@ async def serve_dashboard():
 
 
 @app.get("/slides", response_class=HTMLResponse)
+@app.get("/static/slides.html", response_class=HTMLResponse)
 async def serve_slides():
     """Serves the interactive hackathon pitch deck slides."""
     slides_file = os.path.join(STATIC_DIR, "slides.html")
