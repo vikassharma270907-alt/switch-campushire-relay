@@ -107,7 +107,24 @@ Railway natively supports both the included `Dockerfile` and `Procfile`.
 
 ---
 
-## Strategy 5: Docker Container (Self-Hosted / Cloud Run)
+## Strategy 5: Vercel Serverless Deployment (Live Production Active)
+
+The platform is officially deployed on **Vercel Serverless Production**:
+
+- **Production War Room UI**: [https://switch-campushire-relay.vercel.app/](https://switch-campushire-relay.vercel.app/)
+- **Live Hackathon Pitch Deck**: [https://switch-campushire-relay.vercel.app/slides](https://switch-campushire-relay.vercel.app/slides)
+- **Production Health Check**: [https://switch-campushire-relay.vercel.app/healthz](https://switch-campushire-relay.vercel.app/healthz)
+- **CampusHire API**: [https://switch-campushire-relay.vercel.app/api/campushire/candidates](https://switch-campushire-relay.vercel.app/api/campushire/candidates)
+
+### Deploying / Redeploying to Vercel:
+```bash
+# Production deployment via Vercel CLI
+vercel --prod --yes
+```
+
+---
+
+## Strategy 6: Docker Container (Self-Hosted / Cloud Run)
 
 To run the containerized backend anywhere (AWS ECS, Google Cloud Run, Azure App Service, or local Docker):
 

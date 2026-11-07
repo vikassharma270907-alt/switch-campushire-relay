@@ -2,6 +2,8 @@
 ### Built for the *Flip the Switch Hackathon 2026* (WeMakeDevs × DevTools Academy × Switch AI)
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Live%20Production-black?logo=vercel)](https://switch-campushire-relay.vercel.app/)
+[![Pitch Deck](https://img.shields.io/badge/Pitch%20Deck-Interactive%20Slides-blue)](https://switch-campushire-relay.vercel.app/slides)
 [![Automated Test Suite](https://img.shields.io/badge/pytest-167%2F167%20passed%20(100%25)-brightgreen.svg)](tests/)
 [![Switch Open Source](https://img.shields.io/badge/Switch%20Console-v0.31+-purple.svg)](https://github.com/sandbox-quantum/switch)
 [![System 1 Engine](https://img.shields.io/badge/System%201-Laya%20Reflex%20(<5ms)-red.svg)](switch_agent/laya_gate.py)
@@ -9,6 +11,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **Bringing autonomous coding agents out of isolated local terminals into collaborative, auditable team chat — fortified by sub-millisecond on-device neural triage, deterministic verification, and atomic execution loops.**
+>
+> 🌐 **Live Vercel Production URL:** [https://switch-campushire-relay.vercel.app/](https://switch-campushire-relay.vercel.app/)  
+> 📊 **Interactive Pitch Deck (9 Slides):** [https://switch-campushire-relay.vercel.app/slides](https://switch-campushire-relay.vercel.app/slides)  
+> 🛡️ **Live Health Status:** [https://switch-campushire-relay.vercel.app/healthz](https://switch-campushire-relay.vercel.app/healthz)
 
 ---
 
