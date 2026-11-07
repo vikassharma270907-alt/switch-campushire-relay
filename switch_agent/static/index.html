@@ -2761,13 +2761,13 @@
                 <button class="wispr-close-btn" onclick="closeHallPassModal()">&times;</button>
             </div>
 
-            <div class="hallpass-input-row">
-                <input type="text" id="hallPassInput" class="chat-input" value="23CS01" placeholder="Enter Student Roll No (e.g. 23CS01, 23IT01, 23CS02)..." style="flex:1;">
+            <div class="hallpass-input-row" style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="hallPassInput" class="chat-input" value="23CS01" onkeydown="if(event.key==='Enter') scanHallPass()" placeholder="Enter Student Roll No (e.g. 23CS01, 23IT01, 23CS02)..." style="flex:1;">
                 <button class="shimmer-btn" onclick="scanHallPass()">🔍 Authenticate</button>
             </div>
 
             <div id="hallPassResultCard" style="background: rgba(10, 10, 14, 0.95); border: 1px solid var(--border-glass); border-radius: 12px; padding: 18px; display:flex; flex-direction:column; gap:12px;">
-                <div class="hallpass-card-header">
+                <div class="hallpass-card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
                         <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">STUDENT ADMIT CARD</div>
                         <div style="font-size:1.15rem; font-weight:700; color:white;" id="hpStudentName">Aarav Sharma</div>
@@ -2785,8 +2785,15 @@
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.72rem; color:var(--text-muted);">Test with: <code>23CS01</code>, <code>23IT01</code>, <code>23CS02</code>, <code>23IT02</code></span>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:0.72rem; color:var(--text-muted);">
+                    Test with: 
+                    <code style="cursor:pointer; text-decoration:underline; color:var(--accent);" onclick="document.getElementById('hallPassInput').value='23CS01'; scanHallPass();">23CS01</code>, 
+                    <code style="cursor:pointer; text-decoration:underline; color:var(--accent);" onclick="document.getElementById('hallPassInput').value='23IT01'; scanHallPass();">23IT01</code>, 
+                    <code style="cursor:pointer; text-decoration:underline; color:var(--accent);" onclick="document.getElementById('hallPassInput').value='23CS02'; scanHallPass();">23CS02</code>, 
+                    <code style="cursor:pointer; text-decoration:underline; color:var(--accent);" onclick="document.getElementById('hallPassInput').value='23IT02'; scanHallPass();">23IT02</code>, 
+                    <code style="cursor:pointer; text-decoration:underline; color:var(--accent-red);" onclick="document.getElementById('hallPassInput').value='23CS06'; scanHallPass();" title="Student with active backlogs (ineligible)">23CS06 (Ineligible)</code>
+                </span>
                 <button class="shimmer-btn" onclick="closeHallPassModal()">Close Scanner</button>
             </div>
         </div>
@@ -4524,17 +4531,18 @@
                     starHtml += `</div>`;
                     starHtml += `<span style="font-size:0.8rem; color:var(--text-muted);">Latency: ${sData.latency_ms}ms | Word Count: ${sData.word_count} words</span>`;
                     appendMessage("SwitchGuard", starHtml, true, d, false, true);
-                } else if (text.includes("@DriveCoordinator") || text.includes("@EligibilityAuditor")) {
+                } else if (text.includes("@DriveCoordinator") || text.includes("@EligibilityAuditor") || text.includes("@CareerCoach") || text.includes("@HallPassGenerator") || (currentCircuitMode === 'campushire' && text.includes("@"))) {
                     log("Relaying message to CampusHire Switch Room...", "cyan");
+                    const detectedMentions = text.match(/@[A-Za-z0-9_]+/g) || ["@DriveCoordinator"];
                     const roomRes = await fetch("/api/campushire/events", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ sender: "PlacementOfficer", content: text, room: "#placement-drive-2027", mentions: ["@DriveCoordinator"] })
+                        body: JSON.stringify({ sender: "PlacementOfficer", content: text, room: "#placement-drive-2027", mentions: detectedMentions })
                     });
                     const rData = await roomRes.json();
                     let roomHtml = `🏛️ <strong>CampusHire Multi-Agent Room Response:</strong><br>`;
                     (rData.responses || []).forEach(r => {
-                        roomHtml += `<div style="margin-top:6px; padding:6px 10px; background:#0d1117; border-left:3px solid var(--accent); border-radius:4px;"><strong>@${escapeHtml(r.sender)}:</strong> ${escapeHtml(r.content)}</div>`;
+                        roomHtml += `<div style="margin-top:6px; padding:6px 10px; background:#0d1117; border-left:3px solid var(--accent); border-radius:4px;"><strong>@${escapeHtml(r.sender)}:</strong> ${escapeHtml(r.content).replace(/\n/g, '<br>')}</div>`;
                     });
                     appendMessage("SwitchGuard", roomHtml, true, d);
                 } else if (d.intent === "docs_lookup" || text.toLowerCase().includes("docs for")) {
@@ -4839,11 +4847,23 @@
             const modal = document.getElementById("merkleModalOverlay");
             if (modal) {
                 modal.style.display = "flex";
-                // Fetch live receipt root if available
-                fetch("/api/campushire/audit/export-csv")
-                    .then(() => {
+                // Fetch live Merkle root from governance ledger
+                fetch("/api/campushire/governance/ledger")
+                    .then(res => res.json())
+                    .then(data => {
                         const rootEl = document.getElementById("modalMerkleRoot");
-                        if (rootEl) rootEl.textContent = "0x7f8a91c4d023b98e72c589b21f3a54d68e";
+                        if (rootEl && data.merkle_root) rootEl.textContent = data.merkle_root;
+                        if (data.leaves && data.leaves.length > 0) {
+                            const stream = document.getElementById("hexStreamContent");
+                            if (stream) {
+                                let lines = `<div class="hex-line green">[0x00] LEAF_GENESIS: H(0x00 || criteria_hash_sha256) &rarr; VALIDATED</div>`;
+                                data.leaves.slice(0, 4).forEach((leaf, idx) => {
+                                    lines += `<div class="hex-line cyan">[0x0${idx+1}] EVENT_LEAF_${idx+1}: ${leaf.substring(0, 32)}... &rarr; [RFC-6962]</div>`;
+                                });
+                                lines += `<div class="hex-line green">[0x05] MERKLE_ROOT: ${data.merkle_root.substring(0, 32)}... &rarr; COMPUTED DETERMINISTICALLY</div>`;
+                                stream.innerHTML = lines;
+                            }
+                        }
                     })
                     .catch(() => {});
                 log("🧾 Holographic Merkle Audit Receipt opened (RFC-6962 Verification)", "cyan");
@@ -4856,10 +4876,12 @@
         }
 
         function copyReceiptJson() {
+            const rootEl = document.getElementById("modalMerkleRoot");
+            const currentRoot = (rootEl ? rootEl.textContent : "").trim() || "0x7f8a91c4d023b98e72c589b21f3a54d68e";
             const sampleJson = {
                 protocol: "ArmorAntigravity",
                 standard: "RFC-6962",
-                merkle_root: "0x7f8a91c4d023b98e72c589b21f3a54d68e",
+                merkle_root: currentRoot,
                 candidates_audited: 10,
                 demographic_parity: 1.0,
                 timestamp: new Date().toISOString(),
@@ -4933,27 +4955,63 @@
 
         async function scanHallPass() {
             const input = document.getElementById("hallPassInput");
-            const rollNo = (input ? input.value : "23CS01").trim() || "23CS01";
+            const rollNo = (input ? input.value : "23CS01").trim().toUpperCase() || "23CS01";
             try {
                 const res = await fetch(`/api/campushire/hall-pass/${encodeURIComponent(rollNo)}`);
                 const data = await res.json();
-                if (data.status === "issued" || data.status === "already_issued" || data.token) {
-                    document.getElementById("hpStudentName").textContent = data.student_name || "Aarav Sharma";
-                    document.getElementById("hpStudentRoll").textContent = `Roll No: ${data.student_id || rollNo} · Branch: ${data.branch || 'CSE'}`;
-                    document.getElementById("hpVenue").textContent = `Venue: ${data.venue || 'Hall-A, Seat A-01'}`;
-                    document.getElementById("hpTokenVal").textContent = data.token || "576E-E581-A5B2-7C3D";
-                    document.getElementById("hpStatusBadge").textContent = "AUTHENTIC PASS";
-                    document.getElementById("hpStatusBadge").style.color = "var(--accent-green)";
-                    log(`🛡️ HMAC Hall Pass Authenticated for ${rollNo}`, "green");
-                } else {
-                    document.getElementById("hpStatusBadge").textContent = "CANDIDATE NOT IN SHORTLIST";
-                    document.getElementById("hpStatusBadge").style.color = "var(--accent-red)";
+                const isAuth = res.ok && (data.is_eligible === true || data.status === "VERIFIED_ELIGIBLE" || data.status === "issued" || data.status === "already_issued" || (data.token && !data.token.startsWith("N/A")) || (data.admit_token && !data.admit_token.startsWith("N/A")));
+                
+                if (isAuth) {
+                    const studentName = data.student_name || data.name || "Candidate";
+                    const branch = data.branch || "CSE";
+                    const venue = data.venue || data.seat_no || "Hall-A, Seat A-01";
+                    const token = data.token || data.admit_token || "576E-E581-A5B2-7C3D";
+                    
+                    document.getElementById("hpStudentName").textContent = studentName;
+                    document.getElementById("hpStudentRoll").textContent = `Roll No: ${data.student_id || rollNo} · Branch: ${branch}`;
+                    document.getElementById("hpVenue").textContent = `Venue: ${venue}`;
+                    document.getElementById("hpTokenVal").textContent = token;
+                    
+                    const badge = document.getElementById("hpStatusBadge");
+                    badge.textContent = "AUTHENTIC PASS";
+                    badge.style.color = "var(--accent-green)";
+                    badge.style.background = "rgba(63,185,80,0.2)";
+                    badge.style.borderColor = "rgba(63,185,80,0.4)";
+                    
+                    log(`🛡️ HMAC Hall Pass Authenticated for ${rollNo} (${studentName})`, "green");
+                } else if (res.ok) {
+                    const studentName = data.student_name || data.name || `Candidate ${rollNo}`;
+                    const branch = data.branch || "N/A";
+                    document.getElementById("hpStudentName").textContent = studentName;
+                    document.getElementById("hpStudentRoll").textContent = `Roll No: ${data.student_id || rollNo} · Branch: ${branch}`;
+                    document.getElementById("hpVenue").textContent = "Venue: Not Allocated (Ineligible)";
                     document.getElementById("hpTokenVal").textContent = "N/A - FAILED CRITERIA CHECK";
+                    
+                    const badge = document.getElementById("hpStatusBadge");
+                    badge.textContent = "CANDIDATE NOT IN SHORTLIST";
+                    badge.style.color = "var(--accent-red)";
+                    badge.style.background = "rgba(248,81,73,0.2)";
+                    badge.style.borderColor = "rgba(248,81,73,0.4)";
+                    
+                    const reason = data.ineligible_reasons && data.ineligible_reasons.length ? data.ineligible_reasons.join(", ") : "Failed criteria check";
+                    log(`⚠️ Candidate ${rollNo} (${studentName}) ineligible: ${reason}`, "yellow");
+                } else {
+                    document.getElementById("hpStudentName").textContent = `Roll No: ${rollNo}`;
+                    document.getElementById("hpStudentRoll").textContent = "Not Found in Student Registry";
+                    document.getElementById("hpVenue").textContent = "Venue: N/A";
+                    document.getElementById("hpTokenVal").textContent = "N/A - UNREGISTERED ROLL NO";
+                    
+                    const badge = document.getElementById("hpStatusBadge");
+                    badge.textContent = "CANDIDATE NOT FOUND";
+                    badge.style.color = "var(--accent-red)";
+                    badge.style.background = "rgba(248,81,73,0.2)";
+                    badge.style.borderColor = "rgba(248,81,73,0.4)";
+                    
+                    log(`❌ Roll number ${rollNo} not found in student database`, "red");
                 }
             } catch (e) {
-                document.getElementById("hpStudentName").textContent = "Aarav Sharma";
-                document.getElementById("hpStudentRoll").textContent = `Roll No: ${rollNo} · Branch: CSE`;
-                document.getElementById("hpTokenVal").textContent = "576E-E581-A5B2-7C3D";
+                console.error("Hall pass scan error:", e);
+                log(`❌ Error scanning hall pass: ${e.message}`, "red");
             }
         }
 

@@ -742,6 +742,29 @@ def test_campushire_hall_pass_and_verification():
     assert v_bad.status_code == 200
     assert v_bad.json()["valid"] is False
 
+    # 4. Verify candidate 23CS02 (Diya Sen) eligible hall pass
+    res_cs02 = client.get("/api/campushire/hall-pass/23CS02")
+    assert res_cs02.status_code == 200
+    data_cs02 = res_cs02.json()
+    assert data_cs02["student_id"] == "23CS02"
+    assert data_cs02["name"] == "Diya Sen"
+    assert data_cs02["is_eligible"] is True
+    assert data_cs02["status"] == "VERIFIED_ELIGIBLE"
+    assert data_cs02["token"] != "N/A - FAILED CRITERIA CHECK"
+
+    # 5. Verify candidate 23CS06 (ineligible with backlog)
+    res_cs06 = client.get("/api/campushire/hall-pass/23CS06")
+    assert res_cs06.status_code == 200
+    data_cs06 = res_cs06.json()
+    assert data_cs06["student_id"] == "23CS06"
+    assert data_cs06["is_eligible"] is False
+    assert data_cs06["status"] == "INELIGIBLE"
+    assert data_cs06["token"] == "N/A - FAILED CRITERIA CHECK"
+
+    # 6. Verify non-existent student 404
+    res_404 = client.get("/api/campushire/hall-pass/99ZZ99")
+    assert res_404.status_code == 404
+
 
 def test_campushire_skill_gap_analysis():
     """Verify semantic skill gap analysis and readiness scoring."""
