@@ -18,6 +18,11 @@ During the **WeMakeDevs × DevTools Academy "Flip the Switch" Hackathon**, our t
 
 CampusHire Relay takes AI coding agents out of isolated developer terminals and embeds them directly into persistent, auditable team channels (**Mattermost / Slack**) using **Switch AI**, augmented with **Laya's sub-50ms local neural reflex engine** for Kahneman Dual-Process cognition.
 
+🔗 **Quick Links & Live Artifacts:**
+- 🌐 **Live Web Application:** [https://switch-campushire-relay.vercel.app/](https://switch-campushire-relay.vercel.app/)
+- 📊 **Interactive Pitch Deck (9 Slides):** [https://switch-campushire-relay.vercel.app/slides](https://switch-campushire-relay.vercel.app/slides)
+- 💻 **GitHub Repository:** [https://github.com/vikassharma270907-alt/switch-campushire-relay](https://github.com/vikassharma270907-alt/switch-campushire-relay)
+
 ---
 
 ## 1. Dual-Process Architecture: System 1 (Laya) & System 2 (Switch AI)
@@ -98,8 +103,8 @@ Our architecture is informed by 2024–2026 academic research in multi-agent sys
 
 ```bash
 # 1. Clone & install dependencies
-git clone https://github.com/your-username/campushire-relay.git
-cd campushire-relay
+git clone https://github.com/vikassharma270907-alt/switch-campushire-relay.git
+cd switch-campushire-relay
 pip install -r requirements.txt
 
 # 2. Run the 41-test unit test suite (95% coverage)
@@ -133,4 +138,6 @@ python scripts/laya_gate.py evaluate-star "During my final year project, our tea
 
 The greatest value of AI in 2026 isn't a chatbot answering questions in an isolated silo. It is the ability for humans and specialized AI coding agents to collaborate in shared, governed team spaces.
 
-With **Switch AI** and **Laya**, our coding agents are no longer solitary CLI utilities—they are accountable teammates. Check out our repository, star the project on GitHub, and join us in flipping the switch!
+With **Switch AI** and **Laya**, our coding agents are no longer solitary CLI utilities—they are accountable teammates. 
+
+Check out our repository at [vikassharma270907-alt/switch-campushire-relay](https://github.com/vikassharma270907-alt/switch-campushire-relay), star the project on GitHub, test the live app at [switch-campushire-relay.vercel.app](https://switch-campushire-relay.vercel.app/), and join us in flipping the switch!
