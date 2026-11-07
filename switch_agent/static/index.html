@@ -11,6 +11,64 @@
         rel="stylesheet">
     <style>
         :root,
+        [data-theme="cyber-neon"] {
+            --bg-dark: #070913;
+            --bg-body: #05060c;
+            --bg-card: rgba(13, 16, 29, 0.85);
+            --bg-card-hover: rgba(22, 27, 48, 0.94);
+            --bg-header: rgba(10, 13, 24, 0.92);
+            --border: rgba(0, 240, 255, 0.28);
+            --border-glass: rgba(0, 240, 255, 0.16);
+            --border-glow: rgba(0, 240, 255, 0.65);
+            --accent: #00f0ff;
+            --accent-silver: #38bdf8;
+            --accent-graphite: #818cf8;
+            --accent-slate: #6366f1;
+            --accent-purple: #c084fc;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #f43f5e;
+            --accent-pink: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --spring-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+            --beam-light: #00f0ff;
+            --ambient-glow: rgba(0, 240, 255, 0.22);
+            --card-glow: 0 8px 32px 0 rgba(0, 240, 255, 0.16);
+            --shadow-neon: 0 0 25px rgba(0, 240, 255, 0.35);
+        }
+
+        [data-theme="synthwave"] {
+            --bg-dark: #0f051d;
+            --bg-body: #090214;
+            --bg-card: rgba(26, 12, 45, 0.86);
+            --bg-card-hover: rgba(38, 18, 66, 0.94);
+            --bg-header: rgba(18, 8, 33, 0.92);
+            --border: rgba(255, 0, 128, 0.32);
+            --border-glass: rgba(255, 0, 128, 0.18);
+            --border-glow: rgba(255, 0, 128, 0.65);
+            --accent: #ff007f;
+            --accent-silver: #ff70a6;
+            --accent-graphite: #70d6ff;
+            --accent-slate: #ff9770;
+            --accent-purple: #e0aaff;
+            --accent-green: #06d6a0;
+            --accent-amber: #ffd166;
+            --accent-red: #ef476f;
+            --accent-pink: #ff007f;
+            --text-main: #fdf2f8;
+            --text-muted: #d8b4e2;
+            --text-dim: #9d4edd;
+            --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --spring-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+            --beam-light: #ff007f;
+            --ambient-glow: rgba(255, 0, 128, 0.22);
+            --card-glow: 0 8px 32px 0 rgba(255, 0, 128, 0.18);
+            --shadow-neon: 0 0 25px rgba(255, 0, 128, 0.35);
+        }
+
         [data-theme="obsidian"] {
             --bg-dark: #070709;
             --bg-body: #050507;
@@ -28,6 +86,7 @@
             --accent-green: #4ade80;
             --accent-amber: #fbbf24;
             --accent-red: #f87171;
+            --accent-pink: #f472b6;
             --text-main: #f4f4f5;
             --text-muted: #a1a1aa;
             --text-dim: #71717a;
@@ -35,6 +94,8 @@
             --spring-snappy: cubic-bezier(0.16, 1, 0.3, 1);
             --beam-light: rgba(255, 255, 255, 0.95);
             --ambient-glow: rgba(255, 255, 255, 0.05);
+            --card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            --shadow-neon: 0 0 20px rgba(255, 255, 255, 0.18);
         }
 
         [data-theme="titanium"] {
@@ -54,11 +115,14 @@
             --accent-green: #34d399;
             --accent-amber: #f59e0b;
             --accent-red: #f87171;
+            --accent-pink: #e879f9;
             --text-main: #f4f4f5;
             --text-muted: #9da3af;
             --text-dim: #6b7280;
             --beam-light: rgba(228, 228, 231, 0.9);
             --ambient-glow: rgba(200, 210, 225, 0.07);
+            --card-glow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            --shadow-neon: 0 0 20px rgba(228, 228, 231, 0.2);
         }
 
         [data-theme="carbon"] {
@@ -78,11 +142,14 @@
             --accent-green: #22c55e;
             --accent-amber: #eab308;
             --accent-red: #ef4444;
+            --accent-pink: #ec4899;
             --text-main: #ffffff;
             --text-muted: #a3a3a3;
             --text-dim: #737373;
             --beam-light: #ffffff;
             --ambient-glow: rgba(255, 255, 255, 0.1);
+            --card-glow: 0 8px 32px 0 rgba(255, 255, 255, 0.08);
+            --shadow-neon: 0 0 20px rgba(255, 255, 255, 0.25);
         }
 
         /* Modern Glassmorphic Scrollbars */
@@ -91,7 +158,7 @@
             margin: 0;
             padding: 0;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.22) rgba(10, 10, 14, 0.6);
+            scrollbar-color: var(--border-glass) rgba(10, 10, 14, 0.6);
             transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -106,13 +173,13 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.22);
+            background: var(--border);
             border-radius: 4px;
             transition: background 0.2s ease;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--accent);
         }
 
         html, body {
@@ -185,14 +252,78 @@
             z-index: 1;
         }
 
+        /* Ambient Floating Glow Orbs for Living Dark Depth */
+        .ambient-orbs-container {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(95px);
+            opacity: 0.35;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .orb-1 {
+            width: 550px;
+            height: 550px;
+            top: -100px;
+            left: -80px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            animation: orb-drift-1 18s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 480px;
+            height: 480px;
+            bottom: -80px;
+            right: -60px;
+            background: radial-gradient(circle, var(--accent-purple) 0%, transparent 70%);
+            animation: orb-drift-2 22s ease-in-out infinite alternate;
+        }
+
+        .orb-3 {
+            width: 420px;
+            height: 420px;
+            top: 35%;
+            left: 30%;
+            background: radial-gradient(circle, var(--accent-pink, #ff007f) 0%, transparent 70%);
+            opacity: 0.22;
+            animation: orb-drift-3 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes orb-drift-1 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(120px, 80px) scale(1.15); }
+            100% { transform: translate(40px, 140px) scale(0.95); }
+        }
+
+        @keyframes orb-drift-2 {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-100px, -60px) scale(1.1); }
+            100% { transform: translate(-50px, -120px) scale(0.9); }
+        }
+
+        @keyframes orb-drift-3 {
+            0% { transform: translate(0, 0) scale(0.9); }
+            50% { transform: translate(70px, -50px) scale(1.2); }
+            100% { transform: translate(-80px, 60px) scale(1); }
+        }
+
         .meteor {
             position: absolute;
             top: -20px;
-            width: 2px;
-            height: 2px;
+            width: 2.5px;
+            height: 2.5px;
             border-radius: 9999px;
-            background-color: #ffffff;
-            box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.95), 0 0 20px 4px rgba(161, 161, 170, 0.6);
+            background-color: var(--accent);
+            box-shadow: 0 0 12px 2px var(--accent), 0 0 24px 4px var(--accent-purple);
             transform: rotate(215deg);
             animation: meteor-fall linear infinite;
             pointer-events: none;
@@ -203,9 +334,9 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 90px;
-            height: 1.5px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(161, 161, 170, 0.7), transparent);
+            width: 100px;
+            height: 1.8px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple), transparent);
         }
 
         @keyframes meteor-fall {
@@ -230,15 +361,16 @@
             height: 24px;
             margin-left: -12px;
             margin-top: -12px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(161, 161, 170, 0.2) 50%, transparent 75%);
-            border: 1px solid rgba(255, 255, 255, 0.7);
+            background: radial-gradient(circle, var(--accent) 0%, var(--accent-purple) 40%, transparent 75%);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 16px var(--accent);
             pointer-events: none;
             z-index: 9998;
             animation: ripple-wave 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes ripple-wave {
-            0% { transform: scale(0.2); opacity: 0.9; }
+            0% { transform: scale(0.2); opacity: 0.95; }
             100% { transform: scale(6); opacity: 0; }
         }
 
@@ -248,7 +380,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 99999;
-            background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.16) 0%, transparent 75%);
+            background: radial-gradient(circle at 50% 30%, var(--ambient-glow) 0%, transparent 75%);
             animation: flash-fade 0.4s ease-out forwards;
         }
 
@@ -257,15 +389,25 @@
             100% { opacity: 0; transform: scale(1.02); }
         }
 
-        /* Magic UI Aurora Gradient Text - Metallic Platinum & Chrome */
+        /* Magic UI Aurora Gradient Text - Vibrant Aurora with Fluid Motion */
         .aurora-text {
+            background: linear-gradient(135deg, #00f0ff 0%, #c084fc 25%, #ff007f 50%, #10b981 75%, #00f0ff 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: aurora-shift 5s ease-in-out infinite;
+            font-weight: 800;
+            filter: drop-shadow(0 0 14px rgba(0, 240, 255, 0.4));
+        }
+
+        [data-theme="obsidian"] .aurora-text,
+        [data-theme="carbon"] .aurora-text,
+        [data-theme="titanium"] .aurora-text {
             background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 25%, #ffffff 50%, #71717a 75%, #ffffff 100%);
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: aurora-shift 6s ease-in-out infinite;
-            font-weight: 800;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
         }
 
         @keyframes aurora-shift {
@@ -274,7 +416,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Quantum Gyroscope Holographic Avatar - Polished Titanium & Obsidian */
+        /* Quantum Gyroscope Holographic Avatar - Glowing Cyber Neon Gyro */
         .avatar-quantum {
             position: relative;
             width: 40px;
@@ -295,22 +437,36 @@
         .avatar-quantum .ring-1 {
             width: 36px;
             height: 36px;
-            border-color: rgba(244, 244, 245, 0.85);
+            border-color: var(--accent);
             border-top-color: transparent;
+            box-shadow: 0 0 10px var(--accent);
             animation: gyro-spin-1 3s linear infinite;
         }
 
         .avatar-quantum .ring-2 {
             width: 30px;
             height: 30px;
-            border-color: rgba(161, 161, 170, 0.75);
+            border-color: var(--accent-purple);
             border-bottom-color: transparent;
+            box-shadow: 0 0 10px var(--accent-purple);
             animation: gyro-spin-2 2.2s linear infinite reverse;
         }
 
         .avatar-quantum .core-sphere {
             width: 22px;
             height: 22px;
+            background: linear-gradient(135deg, var(--bg-card-hover), var(--bg-dark));
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 0 14px var(--accent);
+            z-index: 2;
+        }
             background: linear-gradient(135deg, #27272a, #09090b);
             border: 1px solid rgba(255, 255, 255, 0.35);
             border-radius: 50%;
@@ -1006,13 +1162,19 @@
             inset: -1.5px;
             border-radius: inherit;
             padding: 2px;
-            background: conic-gradient(from var(--beam-angle), transparent 25%, rgba(255, 255, 255, 0.95) 45%, #a1a1aa 55%, #52525b 65%, transparent 85%);
+            background: conic-gradient(from var(--beam-angle), transparent 20%, var(--accent) 38%, var(--accent-purple) 52%, var(--accent-pink, #ff007f) 66%, var(--accent-green) 80%, transparent 95%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             animation: border-beam-rotate 5s linear infinite;
             pointer-events: none;
-            opacity: 0.75;
+            opacity: 0.85;
+        }
+
+        [data-theme="obsidian"] .border-beam-card::before,
+        [data-theme="carbon"] .border-beam-card::before,
+        [data-theme="titanium"] .border-beam-card::before {
+            background: conic-gradient(from var(--beam-angle), transparent 25%, rgba(255, 255, 255, 0.95) 45%, #a1a1aa 55%, #52525b 65%, transparent 85%);
         }
 
         .metric-label {
@@ -1165,11 +1327,16 @@
             top: -50%;
             left: -50%;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 0),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 0);
+                linear-gradient(to right, var(--border-glow) 1px, transparent 0),
+                linear-gradient(to bottom, var(--border-glow) 1px, transparent 0);
             background-size: 50px 50px;
             transform: rotateX(68deg);
-            animation: retro-grid-scroll 16s linear infinite;
+            animation: retro-grid-scroll 14s linear infinite;
+        }
+
+        .retro-grid.warp {
+            animation: retro-grid-scroll 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) infinite !important;
+            filter: drop-shadow(0 0 16px var(--accent));
         }
 
         @keyframes retro-grid-scroll {
@@ -1413,10 +1580,11 @@
         }
 
         .wispr-eq-bar {
-            width: 3px;
-            background: linear-gradient(180deg, #f4f4f5, #71717a);
+            width: 3.5px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-pink, #ff007f));
             border-radius: 2px;
             height: 6px;
+            box-shadow: 0 0 8px var(--accent);
             transition: height 0.08s ease;
         }
 
@@ -1564,9 +1732,16 @@
 
 <body>
 
+    <!-- Floating Bioluminescent Ambient Glow Orbs for Living Dark Atmosphere -->
+    <div class="ambient-orbs-container">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
     <!-- Magic UI Retro Cyber Grid Horizon -->
     <div class="retro-grid-container" id="retroGridContainer">
-        <div class="retro-grid"></div>
+        <div class="retro-grid" id="retroGridEl"></div>
         <div class="retro-grid-glow"></div>
     </div>
 
@@ -2176,13 +2351,14 @@
         }
 
         // =============================================================
-        // 0. Grey & Black Multi-Variant Animated Theme Engine
+        // 0. Vibrant & Dark Multi-Variant Animated Theme Engine
         // =============================================================
-        let currentTheme = localStorage.getItem("switch_theme") || "obsidian";
+        let currentTheme = localStorage.getItem("switch_theme") || "cyber-neon";
         const THEME_VARIANTS = [
-            { id: "obsidian", label: "🌑 Theme: Obsidian Black", name: "Obsidian Black" },
-            { id: "titanium", label: "🌪️ Theme: Titanium Grey", name: "Titanium Grey" },
-            { id: "carbon", label: "⚡ Theme: Carbon Steel", name: "Carbon Steel" }
+            { id: "cyber-neon", label: "⚡ Theme: Cyber Neon", name: "Cyber Neon (Vibrant Dark)" },
+            { id: "synthwave", label: "🌆 Theme: Synthwave Sunset", name: "Synthwave Sunset (Vibrant Dark)" },
+            { id: "obsidian", label: "🌑 Theme: Obsidian Noir", name: "Obsidian Noir (Grey & Black)" },
+            { id: "carbon", label: "🖤 Theme: Carbon Steel", name: "Carbon Steel (OLED Black)" }
         ];
 
         function setTheme(themeId, withHaptics = false) {
@@ -2201,22 +2377,34 @@
                 setTimeout(() => flash.remove(), 400);
             }
 
-            initParticles(65);
+            initParticles(70);
+            triggerGridWarp(1000);
         }
 
         function cycleTheme() {
             const idx = THEME_VARIANTS.findIndex(t => t.id === currentTheme);
             const next = THEME_VARIANTS[(idx + 1) % THEME_VARIANTS.length];
             setTheme(next.id, true);
-            log(`🎨 Animated Theme Switched to: ${next.name}`, "cyan");
+            log(`🎨 Vibrant & Dark Theme Switched to: ${next.name}`, "cyan");
+        }
+
+        // Hyper-Speed Perspective Cyber Grid Surge Animation
+        function triggerGridWarp(duration = 1400) {
+            const grid = document.getElementById("retroGridEl");
+            if (!grid) return;
+            grid.classList.add("warp");
+            setTimeout(() => {
+                grid.classList.remove("warp");
+            }, duration);
         }
 
         // -------------------------------------------------------------
-        // 1. Ambient Interactive Particle Mesh (Magic UI Particles)
+        // 1. Ambient Interactive Particle Mesh & Cursor Stardust Trail
         // -------------------------------------------------------------
         const canvas = document.getElementById("ambientCanvas");
         const ctx = canvas.getContext("2d");
         let particles = [];
+        let stardust = [];
         let particlesEnabled = true;
         let animationFrameId = null;
         let mouseX = -1000;
@@ -2232,29 +2420,73 @@
         window.addEventListener("mousemove", (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
+
+            // Spawn Stardust Sparkles on mouse glide
+            if (particlesEnabled && Math.random() > 0.35) {
+                let sColor = "0, 240, 255";
+                if (currentTheme === "cyber-neon") {
+                    sColor = Math.random() > 0.5 ? "0, 240, 255" : "236, 72, 153";
+                } else if (currentTheme === "synthwave") {
+                    sColor = Math.random() > 0.5 ? "255, 0, 128" : "255, 209, 102";
+                } else {
+                    sColor = "244, 244, 245";
+                }
+
+                stardust.push({
+                    x: e.clientX + (Math.random() - 0.5) * 14,
+                    y: e.clientY + (Math.random() - 0.5) * 14,
+                    vx: (Math.random() - 0.5) * 1.4,
+                    vy: (Math.random() - 0.5) * 1.4 - 0.5,
+                    size: Math.random() * 2.8 + 1.2,
+                    alpha: 0.9,
+                    color: sColor
+                });
+            }
         });
 
-        // Expanding Click Ripples
+        // Expanding Click Ripples with Neon Burst
         window.addEventListener("click", (e) => {
             const ripple = document.createElement("div");
             ripple.className = "click-ripple";
             ripple.style.left = `${e.clientX}px`;
             ripple.style.top = `${e.clientY}px`;
             document.body.appendChild(ripple);
-            playChirp(600, 0.05);
+            playChirp(680, 0.05);
             setTimeout(() => ripple.remove(), 700);
+
+            // Click particle burst
+            if (particlesEnabled) {
+                for (let k = 0; k < 12; k++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const spd = Math.random() * 4 + 1.5;
+                    stardust.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        vx: Math.cos(angle) * spd,
+                        vy: Math.sin(angle) * spd,
+                        size: Math.random() * 3.5 + 1.5,
+                        alpha: 1,
+                        color: currentTheme === "cyber-neon" ? "0, 240, 255" : (currentTheme === "synthwave" ? "255, 0, 128" : "255, 255, 255")
+                    });
+                }
+            }
         });
 
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.45;
-                this.vy = (Math.random() - 0.5) * 0.45;
-                this.radius = Math.random() * 1.8 + 0.8;
-                this.baseAlpha = Math.random() * 0.45 + 0.2;
-                if (currentTheme === "titanium") {
-                    this.color = Math.random() > 0.4 ? "212, 212, 216" : "138, 144, 158";
+                this.vx = (Math.random() - 0.5) * 0.55;
+                this.vy = (Math.random() - 0.5) * 0.55;
+                this.radius = Math.random() * 2 + 1;
+                this.baseAlpha = Math.random() * 0.5 + 0.25;
+
+                if (currentTheme === "cyber-neon") {
+                    const palette = ["0, 240, 255", "192, 132, 252", "236, 72, 153", "16, 185, 129", "56, 189, 248"];
+                    this.color = palette[Math.floor(Math.random() * palette.length)];
+                } else if (currentTheme === "synthwave") {
+                    const palette = ["255, 0, 127", "255, 209, 102", "6, 214, 160", "112, 214, 255", "224, 170, 255"];
+                    this.color = palette[Math.floor(Math.random() * palette.length)];
                 } else if (currentTheme === "carbon") {
                     this.color = Math.random() > 0.3 ? "255, 255, 255" : "163, 163, 163";
                 } else {
@@ -2274,10 +2506,10 @@
                 const dx = mouseX - this.x;
                 const dy = mouseY - this.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 120 && dist > 0) {
-                    const force = (120 - dist) / 120;
-                    this.x -= (dx / dist) * force * 1.2;
-                    this.y -= (dy / dist) * force * 1.2;
+                if (dist < 130 && dist > 0) {
+                    const force = (130 - dist) / 130;
+                    this.x -= (dx / dist) * force * 1.5;
+                    this.y -= (dy / dist) * force * 1.5;
                 }
             }
 
@@ -2289,18 +2521,19 @@
             }
         }
 
-        function initParticles(count = 65) {
+        function initParticles(count = 70) {
             particles = [];
             for (let i = 0; i < count; i++) {
                 particles.push(new Particle());
             }
         }
-        initParticles(65);
+        initParticles(70);
 
         function animateParticles() {
             if (!particlesEnabled) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Draw Mesh Particles & Tracer Connections
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update();
                 particles[i].draw();
@@ -2310,23 +2543,43 @@
                     const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < 95) {
-                        const alpha = (1 - dist / 95) * 0.22;
+                    if (dist < 105) {
+                        const alpha = (1 - dist / 105) * 0.28;
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        if (currentTheme === "titanium") {
-                            ctx.strokeStyle = `rgba(212, 212, 216, ${alpha})`;
+
+                        if (currentTheme === "cyber-neon") {
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
+                        } else if (currentTheme === "synthwave") {
+                            ctx.strokeStyle = `rgba(255, 0, 128, ${alpha})`;
                         } else if (currentTheme === "carbon") {
                             ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 1.2})`;
                         } else {
                             ctx.strokeStyle = `rgba(228, 228, 231, ${alpha})`;
                         }
-                        ctx.lineWidth = 0.8;
+                        ctx.lineWidth = 0.9;
                         ctx.stroke();
                     }
                 }
             }
+
+            // Draw & Update Cursor Stardust Trail
+            for (let k = stardust.length - 1; k >= 0; k--) {
+                const s = stardust[k];
+                s.x += s.vx;
+                s.y += s.vy;
+                s.alpha -= 0.024;
+                if (s.alpha <= 0) {
+                    stardust.splice(k, 1);
+                    continue;
+                }
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${s.color}, ${s.alpha})`;
+                ctx.fill();
+            }
+
             animationFrameId = requestAnimationFrame(animateParticles);
         }
         animateParticles();
@@ -2622,7 +2875,12 @@
         }
 
         function fireCelebrationConfetti(source = "both") {
-            const colors = ["#ffffff", "#f4f4f5", "#e4e4e7", "#a1a1aa", "#71717a", "#3f3f46", "#27272a"];
+            let colors = ["#00f0ff", "#ff007f", "#a855f7", "#10b981", "#fbbf24", "#38bdf8", "#ffffff"];
+            if (currentTheme === "obsidian" || currentTheme === "carbon" || currentTheme === "titanium") {
+                colors = ["#ffffff", "#f4f4f5", "#e4e4e7", "#a1a1aa", "#71717a", "#3f3f46", "#27272a"];
+            } else if (currentTheme === "synthwave") {
+                colors = ["#ff007f", "#ffd166", "#06d6a0", "#70d6ff", "#e0aaff", "#ffffff"];
+            }
             const count = 55;
 
             if (source === "left" || source === "both") {
@@ -2885,6 +3143,7 @@
             const metricAction = document.getElementById("metricAction");
             decryptText(metricAction, "EVALUATING...", 300);
             playChirp(650, 0.08);
+            triggerGridWarp(1400);
 
             const nodeSwitch = document.getElementById("nodeSwitch");
             const nodeLaya = document.getElementById("nodeLaya");
@@ -3207,11 +3466,24 @@
                 wCtx.clearRect(0, 0, wCanvas.width, wCanvas.height);
                 phase += wisprStreamingActive ? 0.08 : 0.02;
 
-                const waves = [
-                    { color: "rgba(244, 244, 245, 0.85)", freq: 0.015, amp: wisprStreamingActive ? 22 : 6, speed: phase },
-                    { color: "rgba(161, 161, 170, 0.75)", freq: 0.024, amp: wisprStreamingActive ? 16 : 4, speed: -phase * 0.8 },
-                    { color: "rgba(113, 113, 122, 0.7)", freq: 0.018, amp: wisprStreamingActive ? 12 : 3, speed: phase * 1.2 }
+                let waves = [
+                    { color: "rgba(0, 240, 255, 0.9)", freq: 0.015, amp: wisprStreamingActive ? 24 : 7, speed: phase },
+                    { color: "rgba(236, 72, 153, 0.85)", freq: 0.024, amp: wisprStreamingActive ? 18 : 5, speed: -phase * 0.8 },
+                    { color: "rgba(192, 132, 252, 0.8)", freq: 0.018, amp: wisprStreamingActive ? 14 : 4, speed: phase * 1.2 }
                 ];
+                if (currentTheme === "synthwave") {
+                    waves = [
+                        { color: "rgba(255, 0, 127, 0.95)", freq: 0.015, amp: wisprStreamingActive ? 24 : 7, speed: phase },
+                        { color: "rgba(255, 209, 102, 0.85)", freq: 0.024, amp: wisprStreamingActive ? 18 : 5, speed: -phase * 0.8 },
+                        { color: "rgba(6, 214, 160, 0.8)", freq: 0.018, amp: wisprStreamingActive ? 14 : 4, speed: phase * 1.2 }
+                    ];
+                } else if (currentTheme === "obsidian" || currentTheme === "carbon" || currentTheme === "titanium") {
+                    waves = [
+                        { color: "rgba(244, 244, 245, 0.85)", freq: 0.015, amp: wisprStreamingActive ? 22 : 6, speed: phase },
+                        { color: "rgba(161, 161, 170, 0.75)", freq: 0.024, amp: wisprStreamingActive ? 16 : 4, speed: -phase * 0.8 },
+                        { color: "rgba(113, 113, 122, 0.7)", freq: 0.018, amp: wisprStreamingActive ? 12 : 3, speed: phase * 1.2 }
+                    ];
+                }
 
                 waves.forEach(w => {
                     wCtx.beginPath();
@@ -3250,6 +3522,7 @@
             if (!spokenText) return;
 
             wisprStreamingActive = true;
+            triggerGridWarp(1600);
             const statusLabel = document.getElementById("wisprStatusLabel");
             const streamText = document.getElementById("wisprStreamText");
             const cursor = document.getElementById("wisprCursor");
@@ -3415,6 +3688,7 @@
             
             switchCircuitMode('campushire');
             playSuccessChord();
+            triggerGridWarp(3000);
             log("[Tour] 🚀 STARTING 30-SECOND GUIDED JUDGE TOUR...", "cyan");
             
             const steps = [

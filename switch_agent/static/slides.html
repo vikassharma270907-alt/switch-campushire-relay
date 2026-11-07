@@ -8,18 +8,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #070709;
-      --bg-card: rgba(18, 18, 22, 0.88);
-      --border: rgba(255, 255, 255, 0.1);
-      --accent: #f4f4f5;
-      --accent-silver: #e4e4e7;
-      --accent-graphite: #71717a;
-      --accent-green: #4ade80;
-      --accent-purple: #c4b5fd;
-      --accent-amber: #fbbf24;
-      --accent-red: #f87171;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
+      --bg-dark: #070913;
+      --bg-card: rgba(14, 18, 32, 0.88);
+      --border: rgba(0, 240, 255, 0.25);
+      --border-glow: rgba(0, 240, 255, 0.55);
+      --accent: #00f0ff;
+      --accent-silver: #38bdf8;
+      --accent-graphite: #818cf8;
+      --accent-green: #10b981;
+      --accent-purple: #c084fc;
+      --accent-amber: #f59e0b;
+      --accent-red: #f43f5e;
+      --accent-pink: #ec4899;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,9 +41,9 @@
     .bg-mesh {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 40%),
-                  radial-gradient(circle at 85% 80%, rgba(161, 161, 170, 0.05) 0%, transparent 40%),
-                  radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+      background: radial-gradient(circle at 15% 20%, rgba(0, 240, 255, 0.12) 0%, transparent 40%),
+                  radial-gradient(circle at 85% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 40%),
+                  radial-gradient(circle at 50% 50%, rgba(192, 132, 252, 0.08) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
@@ -63,9 +65,9 @@
       top: 50%;
       left: 50%;
       height: 2px;
-      background: linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(161, 161, 170, 0.5), transparent);
+      background: linear-gradient(to right, #00f0ff, #ec4899, transparent);
       border-radius: 9999px;
-      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+      filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.9));
       transform: rotate(215deg) translateX(0);
       animation: meteorPass linear infinite;
       opacity: 0;
@@ -87,12 +89,12 @@
 
     /* Aurora Gradient Text */
     .aurora-text {
-      background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 25%, #ffffff 50%, #71717a 75%, #ffffff 100%);
+      background: linear-gradient(135deg, #00f0ff 0%, #c084fc 25%, #ff007f 50%, #10b981 75%, #00f0ff 100%);
       background-size: 300% 300%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: auroraShift 8s ease-in-out infinite alternate;
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+      animation: auroraShift 6s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.45));
     }
 
     @keyframes auroraShift {
@@ -109,7 +111,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      background: rgba(12, 12, 15, 0.92);
+      background: rgba(12, 14, 25, 0.92);
       backdrop-filter: blur(18px);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
     }
@@ -124,14 +126,14 @@
     }
 
     .badge {
-      background: linear-gradient(135deg, #27272a, #18181b);
-      color: white;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(192, 132, 252, 0.2));
+      color: #00f0ff;
       padding: 4px 10px;
       border-radius: 6px;
       font-size: 0.75rem;
       font-weight: 700;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
     }
 
     .nav-controls {
@@ -222,20 +224,20 @@
       inset: -1.5px;
       border-radius: inherit;
       padding: 2px;
-      background: conic-gradient(from var(--slide-beam-angle), transparent 25%, rgba(255, 255, 255, 0.95) 45%, #a1a1aa 55%, #52525b 65%, transparent 85%);
+      background: conic-gradient(from var(--slide-beam-angle), transparent 20%, #00f0ff 38%, #c084fc 52%, #ff007f 66%, #10b981 80%, transparent 95%);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
       mask-composite: exclude;
-      animation: slide-beam-rotate 6s linear infinite;
+      animation: slide-beam-rotate 5s linear infinite;
       pointer-events: none;
-      opacity: 0.85;
+      opacity: 0.9;
     }
 
     /* Interactive Click Ripple */
     .click-ripple {
       position: fixed;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(161, 161, 170, 0.2) 60%, transparent 100%);
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.7) 0%, rgba(236, 72, 153, 0.3) 50%, transparent 100%);
       pointer-events: none;
       transform: translate(-50%, -50%) scale(0);
       animation: rippleExpand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
@@ -269,8 +271,8 @@
     .slide-dot.active {
       width: 24px;
       border-radius: 8px;
-      background: linear-gradient(90deg, #ffffff, #a1a1aa);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+      background: linear-gradient(90deg, #00f0ff, #ec4899);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.8);
     }
     
     /* Slide Typography */
@@ -899,7 +901,7 @@
           vx: (Math.random() - 0.5) * 0.7,
           vy: (Math.random() - 0.5) * 0.7,
           radius: Math.random() * 2 + 1,
-          color: i % 3 === 0 ? 'rgba(255, 255, 255, ' : (i % 3 === 1 ? 'rgba(212, 212, 216, ' : 'rgba(161, 161, 170, ')
+          color: i % 4 === 0 ? 'rgba(0, 240, 255, ' : (i % 4 === 1 ? 'rgba(236, 72, 153, ' : (i % 4 === 2 ? 'rgba(192, 132, 252, ' : 'rgba(16, 185, 129, '))
         });
       }
 
@@ -936,7 +938,7 @@
 
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-          ctx.fillStyle = p.color + '0.7)';
+          ctx.fillStyle = p.color + '0.75)';
           ctx.fill();
 
           // Connect nearby particles
@@ -946,11 +948,11 @@
             const djy = p.y - p2.y;
             const d = Math.sqrt(djx * djx + djy * djy);
             if (d < 130) {
-              const alpha = (1 - d / 130) * 0.22;
+              const alpha = (1 - d / 130) * 0.28;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
-              ctx.strokeStyle = `rgba(228, 228, 231, ${alpha})`;
+              ctx.strokeStyle = `rgba(0, 240, 255, ${alpha})`;
               ctx.lineWidth = 1;
               ctx.stroke();
             }
@@ -1004,7 +1006,7 @@
       canvas.height = window.innerHeight;
 
       const particles = [];
-      const colors = ['#ffffff', '#f4f4f5', '#e4e4e7', '#d4d4d8', '#a1a1aa', '#71717a'];
+      const colors = ['#00f0ff', '#ff007f', '#c084fc', '#10b981', '#f59e0b', '#38bdf8', '#ffffff'];
 
       // Left Cannon
       for (let i = 0; i < 70; i++) {

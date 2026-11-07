@@ -5,33 +5,50 @@ on:
     branches: [ master, main ]
   pull_request:
     branches: [ master, main ]
+  workflow_dispatch:
 
 jobs:
   verify:
-    name: Master Verification & Security Gate
-    runs-on: ubuntu-latest
+    name: Master Quality Gate (${{ matrix.os }} - Py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11', '3.12']
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
           if [ -f campushire-relay/requirements.txt ]; then pip install -r campushire-relay/requirements.txt; fi
-          pip install pytest pytest-asyncio anyio httpx
 
-      - name: Run Master Verification Suite
+      - name: Syntax & Compilation Validation
+        shell: bash
         run: |
-          if [ -f run_all_tests.py ]; then
-            python run_all_tests.py
-          elif [ -f scripts/run_all_tests.py ]; then
-            python scripts/run_all_tests.py
-          else
-            pytest -v
-          fi
+          python -m compileall -q switch_agent campushire-relay scripts tests
+
+      - name: Run Master Verification Suite (96 Tests + 62 Governance Tests)
+        shell: bash
+        env:
+          PYTHONPATH: .
+        run: |
+          python run_all_tests.py
+
+      - name: Run End-to-End Subsystems Verification (13 Subsystems)
+        shell: bash
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/e2e_platform_verify.py

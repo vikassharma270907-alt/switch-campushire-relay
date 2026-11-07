@@ -127,6 +127,7 @@ async def api_pipeline_run():
 
             try:
                 default_out = os.path.join(campushire_root, "outputs")
+                os.makedirs(default_out, exist_ok=True)
                 test_probe = os.path.join(default_out, ".probe")
                 with open(test_probe, "w") as f:
                     f.write("probe")

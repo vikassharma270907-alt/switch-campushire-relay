@@ -21,15 +21,74 @@ else:
 
 import shutil
 
-candidate_bins = [
-    os.path.join(WORKSPACE, "laya-repo", ".venv312", "Scripts", "python.exe"),
-    os.path.join(WORKSPACE, ".venv312", "Scripts", "python.exe"),
-    os.path.join(WORKSPACE, "laya-repo", ".venv", "Scripts", "python.exe"),
-    os.path.join(WORKSPACE, "laya-repo", ".venv", "bin", "python"),
-    shutil.which("python3"),
-    shutil.which("python"),
-]
-PYTHON_EXE = next((p for p in candidate_bins if p and os.path.exists(p)), sys.executable)
+def find_working_python() -> str:
+    candidates = []
+    # If running inside a virtual environment, prefer the current python
+    if sys.prefix != getattr(sys, "base_prefix", sys.prefix):
+        candidates.append(sys.executable)
+
+    # Check local workspace virtual environments
+    for rel_dir in ["laya-repo/.venv312", ".venv312", "laya-repo/.venv", ".venv"]:
+        parts = rel_dir.split("/")
+        candidates.append(os.path.join(WORKSPACE, *parts, "Scripts", "python.exe"))
+        candidates.append(os.path.join(WORKSPACE, *parts, "bin", "python"))
+
+    candidates.extend([
+        sys.executable,
+        shutil.which("python3"),
+        shutil.which("python"),
+    ])
+
+    for cand in candidates:
+        if cand and os.path.isfile(cand):
+            try:
+                probe = subprocess.run([cand, "-c", "import pytest"], capture_output=True, text=True)
+                if probe.returncode == 0:
+                    return cand
+            except Exception:
+                continue
+
+    return sys.executable
+
+PYTHON_EXE = find_working_python()
+
+
+def run_e2e_verification() -> tuple[bool, str, float]:
+    e2e_script = os.path.join(WORKSPACE, "scripts", "e2e_platform_verify.py")
+    if not os.path.isfile(e2e_script):
+        return True, "Skipped: e2e script not found", 0.0
+
+    print("\n=======================================================")
+    print(" ▶ Running: End-to-End Subsystem Verification")
+    print(f"   Script: {e2e_script}")
+    print("=======================================================")
+
+    t0 = time.perf_counter()
+    env = os.environ.copy()
+    env["PYTHONNOUSERSITE"] = "1"
+    base_paths = [WORKSPACE, os.path.join(WORKSPACE, "campushire-relay")]
+    existing = [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p and "Python314" not in p]
+    env["PYTHONPATH"] = os.pathsep.join(base_paths + existing)
+
+    res = subprocess.run(
+        [PYTHON_EXE, e2e_script],
+        cwd=WORKSPACE,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+    duration = time.perf_counter() - t0
+    success = res.returncode == 0
+    output = (res.stdout or "") + (res.stderr or "")
+    status_str = "PASSED" if success else "FAILED"
+    print(f"   Status: {status_str} in {duration:.2f}s")
+    if not success:
+        print(output)
+    else:
+        for line in output.splitlines():
+            if "ALL 13 SUBSYSTEMS VERIFIED" in line or "Ready for Hackathon" in line:
+                print(f"   {line.strip()}")
+    return success, output, duration
 
 
 def run_suite(name: str, args: list[str], cwd: str) -> tuple[bool, str, float]:
@@ -95,6 +154,10 @@ def main() -> int:
         if os.path.isdir(cwd):
             ok, out, dur = run_suite(name, args, cwd)
             results.append((name, ok, dur))
+
+    # Run End-to-End Subsystem Verification
+    ok_e2e, out_e2e, dur_e2e = run_e2e_verification()
+    results.append(("End-to-End Subsystem Verification (13/13 Subsystems)", ok_e2e, dur_e2e))
 
     total_time = time.perf_counter() - start_total
 

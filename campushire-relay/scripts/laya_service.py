@@ -20,9 +20,13 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 try:
     import laya
 except ImportError:
-    repo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "laya-repo")
-    if os.path.isdir(repo_path) and repo_path not in sys.path:
-        sys.path.insert(0, repo_path)
+    for candidate in [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "laya-repo"),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "laya-repo"),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "laya-repo"),
+    ]:
+        if os.path.isdir(candidate) and candidate not in sys.path:
+            sys.path.insert(0, candidate)
     try:
         import laya
     except ImportError:
