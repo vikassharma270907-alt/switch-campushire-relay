@@ -9,11 +9,13 @@
 [![System 1 Engine](https://img.shields.io/badge/System%201-Laya%20Reflex%20(<5ms)-red.svg)](switch_agent/laya_gate.py)
 [![Hackathon Tracks](https://img.shields.io/badge/Target%20Tracks-Track%2001%20%7C%20Track%2002%20%7C%20Wispr%20($4,500)-orange.svg)](https://www.wemakedevs.org/hackathons/switch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Dev.to Blog Post](https://img.shields.io/badge/Dev.to-Published%20Article-0a0a0a?logo=devdotto)](https://dev.to/vikas_sharma_ffe81cb77741/moving-ai-coding-agents-from-isolated-terminals-to-auditable-team-chat-how-we-built-campushire-53me)
 
 > **Bringing autonomous coding agents out of isolated local terminals into collaborative, auditable team chat — fortified by sub-millisecond on-device neural triage, deterministic verification, and atomic execution loops.**
 >
 > 🌐 **Live Vercel Production URL:** [https://switch-campushire-relay.vercel.app/](https://switch-campushire-relay.vercel.app/)  
 > 📊 **Interactive Pitch Deck (9 Slides):** [https://switch-campushire-relay.vercel.app/slides](https://switch-campushire-relay.vercel.app/slides)  
+> 📖 **Published Dev.to Article:** [Moving AI Coding Agents from Isolated Terminals to Auditable Team Chat](https://dev.to/vikas_sharma_ffe81cb77741/moving-ai-coding-agents-from-isolated-terminals-to-auditable-team-chat-how-we-built-campushire-53me)  
 > 🛡️ **Live Health Status:** [https://switch-campushire-relay.vercel.app/healthz](https://switch-campushire-relay.vercel.app/healthz)
 
 ---

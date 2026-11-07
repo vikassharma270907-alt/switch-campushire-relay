@@ -1,7 +1,8 @@
 # Moving AI Coding Agents from Isolated Terminals to Auditable Team Chat: How We Built CampusHire Relay on Switch AI
 
 *Published for the WeMakeDevs × DevTools Academy "Flip the Switch" Hackathon (November 2026)*  
-*Targeting Track 01: Best Business Workflow, Track 02: Best Personal / Creative Workflow, and Side Track: Code with Wispr*
+*Targeting Track 01: Best Business Workflow, Track 02: Best Personal / Creative Workflow, and Side Track: Code with Wispr*  
+*Live Article on Dev.to: [https://dev.to/vikas_sharma_ffe81cb77741/moving-ai-coding-agents-from-isolated-terminals-to-auditable-team-chat-how-we-built-campushire-53me](https://dev.to/vikas_sharma_ffe81cb77741/moving-ai-coding-agents-from-isolated-terminals-to-auditable-team-chat-how-we-built-campushire-53me)*
 
 ---
 
