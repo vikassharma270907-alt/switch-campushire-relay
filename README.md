@@ -186,6 +186,11 @@ http://127.0.0.1:8080/
 .\laya-repo\.venv312\Scripts\python.exe campushire-relay/demo_simulator.py
 ```
 
+### 5. Deployment & Cloud Tunneling
+- **Local & Tunnels**: Run `.\expose_tunnel.bat` or `.\expose_tunnel.ps1` for instant Cloudflare / ngrok public HTTPS endpoints.
+- **Render & Railway**: Turnkey configurations pre-built in `render.yaml`, `Dockerfile`, and `Procfile`.
+- **Full Guide**: See [DEPLOYMENT.md](DEPLOYMENT.md) for full instructions and options comparison.
+
 ---
 
 ## 🧪 Verified Test Suite Summary
