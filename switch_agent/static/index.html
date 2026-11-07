@@ -152,13 +152,13 @@
             --shadow-neon: 0 0 20px rgba(255, 255, 255, 0.25);
         }
 
-        /* Modern Glassmorphic Scrollbars */
-        * {
+        /* Modern Glassmorphic Scrollbars - 100% Elimination of White Scrollbars */
+        html, body, *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             scrollbar-width: thin;
-            scrollbar-color: var(--border-glass) rgba(10, 10, 14, 0.6);
+            scrollbar-color: rgba(0, 240, 255, 0.4) rgba(7, 9, 19, 0.85);
             transition: background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -168,18 +168,30 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(10, 10, 14, 0.6);
-            border-radius: 4px;
+            background: rgba(7, 9, 19, 0.9);
+            border-radius: 9999px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
+            background: linear-gradient(180deg, rgba(0, 240, 255, 0.5), rgba(192, 132, 252, 0.5));
+            border-radius: 9999px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
             transition: background 0.2s ease;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
+            background: linear-gradient(180deg, #00f0ff, #ec4899);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.8);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-button {
+            display: none;
+            width: 0;
+            height: 0;
         }
 
         html, body {
