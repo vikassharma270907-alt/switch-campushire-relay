@@ -25,6 +25,37 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Custom Neon Dark Scrollbars - Strictly No White Scrollbars */
+    html, body, *, *::before, *::after {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 240, 255, 0.4) rgba(7, 9, 19, 0.85);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(7, 9, 19, 0.9);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(0, 240, 255, 0.45), rgba(192, 132, 252, 0.45));
+      border-radius: 9999px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(0, 240, 255, 0.85), rgba(192, 132, 252, 0.85));
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+    }
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-button {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg-dark);
@@ -185,11 +216,11 @@
       position: absolute;
       width: 100%;
       max-width: 1160px;
-      height: calc(100vh - 180px);
+      height: calc(100vh - 170px);
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 2.8rem 3.5rem;
+      padding: clamp(1.4rem, 2.6vh, 2.4rem) clamp(1.6rem, 3vw, 3.2rem);
       display: flex;
       flex-direction: column;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -199,6 +230,23 @@
       pointer-events: none;
       transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
       overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(0, 240, 255, 0.25) transparent;
+    }
+
+    .slide::-webkit-scrollbar {
+      width: 5px;
+    }
+    .slide::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .slide::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.2);
+      border-radius: 9999px;
+    }
+    .slide:hover::-webkit-scrollbar-thumb {
+      background: rgba(0, 240, 255, 0.6);
     }
 
     .slide.active {
@@ -361,6 +409,515 @@
       font-size: 0.75rem;
     }
 
+    /* Google NotebookLM Floating Audio Overview Podcast Player */
+    .podcast-dock {
+      position: fixed;
+      top: 68px;
+      right: 24px;
+      width: 440px;
+      max-width: calc(100vw - 32px);
+      background: rgba(10, 14, 28, 0.94);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 16px;
+      padding: 16px 18px;
+      z-index: 1000;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 240, 255, 0.2);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: podcastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes podcastSlideIn {
+      from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .podcast-dock.open {
+      display: flex;
+    }
+
+    .podcast-dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .podcast-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 9999px;
+      padding: 3px 9px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .podcast-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .podcast-close-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .podcast-hosts {
+      display: flex;
+      gap: 10px;
+    }
+
+    .host-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .host-pill.active {
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.15);
+    }
+
+    .host-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .host-avatar.alex {
+      background: linear-gradient(135deg, #00f0ff, #3b82f6);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    }
+
+    .host-avatar.priya {
+      background: linear-gradient(135deg, #ec4899, #c084fc);
+      box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
+    }
+
+    .host-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .host-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .host-role {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .host-speaking-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .host-pill.active .host-speaking-indicator {
+      opacity: 1;
+      animation: speakPulse 1.2s infinite;
+    }
+    @keyframes speakPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.6); opacity: 0.5; }
+    }
+
+    .podcast-waveform-wrap {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #podcastWaveformCanvas {
+      width: 100%;
+      height: 38px;
+      display: block;
+    }
+
+    .podcast-subtitle-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-left: 3px solid var(--accent);
+      padding: 8px 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.76rem;
+      line-height: 1.4;
+      color: #e2e8f0;
+      min-height: 40px;
+      font-style: italic;
+      transition: all 0.3s;
+    }
+
+    .podcast-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .podcast-play-btn {
+      background: linear-gradient(135deg, #00f0ff, #0284c7);
+      border: none;
+      color: #070913;
+      font-weight: 700;
+      font-size: 0.74rem;
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .podcast-play-btn:hover {
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .podcast-scrubber-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .podcast-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .podcast-progress-track {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .podcast-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00f0ff, #c084fc);
+      border-radius: 9999px;
+      transition: width 0.15s linear;
+    }
+
+    .podcast-speed-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .podcast-speed-btn:hover {
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--accent);
+    }
+
+    /* Magic UI Apple Keynote-Style Floating Slide Dock */
+    .slide-dock {
+      position: fixed;
+      bottom: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(12, 16, 30, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 5px 8px;
+      border-radius: 9999px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.15);
+      z-index: 90;
+      user-select: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 9px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: all 0.22s ease;
+      position: relative;
+    }
+
+    .dock-pill:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .dock-pill.active {
+      color: #070913;
+      background: linear-gradient(135deg, #00f0ff, #38bdf8);
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .dock-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      opacity: 0.85;
+    }
+
+    .dock-name {
+      display: inline;
+    }
+
+    .dock-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: 0 3px;
+    }
+
+    .dock-auto-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      background: rgba(192, 132, 252, 0.12);
+      color: #e9d5ff;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .dock-auto-btn:hover {
+      background: rgba(192, 132, 252, 0.25);
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .dock-auto-btn.active {
+      background: linear-gradient(135deg, rgba(192, 132, 252, 0.4), rgba(236, 72, 153, 0.4));
+      border-color: #c084fc;
+      color: #fff;
+    }
+
+    .auto-timer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background: #00f0ff;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    /* Architecture Packet Flow Simulator on Slide 4 */
+    .arch-sim-container {
+      margin-top: 0.85rem;
+      background: rgba(6, 9, 20, 0.75);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .arch-sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .arch-sim-btn {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(192, 132, 252, 0.2));
+      border: 1px solid var(--accent);
+      color: #fff;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .arch-sim-btn:hover {
+      background: linear-gradient(135deg, #00f0ff, #c084fc);
+      color: #070913;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .arch-nodes-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 0;
+    }
+
+    .arch-node {
+      flex: 1;
+      min-width: 105px;
+      background: rgba(14, 18, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 7px 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .arch-node.active-packet {
+      border-color: #00f0ff;
+      background: rgba(0, 240, 255, 0.18);
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.55);
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .arch-node.completed-packet {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.14);
+    }
+
+    .node-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .node-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .node-sub {
+      font-size: 0.64rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .node-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .arch-node.active-packet .node-status {
+      color: #00f0ff;
+    }
+    .arch-node.completed-packet .node-status {
+      color: #10b981;
+    }
+
+    .arch-connector {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      opacity: 0.35;
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .arch-connector.lit {
+      color: #00f0ff;
+      opacity: 1;
+      filter: drop-shadow(0 0 6px #00f0ff);
+      transform: scale(1.2);
+    }
+
+    .arch-sim-output {
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: #38bdf8;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Media queries adjustments for mobile */
+    @media (max-width: 960px) {
+      .slide-dock {
+        display: none;
+      }
+      .podcast-dock {
+        width: calc(100vw - 24px);
+        right: 12px;
+        top: 56px;
+      }
+    }
+
     /* Progress Footer */
     footer {
       position: relative;
@@ -518,6 +1075,7 @@
       <span id="slideIndicator" style="font-family:'JetBrains Mono'; font-size:0.85rem; color:var(--text-muted); margin-right:4px;">Slide 1 / 9</span>
       <button class="ctrl-btn" onclick="prevSlide()" title="Previous Slide">◀<span class="btn-label"> Prev</span></button>
       <button class="ctrl-btn" onclick="nextSlide()" title="Next Slide"><span class="btn-label">Next </span>▶</button>
+      <button class="ctrl-btn" id="btnPodcast" onclick="togglePodcastPlayer()" title="Google NotebookLM Audio Overview Podcast"><span class="btn-icon">🎙️</span><span class="btn-label"> Podcast</span></button>
       <button class="ctrl-btn" id="btnParticles" onclick="toggleParticles()" title="Toggle Particle Mesh"><span class="btn-icon">✨</span><span class="btn-label"> Particles: ON</span></button>
       <button class="ctrl-btn" id="btnMeteors" onclick="toggleMeteors()" title="Toggle Meteors Shower"><span class="btn-icon">🌠</span><span class="btn-label"> Meteors: ON</span></button>
       <button class="ctrl-btn" id="btnAudio" onclick="toggleAudio()" title="Toggle Sci-Fi Audio"><span class="btn-icon">🔊</span><span class="btn-label"> Audio: ON</span></button>
@@ -527,34 +1085,90 @@
     </div>
   </header>
 
+  <!-- Google NotebookLM Floating Audio Overview Podcast Player -->
+  <div class="podcast-dock" id="podcastDock">
+    <div class="podcast-dock-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="podcast-live-badge">● NOTEBOOKLM PODCAST</span>
+        <span style="font-size:0.72rem; color:var(--text-muted); font-family:'JetBrains Mono';">Deep Dive Debrief (Alex &amp; Priya)</span>
+      </div>
+      <button class="podcast-close-btn" onclick="togglePodcastPlayer()" title="Close Podcast Player">✕</button>
+    </div>
+    <div class="podcast-dock-body" style="display:flex; flex-direction:column; gap:10px;">
+      <div class="podcast-hosts">
+        <div class="host-pill active" id="hostAlex">
+          <div class="host-avatar alex">A</div>
+          <div class="host-info">
+            <span class="host-name">Alex</span>
+            <span class="host-role">Systems Architect</span>
+          </div>
+          <span class="host-speaking-indicator"></span>
+        </div>
+        <div class="host-pill" id="hostPriya">
+          <div class="host-avatar priya">P</div>
+          <div class="host-info">
+            <span class="host-name">Priya</span>
+            <span class="host-role">Placement Lead</span>
+          </div>
+          <span class="host-speaking-indicator"></span>
+        </div>
+      </div>
+      
+      <!-- Live Audio Waveform Canvas -->
+      <div class="podcast-waveform-wrap">
+        <canvas id="podcastWaveformCanvas" width="400" height="38"></canvas>
+      </div>
+
+      <!-- Live Transcript Subtitle -->
+      <div class="podcast-subtitle-box" id="podcastSubtitle">
+        "Welcome to the deep dive on CampusHire Relay! We're breaking down how multi-agent rooms and deterministic math eliminate the all-or-nothing LLM trap."
+      </div>
+
+      <!-- Controls: Play/Pause, Scrubber, Speed -->
+      <div class="podcast-controls">
+        <button class="podcast-play-btn" id="podcastPlayBtn" onclick="togglePodcastPlay()">
+          <span id="podcastPlayIcon">▶</span> <span id="podcastPlayText">Play Briefing</span>
+        </button>
+        <div class="podcast-scrubber-wrap">
+          <span class="podcast-time" id="podcastCurrentTime">00:00</span>
+          <div class="podcast-progress-track" id="podcastTrack" onclick="seekPodcast(event)">
+            <div class="podcast-progress-fill" id="podcastFill" style="width: 0%;"></div>
+          </div>
+          <span class="podcast-time" id="podcastTotalTime">03:45</span>
+        </div>
+        <button class="podcast-speed-btn" id="podcastSpeedBtn" onclick="cyclePodcastSpeed()">1.0x</button>
+      </div>
+    </div>
+  </div>
+
   <div class="viewport">
     <div class="progress-bar" id="progressBar" style="width: 11%;"></div>
 
     <!-- Slide 1: Title Slide -->
     <div class="slide active" id="slide-1">
       <span class="slide-tag">WeMakeDevs × DevTools Academy × Switch AI · Flip the Switch Hackathon 2026</span>
-      <h1 class="slide-title" style="font-size: 3rem; margin-top: 0.5rem;">CampusHire Relay</h1>
-      <p class="slide-subtitle" style="font-size: 1.25rem;">Human-in-the-Loop Multi-Agent Placement & Career Prep on Switch AI</p>
+      <h1 class="slide-title" style="font-size: clamp(1.85rem, 4vh, 2.75rem); margin-top: 0.25rem;">CampusHire Relay</h1>
+      <p class="slide-subtitle" style="font-size: clamp(0.92rem, 1.7vh, 1.15rem); margin-top: 0.2rem;">Human-in-the-Loop Multi-Agent Placement &amp; Career Prep on Switch AI</p>
       
-      <div class="grid-3" style="margin-top: 1rem;">
-        <div class="card" style="border-top: 3px solid var(--accent);">
-          <span class="highlight-blue" style="font-size: 1.2rem;">Track 01: Business</span>
+      <div class="grid-3" style="margin-top: clamp(0.5rem, 1.4vh, 0.9rem);">
+        <div class="card" style="border-top: 3px solid var(--accent); padding: clamp(0.75rem, 1.6vh, 1rem);">
+          <span class="highlight-blue" style="font-size: 1.1rem;">Track 01: Business</span>
           <p><strong>$2,000 Cash Target</strong></p>
           <p>Automates placement cell operations, notice parsing, deterministic student auditing, and operations pack assembly.</p>
         </div>
-        <div class="card" style="border-top: 3px solid var(--accent-purple);">
-          <span class="highlight-purple" style="font-size: 1.2rem;">Track 02: Personal</span>
+        <div class="card" style="border-top: 3px solid var(--accent-purple); padding: clamp(0.75rem, 1.6vh, 1rem);">
+          <span class="highlight-purple" style="font-size: 1.1rem;">Track 02: Personal</span>
           <p><strong>$2,000 Cash Target</strong></p>
           <p>Context-quarantined student prep kits, company-specific roadmaps, and voice STAR mock interview practice.</p>
         </div>
-        <div class="card" style="border-top: 3px solid var(--accent-green);">
-          <span class="highlight-green" style="font-size: 1.2rem;">Side Track: Wispr Flow</span>
+        <div class="card" style="border-top: 3px solid var(--accent-green); padding: clamp(0.75rem, 1.6vh, 1rem);">
+          <span class="highlight-green" style="font-size: 1.1rem;">Side Track: Wispr Flow</span>
           <p><strong>$500 Cash Target</strong></p>
           <p>Hands-free voice coordinator approval gates and real-time sub-50ms spoken interview evaluation via Laya System-1.</p>
         </div>
       </div>
 
-      <div style="margin-top: 2rem; display: flex; gap: 16px; align-items: center; font-size: 0.85rem; color: var(--text-muted);">
+      <div style="margin-top: clamp(0.6rem, 1.8vh, 1.25rem); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 0.8rem; color: var(--text-muted);">
         <span>● Multi-Agent Rooms</span>
         <span>● Sub-5ms Neural Reflex</span>
         <span>● Zero-LLM Math</span>
@@ -649,6 +1263,58 @@
         <div class="card">
           <h3>Console Templates</h3>
           <p>Packaged as <code>campus-hire.template.yaml</code> for one-click deployment across Mattermost, Slack, Discord, and Teams.</p>
+        </div>
+      </div>
+
+      <!-- Architecture Packet Flow Simulator -->
+      <div class="arch-sim-container">
+        <div class="arch-sim-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#00f0ff; box-shadow:0 0 8px #00f0ff;"></span>
+            <strong style="color:var(--accent); font-size:0.78rem; font-family:'JetBrains Mono';">LIVE EXECUTION PIPELINE SIMULATOR</strong>
+          </div>
+          <button class="arch-sim-btn" onclick="runArchitectureSimulation()" id="btnArchSim">
+            ⚡ Fire Trace Packet
+          </button>
+        </div>
+        <div class="arch-nodes-grid">
+          <div class="arch-node" id="simNode1">
+            <div class="node-badge">STAGE 1</div>
+            <div class="node-title">Notice Ingestion</div>
+            <div class="node-sub">PDF OCR &amp; Text</div>
+            <div class="node-status" id="simStatus1">READY</div>
+          </div>
+          <div class="arch-connector" id="simConn1">➔</div>
+          <div class="arch-node" id="simNode2">
+            <div class="node-badge">STAGE 2</div>
+            <div class="node-title">Laya Reflex</div>
+            <div class="node-sub">&lt;5ms Guardrail</div>
+            <div class="node-status" id="simStatus2">IDLE</div>
+          </div>
+          <div class="arch-connector" id="simConn2">➔</div>
+          <div class="arch-node" id="simNode3">
+            <div class="node-badge">STAGE 3</div>
+            <div class="node-title">Switch Room</div>
+            <div class="node-sub">@coord &amp; @auditor</div>
+            <div class="node-status" id="simStatus3">IDLE</div>
+          </div>
+          <div class="arch-connector" id="simConn3">➔</div>
+          <div class="arch-node" id="simNode4">
+            <div class="node-badge">STAGE 4</div>
+            <div class="node-title">Python Math</div>
+            <div class="node-sub">0% Hallucination</div>
+            <div class="node-status" id="simStatus4">IDLE</div>
+          </div>
+          <div class="arch-connector" id="simConn4">➔</div>
+          <div class="arch-node" id="simNode5">
+            <div class="node-badge">STAGE 5</div>
+            <div class="node-title">ArmorIQ Ledger</div>
+            <div class="node-sub">HMAC SHA-256</div>
+            <div class="node-status" id="simStatus5">IDLE</div>
+          </div>
+        </div>
+        <div class="arch-sim-output" id="simOutput">
+          System idle. Click "⚡ Fire Trace Packet" to simulate real-time packet trajectory across the Switch AI bus.
         </div>
       </div>
     </div>
@@ -805,6 +1471,43 @@
         $ python run_all_tests.py<br>
         <span style="color:var(--accent-green);">🎉 Final Verdict: ALL TEST SUITES PASSED (100% GREEN) in 28.66s 🎉</span>
       </div>
+    </div>
+
+    <!-- Magic UI Floating Keynote Slide Dock -->
+    <div class="slide-dock" id="slideDock">
+      <div class="dock-pill active" onclick="goToSlide(1)" data-slide="1" title="01 Overview">
+        <span class="dock-num">01</span><span class="dock-name">Overview</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(2)" data-slide="2" title="02 Crisis">
+        <span class="dock-num">02</span><span class="dock-name">Crisis</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(3)" data-slide="3" title="03 Dual-System Solution">
+        <span class="dock-num">03</span><span class="dock-name">Solution</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(4)" data-slide="4" title="04 Switch Architecture">
+        <span class="dock-num">04</span><span class="dock-name">Switch AI</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(5)" data-slide="5" title="05 Audit Math Engine">
+        <span class="dock-num">05</span><span class="dock-name">Audit Math</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(6)" data-slide="6" title="06 Prep Studio">
+        <span class="dock-num">06</span><span class="dock-name">Prep Studio</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(7)" data-slide="7" title="07 Tech Stack">
+        <span class="dock-num">07</span><span class="dock-name">Tech Stack</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(8)" data-slide="8" title="08 ACL Rubric">
+        <span class="dock-num">08</span><span class="dock-name">ACL Rubric</span>
+      </div>
+      <div class="dock-pill" onclick="goToSlide(9)" data-slide="9" title="09 158 Tests">
+        <span class="dock-num">09</span><span class="dock-name">158 Tests</span>
+      </div>
+      <div class="dock-divider"></div>
+      <button class="dock-auto-btn" id="btnAutoPitch" onclick="toggleAutoPitch()" title="Auto-advance slides every 12 seconds">
+        <span class="auto-icon">⏱️</span>
+        <span class="auto-text" id="autoPitchText">Auto-Pitch</span>
+        <div class="auto-timer-bar" id="autoTimerBar"></div>
+      </button>
     </div>
   </div>
 
@@ -964,6 +1667,7 @@
       document.getElementById('progressBar').style.width = `${(n / totalSlides) * 100}%`;
       currentSlide = n;
       updateDots(n);
+      updateSlideDock(n);
 
       if (n !== prevIndex) {
         playSlideSound(direction === 'next');
@@ -1253,11 +1957,365 @@
       }
     }, { passive: true });
 
+    // --- Magic UI Slide Dock Synchronization ---
+    function updateSlideDock(n) {
+      document.querySelectorAll('.dock-pill').forEach(pill => {
+        const slideNum = parseInt(pill.getAttribute('data-slide'));
+        if (slideNum === n) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      });
+    }
+
+    function goToSlide(n) {
+      if (n >= 1 && n <= totalSlides) {
+        showSlide(n, n >= currentSlide ? 'next' : 'prev');
+      }
+    }
+
+    // --- Keynote Auto-Pitch (12s timer) ---
+    let autoPitchActive = false;
+    let autoPitchInterval = null;
+    let autoPitchTimer = 0;
+    const autoPitchDuration = 12; // seconds
+
+    function toggleAutoPitch() {
+      autoPitchActive = !autoPitchActive;
+      const btn = document.getElementById('btnAutoPitch');
+      const text = document.getElementById('autoPitchText');
+      const bar = document.getElementById('autoTimerBar');
+
+      if (autoPitchActive) {
+        if (btn) btn.classList.add('active');
+        if (text) text.textContent = 'Pitching (12s)';
+        autoPitchTimer = 0;
+        if (autoPitchInterval) clearInterval(autoPitchInterval);
+        autoPitchInterval = setInterval(() => {
+          autoPitchTimer += 0.1;
+          const pct = Math.min(100, (autoPitchTimer / autoPitchDuration) * 100);
+          if (bar) bar.style.width = `${pct}%`;
+          if (autoPitchTimer >= autoPitchDuration) {
+            autoPitchTimer = 0;
+            if (bar) bar.style.width = '0%';
+            nextSlide();
+          }
+        }, 100);
+      } else {
+        if (btn) btn.classList.remove('active');
+        if (text) text.textContent = 'Auto-Pitch';
+        if (bar) bar.style.width = '0%';
+        if (autoPitchInterval) {
+          clearInterval(autoPitchInterval);
+          autoPitchInterval = null;
+        }
+      }
+    }
+
+    // --- Google NotebookLM Audio Overview Player ---
+    let podcastOpen = false;
+    let podcastPlaying = false;
+    let podcastSpeed = 1.0;
+    let podcastProgress = 0;
+    const podcastDuration = 225; // 3m 45s
+    let podcastInterval = null;
+    let podcastSynthOsc = null;
+    let podcastSynthGain = null;
+
+    const podcastTranscript = [
+      { speaker: 'alex', text: "Welcome to this deep dive debrief on CampusHire Relay. Today we're looking at why traditional coding agents fail at campus placements." },
+      { speaker: 'priya', text: "Right, Alex! In placement cells, an all-or-nothing LLM trying to filter CGPAs hallucinated cutoffs and created legal liability." },
+      { speaker: 'alex', text: "Exactly. CampusHire Relay splits the workload: Laya reflex runs sub-5ms screening on CPU, while Python runs 100% deterministic math." },
+      { speaker: 'priya', text: "And coordinators maintain total governance with cryptographic HMAC SHA-256 receipts, ensuring zero student exclusion errors." },
+      { speaker: 'alex', text: "Plus candidates get personalized STAR interview preparation powered by Wispr Flow and NotebookLM audio summaries. Truly production-grade!" }
+    ];
+
+    function togglePodcastPlayer() {
+      podcastOpen = !podcastOpen;
+      const dock = document.getElementById('podcastDock');
+      const btn = document.getElementById('btnPodcast');
+      if (dock) {
+        if (podcastOpen) {
+          dock.classList.add('open');
+          initPodcastWaveform();
+          if (btn) btn.style.borderColor = 'var(--accent)';
+        } else {
+          dock.classList.remove('open');
+          if (btn) btn.style.borderColor = '';
+        }
+      }
+    }
+
+    function togglePodcastPlay() {
+      podcastPlaying = !podcastPlaying;
+      const playIcon = document.getElementById('podcastPlayIcon');
+      const playText = document.getElementById('podcastPlayText');
+
+      if (podcastPlaying) {
+        if (playIcon) playIcon.textContent = '⏸';
+        if (playText) playText.textContent = 'Pause';
+        startPodcastAudioBed();
+        startPodcastLoop();
+      } else {
+        if (playIcon) playIcon.textContent = '▶';
+        if (playText) playText.textContent = 'Play Briefing';
+        stopPodcastAudioBed();
+        if (podcastInterval) {
+          clearInterval(podcastInterval);
+          podcastInterval = null;
+        }
+      }
+    }
+
+    function cyclePodcastSpeed() {
+      const speeds = [1.0, 1.25, 1.5, 2.0];
+      const idx = speeds.indexOf(podcastSpeed);
+      podcastSpeed = speeds[(idx + 1) % speeds.length];
+      const btn = document.getElementById('podcastSpeedBtn');
+      if (btn) btn.textContent = `${podcastSpeed.toFixed(1)}x`;
+      if (podcastPlaying) {
+        clearInterval(podcastInterval);
+        startPodcastLoop();
+      }
+    }
+
+    function seekPodcast(e) {
+      const track = document.getElementById('podcastTrack');
+      if (!track) return;
+      const rect = track.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const pct = Math.max(0, Math.min(1, clickX / rect.width));
+      podcastProgress = pct * podcastDuration;
+      updatePodcastUI();
+    }
+
+    function startPodcastLoop() {
+      if (podcastInterval) clearInterval(podcastInterval);
+      const stepMs = 250;
+      podcastInterval = setInterval(() => {
+        podcastProgress += (stepMs / 1000) * podcastSpeed;
+        if (podcastProgress >= podcastDuration) {
+          podcastProgress = 0;
+          togglePodcastPlay();
+          return;
+        }
+        updatePodcastUI();
+      }, stepMs);
+    }
+
+    function updatePodcastUI() {
+      const fill = document.getElementById('podcastFill');
+      const timeEl = document.getElementById('podcastCurrentTime');
+      const subEl = document.getElementById('podcastSubtitle');
+      const hostAlex = document.getElementById('hostAlex');
+      const hostPriya = document.getElementById('hostPriya');
+
+      const pct = (podcastProgress / podcastDuration) * 100;
+      if (fill) fill.style.width = `${pct}%`;
+
+      const mins = Math.floor(podcastProgress / 60);
+      const secs = Math.floor(podcastProgress % 60);
+      if (timeEl) timeEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+      // Cycle dialogue lines based on timeline
+      const lineIndex = Math.floor((podcastProgress / podcastDuration) * podcastTranscript.length) % podcastTranscript.length;
+      const currentLine = podcastTranscript[lineIndex];
+
+      if (subEl && subEl.getAttribute('data-index') !== String(lineIndex)) {
+        subEl.setAttribute('data-index', String(lineIndex));
+        subEl.textContent = `"${currentLine.text}"`;
+      }
+
+      if (currentLine.speaker === 'alex') {
+        if (hostAlex) hostAlex.classList.add('active');
+        if (hostPriya) hostPriya.classList.remove('active');
+      } else {
+        if (hostPriya) hostPriya.classList.add('active');
+        if (hostAlex) hostAlex.classList.remove('active');
+      }
+    }
+
+    function startPodcastAudioBed() {
+      if (!audioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        podcastSynthOsc = ctx.createOscillator();
+        podcastSynthGain = ctx.createGain();
+        podcastSynthOsc.type = 'sine';
+        podcastSynthOsc.frequency.setValueAtTime(130.81, now); // C3 warm tone
+        podcastSynthGain.gain.setValueAtTime(0.001, now);
+        podcastSynthGain.gain.exponentialRampToValueAtTime(0.025, now + 0.5);
+        podcastSynthOsc.connect(podcastSynthGain);
+        podcastSynthGain.connect(ctx.destination);
+        podcastSynthOsc.start(now);
+      } catch (e) {}
+    }
+
+    function stopPodcastAudioBed() {
+      try {
+        if (podcastSynthGain && audioCtx) {
+          podcastSynthGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          setTimeout(() => {
+            if (podcastSynthOsc) {
+              podcastSynthOsc.stop();
+              podcastSynthOsc.disconnect();
+              podcastSynthOsc = null;
+            }
+          }, 350);
+        }
+      } catch (e) {}
+    }
+
+    function initPodcastWaveform() {
+      const canvas = document.getElementById('podcastWaveformCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const barCount = 38;
+
+      function renderWave() {
+        if (!podcastOpen) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / barCount) - 3;
+
+        for (let i = 0; i < barCount; i++) {
+          const heightFactor = podcastPlaying
+            ? Math.sin(Date.now() * 0.008 + i * 0.4) * 0.4 + 0.5 + Math.random() * 0.2
+            : 0.15;
+          const barHeight = Math.max(3, heightFactor * (canvas.height - 6));
+          const x = i * (barWidth + 3);
+          const y = (canvas.height - barHeight) / 2;
+
+          const grad = ctx.createLinearGradient(0, y, 0, y + barHeight);
+          grad.addColorStop(0, '#00f0ff');
+          grad.addColorStop(1, '#c084fc');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect ? ctx.roundRect(x, y, barWidth, barHeight, 2) : ctx.fillRect(x, y, barWidth, barHeight);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(renderWave);
+      }
+      renderWave();
+    }
+
+    // --- Slide 4: Interactive Architecture Simulator ---
+    let simRunning = false;
+    function runArchitectureSimulation() {
+      if (simRunning) return;
+      simRunning = true;
+      const btn = document.getElementById('btnArchSim');
+      const out = document.getElementById('simOutput');
+      if (btn) btn.disabled = true;
+
+      const stages = [
+        { node: 'simNode1', conn: 'simConn1', status: 'simStatus1', name: 'STAGE 1: Ingesting Notice PDF', time: '1.2ms' },
+        { node: 'simNode2', conn: 'simConn2', status: 'simStatus2', name: 'STAGE 2: Laya Reflex Pre-Screening (<5ms)', time: '2.8ms' },
+        { node: 'simNode3', conn: 'simConn3', status: 'simStatus3', name: 'STAGE 3: Switch AI Room Message Bus RLS', time: '4.1ms' },
+        { node: 'simNode4', conn: 'simConn4', status: 'simStatus4', name: 'STAGE 4: Deterministic Python Math Audit', time: '5.9ms' },
+        { node: 'simNode5', conn: null,       status: 'simStatus5', name: 'STAGE 5: HMAC SHA-256 Receipt Sealed', time: '6.4ms' }
+      ];
+
+      // Reset
+      stages.forEach(s => {
+        const node = document.getElementById(s.node);
+        const stat = document.getElementById(s.status);
+        if (node) { node.classList.remove('active-packet', 'completed-packet'); }
+        if (stat) stat.textContent = 'WAITING';
+        if (s.conn) {
+          const conn = document.getElementById(s.conn);
+          if (conn) conn.classList.remove('lit');
+        }
+      });
+
+      let step = 0;
+      function nextStep() {
+        if (step > 0) {
+          const prev = stages[step - 1];
+          const prevNode = document.getElementById(prev.node);
+          const prevStat = document.getElementById(prev.status);
+          if (prevNode) {
+            prevNode.classList.remove('active-packet');
+            prevNode.classList.add('completed-packet');
+          }
+          if (prevStat) prevStat.textContent = `DONE [${prev.time}]`;
+        }
+
+        if (step < stages.length) {
+          const curr = stages[step];
+          const currNode = document.getElementById(curr.node);
+          const currStat = document.getElementById(curr.status);
+          if (currNode) currNode.classList.add('active-packet');
+          if (currStat) currStat.textContent = 'PROCESSING...';
+          if (curr.conn) {
+            const conn = document.getElementById(curr.conn);
+            if (conn) conn.classList.add('lit');
+          }
+          if (out) out.textContent = `⚡ [ACTIVE] ${curr.name} -> Latency: ${curr.time}`;
+
+          // Play subtle sci-fi frequency blip
+          if (audioEnabled) {
+            try {
+              const ctx = getAudioContext();
+              if (ctx) {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500 + step * 160, ctx.currentTime);
+                gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+              }
+            } catch (e) {}
+          }
+
+          step++;
+          setTimeout(nextStep, 550);
+        } else {
+          // Simulation complete
+          if (out) {
+            out.innerHTML = '<span style="color:#10b981;">✔ VERIFIED PIPELINE:</span> Packet verified in 6.4ms · Zero LLM Math Drift · HMAC Merkle <code>0x8f2a...c710</code> sealed!';
+          }
+          if (btn) btn.disabled = false;
+          simRunning = false;
+        }
+      }
+
+      nextStep();
+    }
+
+    // --- 3D Perspective Tilt on All Cards ---
+    function initCardTilt() {
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = ((y - centerY) / centerY) * -5;
+          const rotateY = ((x - centerX) / centerX) * 5;
+          card.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-3px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0)';
+        });
+      });
+    }
+
     // Bootstrap Presentation
     window.addEventListener('DOMContentLoaded', () => {
       initDots();
       initAmbientMesh();
       initMeteors();
+      initCardTilt();
       const firstTitle = document.querySelector('#slide-1 .slide-title');
       if (firstTitle) decryptText(firstTitle);
     });
