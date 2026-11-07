@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusHire Relay & SwitchGuard | Official 3-Minute Video Demo</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+    .brand span.tag {
+      background: var(--accent-glow);
+      color: #818cf8;
+      border: 1px solid #4f46e5;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .nav-links {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: #1f2937;
+      color: #f3f4f6;
+      border: 1px solid #374151;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #374151;
+      border-color: #4b5563;
+    }
+    .btn-primary {
+      background: var(--accent);
+      border-color: #4f46e5;
+    }
+    .btn-primary:hover {
+      background: #4f46e5;
+    }
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .video-hero {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    video {
+      width: 100%;
+      max-height: 640px;
+      background: #000;
+      display: block;
+    }
+    .video-info {
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .video-title h1 {
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+    .video-title p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .chapters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      gap: 12px;
+    }
+    .chapter-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    }
+    .chapter-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #818cf8;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      height: fit-content;
+      white-space: nowrap;
+    }
+    .chapter-details h3 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .chapter-details p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span>🎬 CampusHire Relay</span>
+      <span class="tag">Timed 3-Min Demo</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="btn">🚀 War Room</a>
+      <a href="/slides" class="btn">📊 Slide Deck</a>
+      <a href="/static/demo_video.mp4" download="campushire_relay_demo_3min.mp4" class="btn btn-primary">⬇️ Download MP4 (1080p)</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="video-hero">
+      <video id="player" controls playsinline poster="/static/scene1_frame.png">
+        <source src="/static/demo_video.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+      <div class="video-info">
+        <div class="video-title">
+          <h1>CampusHire Relay & SwitchGuard — 3-Minute Walkthrough</h1>
+          <p>Duration: <strong>2m 58s (178s)</strong> · 1080p High Definition · Microsoft Neural Voice & Wispr Flow</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <a href="/static/demo_video.mp4" download="campushire_relay_demo_3min.mp4" class="btn btn-primary">⬇️ Download Video</a>
+          <button class="btn" onclick="player.requestFullscreen()">⛶ Fullscreen</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="font-size: 1.25rem; margin-bottom: 1rem;">📑 Scene Chapters & Storyboard Breakdown</h2>
+      <div class="chapters-grid">
+        <div class="chapter-card" onclick="seekTo(0)">
+          <div class="chapter-time">0:00</div>
+          <div class="chapter-details">
+            <h3>1. The Problem: Terminal Isolation & Math Trap</h3>
+            <p>Why terminal agents fail in teams and pure LLMs hallucinate floating-point GPA audits.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(30)">
+          <div class="chapter-time">0:30</div>
+          <div class="chapter-details">
+            <h3>2. Switch Architecture & Laya Reflex Gate</h3>
+            <p>Sub-millisecond on-device neural triage (<1ms, 0 tokens) and Switch PostgreSQL message bus.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(56)">
+          <div class="chapter-time">0:56</div>
+          <div class="chapter-details">
+            <h3>3. Notice Ingestion & Communicative Dehallucination</h3>
+            <p>ChatDev principles in action: parsing criteria into drive_brief.json and halting for sign-off.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(80)">
+          <div class="chapter-time">1:20</div>
+          <div class="chapter-details">
+            <h3>4. Human Approval Gate & Wispr Voice Dictation</h3>
+            <p>Placement coordinator dictates approval hands-free at 112 WPM with 99.4% speech accuracy.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(104)">
+          <div class="chapter-time">1:44</div>
+          <div class="chapter-details">
+            <h3>5. Deterministic Math Audit & SHA-256 Receipt</h3>
+            <p>validate_eligibility.py classifies students with zero hallucination & seals Merkle leaf.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(133)">
+          <div class="chapter-time">2:13</div>
+          <div class="chapter-details">
+            <h3>6. Operations Pack & Track 02 Student Prep</h3>
+            <p>Attendance CSV, draft announcements, personal prep kits, and spoken STAR mock scoring.</p>
+          </div>
+        </div>
+
+        <div class="chapter-card" onclick="seekTo(155)">
+          <div class="chapter-time">2:35</div>
+          <div class="chapter-details">
+            <h3>7. Reproducibility & 167 Passing Tests</h3>
+            <p>167/167 tests 100% green, Strix red-team badge, and live Vercel production deployment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>CampusHire Relay & SwitchGuard · WeMakeDevs × DevTools Academy × Switch AI Hackathon 2026</p>
+  </footer>
+
+  <script>
+    const player = document.getElementById('player');
+    function seekTo(seconds) {
+      player.currentTime = seconds;
+      player.play();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ import subprocess
 sys.modules["switch_agent.server.subprocess"] = subprocess
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import CONFIG
@@ -62,6 +63,8 @@ app.include_router(ui_router)
 app.include_router(notebooklm_router)
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -83,6 +86,17 @@ async def serve_slides():
         with open(slides_file, "r", encoding="utf-8") as f:
             return f.read()
     return "<h1>Pitch Deck Slides Not Found</h1>"
+
+
+@app.get("/video", response_class=HTMLResponse)
+@app.get("/demo-video", response_class=HTMLResponse)
+async def serve_video():
+    """Serves the 3-minute video demo showcase page."""
+    video_html = os.path.join(STATIC_DIR, "video.html")
+    if os.path.exists(video_html):
+        with open(video_html, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>Video Demo Page Not Found</h1>"
 
 
 # Backward compatibility re-exports
