@@ -41,9 +41,13 @@ start_switch_agent.bat
 
 ---
 
-## Strategy 2: Local + Public HTTPS Tunnel (Zero-Cost Webhooks)
+## Strategy 2: Local + Public HTTPS Tunnel (Connecting to Switch Console)
 
-When configuring agents in the **Switch AI Cloud Console** (`https://console.switchagents.ai/`), Switch AI's servers send HTTP POST webhooks to your agent. Since Switch AI cannot reach `http://127.0.0.1:8080` behind your local NAT/router, you can create an instant public HTTPS tunnel.
+When configuring agents in the **Switch Desktop Console** ([sandbox-quantum/switch](https://github.com/sandbox-quantum/switch)) or integrating external chat platform webhooks (Slack, Discord, Mattermost), your agent endpoint needs to be reached:
+
+- **Inside the Switch Desktop App on the same machine**: You can directly point to:
+  `http://localhost:8080/agent`
+- **If Switch or your chat webhooks run remotely**: You can create an instant public HTTPS tunnel.
 
 ### Launch Tunnel
 Run the included launcher:
@@ -65,10 +69,10 @@ The script automatically detects and launches one of the following:
    ```
    *Generates*: `https://<id>.ngrok-free.app`
 
-### Switch AI Console Configuration
-In the Switch AI Developer Console:
-- **Agent URL**: `https://<your-tunnel-url>/agent`
-- **Webhook URL**: `https://<your-tunnel-url>/api/campushire/events`
+### Switch Agent Configuration
+In the **Switch Console** ([GitHub Releases](https://github.com/sandbox-quantum/switch/releases)):
+- **Agent URL**: `http://localhost:8080/agent` (or `https://<your-tunnel-url>/agent`)
+- **Webhook Events URL**: `http://localhost:8080/api/campushire/events` (or `https://<your-tunnel-url>/api/campushire/events`)
 
 ---
 

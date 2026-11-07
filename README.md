@@ -3,7 +3,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Automated Test Suite](https://img.shields.io/badge/pytest-158%2F158%20passed%20(100%25)-brightgreen.svg)](tests/)
-[![Switch AI Protocol](https://img.shields.io/badge/Switch%20Console-v0.31+-purple.svg)](https://docs.switchagents.ai/)
+[![Switch Open Source](https://img.shields.io/badge/Switch%20Console-v0.31+-purple.svg)](https://github.com/sandbox-quantum/switch)
 [![System 1 Engine](https://img.shields.io/badge/System%201-Laya%20Reflex%20(<5ms)-red.svg)](switch_agent/laya_gate.py)
 [![Hackathon Tracks](https://img.shields.io/badge/Target%20Tracks-Track%2001%20%7C%20Track%2002%20%7C%20Wispr%20($4,500)-orange.svg)](https://www.wemakedevs.org/hackathons/switch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
