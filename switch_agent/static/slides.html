@@ -382,6 +382,125 @@
       transition: width 0.3s ease;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
     }
+
+    /* Responsive Media Queries for Mobile, Tablet, and Desktop */
+    @media (max-width: 960px) {
+      header {
+        padding: 0.6rem 0.85rem;
+        gap: 6px;
+      }
+      .brand {
+        font-size: 0.95rem;
+        gap: 6px;
+      }
+      .brand .aurora-text {
+        font-size: 0.95rem !important;
+        max-width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .badge {
+        font-size: 0.68rem;
+        padding: 2px 6px;
+      }
+      .nav-controls {
+        gap: 3px;
+      }
+      .ctrl-btn {
+        padding: 5px 8px;
+        font-size: 0.74rem;
+      }
+      .btn-label {
+        display: none;
+      }
+      #slideIndicator {
+        font-size: 0.74rem;
+        margin-right: 2px;
+      }
+      .viewport {
+        padding: 0.65rem;
+      }
+      .slide {
+        height: calc(100vh - 120px);
+        padding: 1.25rem 1.15rem;
+        border-radius: 12px;
+        max-width: 100%;
+        width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .slide-tag {
+        font-size: 0.7rem;
+        margin-bottom: 4px;
+      }
+      .slide-title {
+        font-size: clamp(1.4rem, 5vw, 2.2rem) !important;
+        margin-bottom: 6px;
+        line-height: 1.2;
+      }
+      .slide-subtitle {
+        font-size: 0.88rem !important;
+        margin-bottom: 1rem;
+        line-height: 1.35;
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .card {
+        padding: 0.9rem;
+        gap: 6px;
+      }
+      .card h3 {
+        font-size: 0.95rem;
+      }
+      .card p, .card li {
+        font-size: 0.82rem;
+      }
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        display: block;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        margin-top: 6px;
+      }
+      table {
+        min-width: 540px;
+        font-size: 0.72rem;
+      }
+      th, td {
+        padding: 6px 8px;
+      }
+      footer {
+        padding: 0.5rem 0.85rem;
+        font-size: 0.72rem;
+      }
+      .footer-title {
+        display: none;
+      }
+      .footer-hint-desktop {
+        display: none;
+      }
+      .footer-hint-mobile {
+        display: inline;
+      }
+    }
+
+    @media (min-width: 961px) {
+      .footer-hint-mobile {
+        display: none;
+      }
+      .footer-hint-desktop {
+        display: inline;
+      }
+      .table-responsive {
+        width: 100%;
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
@@ -396,15 +515,15 @@
       <span class="aurora-text" style="font-weight:800; font-size:1.1rem;">CampusHire Relay & SwitchGuard</span>
     </div>
     <div class="nav-controls">
-      <span id="slideIndicator" style="font-family:'JetBrains Mono'; font-size:0.85rem; color:var(--text-muted); margin-right:8px;">Slide 1 / 9</span>
-      <button class="ctrl-btn" onclick="prevSlide()">◀ Prev</button>
-      <button class="ctrl-btn" onclick="nextSlide()">Next ▶</button>
-      <button class="ctrl-btn" id="btnParticles" onclick="toggleParticles()">✨ Particles: ON</button>
-      <button class="ctrl-btn" id="btnMeteors" onclick="toggleMeteors()">🌠 Meteors: ON</button>
-      <button class="ctrl-btn" id="btnAudio" onclick="toggleAudio()">🔊 Audio: ON</button>
-      <button class="ctrl-btn" onclick="fireSlideConfetti()" style="background:rgba(210,153,34,0.2); border-color:var(--accent-amber); color:#f0f6fc;">🎉 Confetti</button>
-      <button class="ctrl-btn" onclick="toggleFullScreen()">⛶ Fullscreen</button>
-      <a href="/" class="ctrl-btn" style="text-decoration:none; color:var(--accent);">🚀 War Room</a>
+      <span id="slideIndicator" style="font-family:'JetBrains Mono'; font-size:0.85rem; color:var(--text-muted); margin-right:4px;">Slide 1 / 9</span>
+      <button class="ctrl-btn" onclick="prevSlide()" title="Previous Slide">◀<span class="btn-label"> Prev</span></button>
+      <button class="ctrl-btn" onclick="nextSlide()" title="Next Slide"><span class="btn-label">Next </span>▶</button>
+      <button class="ctrl-btn" id="btnParticles" onclick="toggleParticles()" title="Toggle Particle Mesh"><span class="btn-icon">✨</span><span class="btn-label"> Particles: ON</span></button>
+      <button class="ctrl-btn" id="btnMeteors" onclick="toggleMeteors()" title="Toggle Meteors Shower"><span class="btn-icon">🌠</span><span class="btn-label"> Meteors: ON</span></button>
+      <button class="ctrl-btn" id="btnAudio" onclick="toggleAudio()" title="Toggle Sci-Fi Audio"><span class="btn-icon">🔊</span><span class="btn-label"> Audio: ON</span></button>
+      <button class="ctrl-btn" onclick="fireSlideConfetti()" style="background:rgba(210,153,34,0.2); border-color:var(--accent-amber); color:#f0f6fc;" title="Celebration Confetti"><span class="btn-icon">🎉</span><span class="btn-label"> Confetti</span></button>
+      <button class="ctrl-btn" onclick="toggleFullScreen()" title="Toggle Fullscreen"><span class="btn-icon">⛶</span><span class="btn-label"> Fullscreen</span></button>
+      <a href="/" class="ctrl-btn" style="text-decoration:none; color:var(--accent);" title="Return to Collaborative War Room"><span class="btn-icon">🚀</span><span class="btn-label"> War Room</span></a>
     </div>
   </header>
 
@@ -540,6 +659,7 @@
       <h2 class="slide-title">Deterministic Python Math & Synthetic Student Benchmark</h2>
       <p class="slide-subtitle">Eliminating LLM floating-point errors through strict mathematical auditing.</p>
 
+      <div class="table-responsive">
       <table>
         <thead>
           <tr>
@@ -562,6 +682,7 @@
           <tr><td>22CS50</td><td>CSE</td><td>9.10</td><td>0</td><td class="highlight-red">2026</td><td class="highlight-red">INELIGIBLE</td><td>Batch Year Mismatch (2026 != 2027)</td></tr>
         </tbody>
       </table>
+      </div>
 
       <div style="margin-top: 1.5rem; background: rgba(0,0,0,0.4); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem;">
         🔐 <strong>SHA-256 Cryptographic Receipt Digest:</strong> <code>c9a81f3e7b02d458e...</code> (Generated in 0.02s)
@@ -689,10 +810,13 @@
 
   <footer>
     <div style="display:flex; align-items:center; gap:16px;">
-      <span>CampusHire Relay · WeMakeDevs × DevTools Academy × Switch AI</span>
+      <span class="footer-title">CampusHire Relay · WeMakeDevs × DevTools Academy × Switch AI</span>
       <div class="slide-dots-bar" id="slideDotsBar"></div>
     </div>
-    <div>Use <strong>◀ / ▶ Arrow Keys</strong>, <strong>Spacebar</strong>, or <strong>1–9</strong> · Press <strong>F</strong> for Fullscreen</div>
+    <div>
+      <span class="footer-hint-desktop">Use <strong>◀ / ▶ Arrow Keys</strong>, <strong>Spacebar</strong>, or <strong>1–9</strong> · Press <strong>F</strong> for Fullscreen</span>
+      <span class="footer-hint-mobile">Swipe <strong>◀ / ▶</strong> or tap dots to navigate</span>
+    </div>
   </footer>
 
   <script>
@@ -1103,6 +1227,31 @@
         showSlide(parseInt(e.key), parseInt(e.key) >= currentSlide ? 'next' : 'prev');
       }
     });
+
+    // Touch Swipe Navigation for Mobile / Tablet
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].clientX;
+      touchEndY = e.changedTouches[0].clientY;
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+        if (diffX < 0) {
+          nextSlide();
+        } else {
+          prevSlide();
+        }
+      }
+    }, { passive: true });
 
     // Bootstrap Presentation
     window.addEventListener('DOMContentLoaded', () => {
