@@ -400,14 +400,38 @@ def get_hall_pass(student_id: str = FPath(..., description="Roll Number")) -> Di
     seat_no = f"Hall-A Seat A-{seat_num:02d}"
     token = compute_admit_token(norm_id, seat_no, company)
 
+    # Check candidate eligibility against active criteria
+    is_eligible = True
+    ineligible_reasons = []
+    if room.active_criteria:
+        if cand.cgpa < room.active_criteria.min_cgpa:
+            is_eligible = False
+            ineligible_reasons.append(f"CGPA {cand.cgpa:.2f} < Min {room.active_criteria.min_cgpa:.2f}")
+        if cand.active_backlogs > room.active_criteria.max_active_backlogs:
+            is_eligible = False
+            ineligible_reasons.append(f"{cand.active_backlogs} active backlogs (max {room.active_criteria.max_active_backlogs})")
+        if cand.branch.upper() not in [b.upper() for b in room.active_criteria.eligible_branches]:
+            is_eligible = False
+            ineligible_reasons.append(f"Branch {cand.branch} not in {room.active_criteria.eligible_branches}")
+        if cand.batch_year != room.active_criteria.batch_year:
+            is_eligible = False
+            ineligible_reasons.append(f"Batch {cand.batch_year} != {room.active_criteria.batch_year}")
+
     return {
         "student_id": cand.roll_no,
         "name": cand.name,
+        "student_name": cand.name,
+        "branch": cand.branch,
+        "cgpa": cand.cgpa,
         "company": company,
-        "seat_no": seat_no,
-        "admit_token": token,
-        "status": "VERIFIED_ELIGIBLE",
-        "qr_payload": f"CAMPUSHIRE:{norm_id}:{seat_no}:{token}",
+        "seat_no": seat_no if is_eligible else "Not Allocated",
+        "venue": seat_no if is_eligible else "Not Allocated",
+        "admit_token": token if is_eligible else "N/A - FAILED CRITERIA CHECK",
+        "token": token if is_eligible else "N/A - FAILED CRITERIA CHECK",
+        "status": "VERIFIED_ELIGIBLE" if is_eligible else "INELIGIBLE",
+        "is_eligible": is_eligible,
+        "ineligible_reasons": ineligible_reasons,
+        "qr_payload": f"CAMPUSHIRE:{norm_id}:{seat_no}:{token}" if is_eligible else "",
     }
 
 
